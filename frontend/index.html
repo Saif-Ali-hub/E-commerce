@@ -60,9 +60,12 @@
             class="search-input"
             placeholder="Search products by title, category, or keyword..."
             aria-label="Search products by title, category, or keyword"
+            autocomplete="off"
           />
           <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search" aria-label="Clear search">✕</button>
         </div>
+        <!-- Autocomplete Suggestions Dropdown -->
+        <div class="search-suggestions-dropdown" id="search-suggestions-dropdown" style="display: none;" role="listbox" aria-label="Product suggestions"></div>
       </div>
 
       <div class="nav-actions">

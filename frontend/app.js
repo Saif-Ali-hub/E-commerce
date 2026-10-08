@@ -62,6 +62,8 @@ const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
 const categorySelect = document.getElementById('category-select');
 const resetFiltersBtn = document.getElementById('reset-filters-btn');
+const navSearchWrap = document.getElementById('nav-search-wrap');
+const searchSuggestionsDropdown = document.getElementById('search-suggestions-dropdown');
 
 // DOM Elements - Product Details Modal
 const productModal = document.getElementById('product-modal');
@@ -3761,22 +3763,227 @@ if (themeToggleBtn) {
 if (refreshBtn) refreshBtn.addEventListener('click', () => fetchProducts(currentPage));
 if (retryBtn) retryBtn.addEventListener('click', () => fetchProducts(currentPage));
 
+// ============================================================
+// Search Autocomplete & Suggestions
+// ============================================================
+let suggestionDebounceTimer = null;
+let activeSuggestionIndex = -1;
+let currentSuggestionsList = [];
+let latestSuggestionRequestId = 0;
+
+function closeSuggestionsDropdown() {
+  if (!searchSuggestionsDropdown) return;
+  searchSuggestionsDropdown.style.display = 'none';
+  searchSuggestionsDropdown.innerHTML = '';
+  currentSuggestionsList = [];
+  activeSuggestionIndex = -1;
+}
+
+function highlightMatch(text, query) {
+  if (!text) return '';
+  if (!query || !query.trim()) return escapeHtml(text);
+  const escapedQuery = query.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  const safeText = escapeHtml(text);
+  return safeText.replace(new RegExp(`(${escapedQuery})`, 'gi'), '<span class="suggestion-highlight">$1</span>');
+}
+
+function renderSuggestionsDropdown(suggestions, query) {
+  if (!searchSuggestionsDropdown) return;
+
+  if (!suggestions || suggestions.length === 0) {
+    closeSuggestionsDropdown();
+    return;
+  }
+
+  currentSuggestionsList = suggestions;
+  activeSuggestionIndex = -1;
+
+  let html = '<ul class="suggestions-list" role="listbox">';
+  suggestions.forEach((item, index) => {
+    const highlightedName = highlightMatch(item.name, query);
+    const categoryLabel = item.category ? escapeHtml(item.category) : '';
+    const priceLabel = item.price ? `₹${item.price.toLocaleString('en-IN')}` : '';
+
+    html += `
+      <li class="suggestion-item" role="option" id="suggestion-item-${index}" data-index="${index}" data-name="${escapeHtml(item.name)}">
+        <div class="suggestion-left">
+          <span class="suggestion-icon" aria-hidden="true">🔍</span>
+          <span class="suggestion-name">${highlightedName}</span>
+        </div>
+        <div class="suggestion-right">
+          ${categoryLabel ? `<span class="suggestion-category">${categoryLabel}</span>` : ''}
+          ${priceLabel ? `<span class="suggestion-price">${priceLabel}</span>` : ''}
+        </div>
+      </li>
+    `;
+  });
+  html += '</ul>';
+
+  html += `
+    <div class="suggestions-footer">
+      <span>${suggestions.length} ${suggestions.length === 1 ? 'match' : 'matches'} found</span>
+      <div class="suggestions-footer-keys">
+        <span class="suggestions-key-badge">↑↓</span> navigate
+        <span class="suggestions-key-badge">↵</span> select
+        <span class="suggestions-key-badge">esc</span> dismiss
+      </div>
+    </div>
+  `;
+
+  searchSuggestionsDropdown.innerHTML = html;
+  searchSuggestionsDropdown.style.display = 'block';
+
+  // Attach hover and click listeners to suggestion items
+  const items = searchSuggestionsDropdown.querySelectorAll('.suggestion-item');
+  items.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const selectedName = item.dataset.name;
+      selectSuggestion(selectedName);
+    });
+
+    item.addEventListener('mouseenter', () => {
+      const idx = parseInt(item.dataset.index, 10);
+      activeSuggestionIndex = idx;
+      updateHighlightedSuggestion();
+    });
+  });
+}
+
+function updateHighlightedSuggestion() {
+  if (!searchSuggestionsDropdown) return;
+  const items = searchSuggestionsDropdown.querySelectorAll('.suggestion-item');
+  items.forEach((item, idx) => {
+    const isSelected = idx === activeSuggestionIndex;
+    item.classList.toggle('is-selected', isSelected);
+    item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    if (isSelected) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  });
+}
+
+function selectSuggestion(fullName) {
+  if (!fullName) return;
+  if (searchInput) {
+    searchInput.value = fullName;
+    searchInput.focus();
+  }
+  currentSearchTerm = fullName;
+  if (clearSearchBtn) {
+    clearSearchBtn.style.display = 'block';
+  }
+  closeSuggestionsDropdown();
+  clearTimeout(searchDebounceTimeout);
+  applyFiltersAndRender(true);
+}
+
+async function fetchSuggestions(query) {
+  if (!query || query.trim().length < 2) {
+    closeSuggestionsDropdown();
+    return;
+  }
+
+  const currentRequestId = ++latestSuggestionRequestId;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/suggestions?q=${encodeURIComponent(query.trim())}`);
+
+    // Discard response if a newer request was dispatched
+    if (currentRequestId !== latestSuggestionRequestId) {
+      return;
+    }
+
+    if (!response.ok) {
+      closeSuggestionsDropdown();
+      return;
+    }
+
+    const result = await response.json();
+
+    // Verify search input still matches query before rendering
+    if (!searchInput || searchInput.value.trim().length < 2) {
+      closeSuggestionsDropdown();
+      return;
+    }
+
+    if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+      renderSuggestionsDropdown(result.data, query);
+    } else {
+      closeSuggestionsDropdown();
+    }
+  } catch (error) {
+    console.debug('Autocomplete fetch error:', error);
+    if (currentRequestId === latestSuggestionRequestId) {
+      closeSuggestionsDropdown();
+    }
+  }
+}
+
 // Search
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     currentSearchTerm = e.target.value;
+    const query = currentSearchTerm.trim();
     clearSearchBtn.style.display = currentSearchTerm ? 'block' : 'none';
+
+    // 1. Debounced catalog search
     clearTimeout(searchDebounceTimeout);
     searchDebounceTimeout = setTimeout(() => {
       applyFiltersAndRender(true);
     }, 250);
+
+    // 2. Debounced autocomplete suggestions (minimum 2 characters)
+    clearTimeout(suggestionDebounceTimer);
+    if (query.length < 2) {
+      closeSuggestionsDropdown();
+    } else {
+      suggestionDebounceTimer = setTimeout(() => {
+        fetchSuggestions(query);
+      }, 250);
+    }
   });
 
   searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    const isDropdownVisible = searchSuggestionsDropdown && searchSuggestionsDropdown.style.display === 'block';
+
+    if (e.key === 'ArrowDown') {
+      if (isDropdownVisible && currentSuggestionsList.length > 0) {
+        e.preventDefault();
+        activeSuggestionIndex = (activeSuggestionIndex + 1) % currentSuggestionsList.length;
+        updateHighlightedSuggestion();
+        return;
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (isDropdownVisible && currentSuggestionsList.length > 0) {
+        e.preventDefault();
+        if (activeSuggestionIndex <= 0) {
+          activeSuggestionIndex = currentSuggestionsList.length - 1;
+        } else {
+          activeSuggestionIndex--;
+        }
+        updateHighlightedSuggestion();
+        return;
+      }
+    } else if (e.key === 'Enter') {
+      if (isDropdownVisible && activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestionsList.length) {
+        e.preventDefault();
+        const selected = currentSuggestionsList[activeSuggestionIndex];
+        selectSuggestion(selected.name);
+        return;
+      }
+      // Otherwise trigger normal Enter key search
       e.preventDefault();
+      closeSuggestionsDropdown();
       clearTimeout(searchDebounceTimeout);
       applyFiltersAndRender(true);
+      return;
+    } else if (e.key === 'Escape') {
+      if (isDropdownVisible) {
+        e.preventDefault();
+        closeSuggestionsDropdown();
+        return;
+      }
     }
   });
 }
@@ -3784,6 +3991,8 @@ if (searchInput) {
 if (clearSearchBtn) {
   clearSearchBtn.addEventListener('click', () => {
     clearTimeout(searchDebounceTimeout);
+    clearTimeout(suggestionDebounceTimer);
+    closeSuggestionsDropdown();
     searchInput.value = '';
     currentSearchTerm = '';
     clearSearchBtn.style.display = 'none';
@@ -3791,6 +4000,13 @@ if (clearSearchBtn) {
     searchInput.focus();
   });
 }
+
+// Close suggestions dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (navSearchWrap && !navSearchWrap.contains(e.target)) {
+    closeSuggestionsDropdown();
+  }
+});
 
 // Category filter
 if (categorySelect) {
@@ -4242,6 +4458,7 @@ if (registerForm) {
 // Global Keyboard (Escape closes active modal)
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    closeSuggestionsDropdown();
     closeProfileDropdown();
     if (profileModal && profileModal.style.display === 'flex') closeProfileModal();
     if (addressModal && addressModal.style.display === 'flex') closeAddressModal();

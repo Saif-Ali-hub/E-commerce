@@ -21,20 +21,146 @@ const recalculateProductRating = (product) => {
 };
 
 // ============================================================
-// 1. GET /api/products - Retrieve all products
+// 1. GET /api/products - Retrieve products (with server-side pagination, category, and search)
 // ============================================================
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const { page, limit, category, search, all } = req.query;
+
+    const filter = {};
+
+    // Category filter
+    if (category && category.trim() !== '' && category.toLowerCase() !== 'all') {
+      const escapedCat = category.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+      filter.category = new RegExp('^' + escapedCat + '$', 'i');
+    }
+
+    // Search filter
+    if (search && search.trim() !== '') {
+      const escapedSearch = search.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+      const searchRegex = new RegExp(escapedSearch, 'i');
+      const searchConditions = [
+        { name: searchRegex },
+        { description: searchRegex }
+      ];
+      if (!filter.category) {
+        searchConditions.push({ category: searchRegex });
+      }
+      filter.$or = searchConditions;
+    }
+
+    // Determine pagination: enabled if page/limit/category/search specified and all !== 'true'
+    const hasPaginationOrFilter = page !== undefined || limit !== undefined || category !== undefined || search !== undefined;
+    const isPaginated = hasPaginationOrFilter && all !== 'true';
+
+    const totalProducts = await Product.countDocuments(filter);
+
+    let products;
+    let pageNum = 1;
+    let limitNum = 12;
+
+    if (isPaginated) {
+      pageNum = Math.max(1, parseInt(page, 10) || 1);
+      limitNum = Math.max(1, parseInt(limit, 10) || 12);
+      const skip = (pageNum - 1) * limitNum;
+
+      products = await Product.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum);
+    } else {
+      pageNum = 1;
+      limitNum = totalProducts || 1;
+      products = await Product.find(filter).sort({ createdAt: -1 });
+    }
+
+    const totalPages = Math.max(1, Math.ceil(totalProducts / limitNum));
+    const allCategories = await Product.distinct('category');
+
     res.status(200).json({
       success: true,
       count: products.length,
-      data: products
+      data: products,
+      products: products,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        totalProducts: totalProducts,
+        totalPages: totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPreviousPage: pageNum > 1
+      },
+      categories: allCategories.filter(Boolean).sort()
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve products',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 1b. GET /api/products/categories - Distinct categories list
+// ============================================================
+router.get('/categories', async (req, res) => {
+  try {
+    const categories = await Product.distinct('category');
+    res.status(200).json({
+      success: true,
+      data: categories.filter(Boolean).sort()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve categories',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 1c. GET /api/products/suggestions - Lightweight search suggestions
+// ============================================================
+router.get('/suggestions', async (req, res) => {
+  try {
+    const query = (req.query.q || req.query.search || '').trim();
+
+    // Do nothing / return empty array for 0 or 1 character
+    if (!query || query.length < 2) {
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        data: []
+      });
+    }
+
+    // Escape regex special characters safely
+    const escapedQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    const nameRegex = new RegExp(escapedQuery, 'i');
+
+    // Query MongoDB dynamically on product name, return minimal fields, limit to 10
+    const matchingProducts = await Product.find({ name: nameRegex })
+      .select('name category price image')
+      .limit(10)
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: matchingProducts.length,
+      data: matchingProducts.map((p) => ({
+        id: p._id,
+        name: p.name,
+        category: p.category,
+        price: p.price,
+        image: p.image
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve product suggestions',
       error: error.message
     });
   }
