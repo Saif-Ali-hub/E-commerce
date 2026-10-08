@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore quality products at MiniStore. Clean, fast, and modern e-commerce catalog.">
+  <title>MiniStore | Explore Our Catalog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- Top Utility Announcement Bar -->
+  <div class="top-announcement-bar" id="top-announcement-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <span class="announcement-pill">🚚 FREE DELIVERY</span>
+        <span class="announcement-text">Pan-India express shipping on all orders over ₹499</span>
+      </div>
+      <div class="top-bar-right">
+        <span class="top-bar-feature">✓ 100% Certified Authentic</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">✓ 7-Day Easy Returns</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">✓ Direct INR Pricing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar" id="main-header">
+    <div class="container navbar-inner">
+      <a href="#" class="brand" id="brand-logo" aria-label="MiniStore Home">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">MiniStore</span>
+      </a>
+
+      <!-- Central Commercial Search Bar -->
+      <div class="nav-search-wrap" id="nav-search-wrap">
+        <div class="search-input-wrap">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="Search products by title, category, or keyword..."
+            aria-label="Search products by title, category, or keyword"
+          />
+          <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search" aria-label="Clear search">✕</button>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-sm" id="nav-orders-btn" style="display: none;" aria-label="View My Orders">
+          <span class="nav-btn-icon">📦</span>
+          <span class="nav-btn-label">My Orders</span>
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="nav-addresses-btn" style="display: none;" aria-label="Manage Addresses">
+          <span class="nav-btn-icon">📍</span>
+          <span class="nav-btn-label">Addresses</span>
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="nav-admin-btn" style="display: none;" aria-label="Admin Dashboard">
+          <span class="nav-btn-icon">🛡️</span>
+          <span class="nav-btn-label">Admin Panel</span>
+        </button>
+
+        <div id="auth-nav-cluster" class="auth-nav-cluster">
+          <button class="btn btn-secondary btn-sm" id="nav-login-btn">
+            <span class="nav-btn-icon">👤</span>
+            <span class="nav-btn-label">Log In</span>
+          </button>
+          <div id="nav-user-info" style="display: none;" class="nav-user-info">
+            <span class="user-greeting" id="nav-user-name">User</span>
+            <button class="btn btn-secondary btn-sm nav-logout-btn" id="nav-logout-btn">Log Out</button>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary btn-sm wishlist-nav-btn" id="nav-wishlist-btn" aria-label="View Wishlist">
+          <span class="nav-btn-icon">❤️</span>
+          <span class="nav-btn-label">Wishlist</span>
+          <span class="nav-badge-pill" id="wishlist-nav-badge">0</span>
+        </button>
+
+        <button class="btn btn-primary btn-sm cart-nav-btn" id="nav-cart-btn" aria-label="Shopping Cart">
+          <span class="nav-btn-icon">🛒</span>
+          <span class="nav-btn-label">Cart</span>
+          <span class="nav-badge-pill" id="cart-nav-badge">0</span>
+        </button>
+
+        <button class="btn btn-secondary btn-sm theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">
+          <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
+          <span class="theme-toggle-label" id="theme-toggle-label">Dark</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="hero-banner">
+    <div class="hero-backdrop" aria-hidden="true">
+      <!-- Background E-Commerce Sliding Carousel -->
+      <div class="hero-slider" id="hero-slider">
+        <div class="hero-slide active" data-index="0">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80" alt="E-commerce Fashion & Storefront" class="hero-slide-img" loading="eager" />
+        </div>
+        <div class="hero-slide" data-index="1">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&auto=format&fit=crop&q=80" alt="Electronics & Audio Gear" class="hero-slide-img" loading="lazy" />
+        </div>
+        <div class="hero-slide" data-index="2">
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1600&auto=format&fit=crop&q=80" alt="Watches & Minimalist Accessories" class="hero-slide-img" loading="lazy" />
+        </div>
+        <div class="hero-slide" data-index="3">
+          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&auto=format&fit=crop&q=80" alt="Sneakers & Lifestyle Shoes" class="hero-slide-img" loading="lazy" />
+        </div>
+        <div class="hero-slide" data-index="4">
+          <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1600&auto=format&fit=crop&q=80" alt="Tech Gadgets & Workspace" class="hero-slide-img" loading="lazy" />
+        </div>
+      </div>
+      <div class="hero-slider-overlay"></div>
+    </div>
+
+    <div class="container hero-container">
+      <!-- Center Hero Content with Synchronized Information Slider -->
+      <div class="hero-content" id="hero-interactive-panel" tabindex="0" role="region" aria-label="Featured Categories and Store Highlights Slider">
+        <div class="hero-info-track" id="hero-info-track">
+          <!-- Slide 1: Curated Fashion & Everyday Essentials -->
+          <div class="hero-info-slide active" data-index="0">
+            <span class="hero-badge"><span class="badge-sparkle">✨</span> New Arrivals 2026</span>
+            <h1 class="hero-title">Curated Essentials for Everyday Living</h1>
+            <p class="hero-subtitle">Discover premium apparel, durable canvas totes, and artisan crafted accessories curated for timeless daily style.</p>
+            <div class="hero-slide-highlights">
+              <span class="hero-highlight-pill">🏷️ Direct INR Pricing</span>
+              <span class="hero-highlight-pill">🧵 100% Quality Inspected</span>
+              <span class="hero-highlight-pill">⭐ 4.9 Buyer Rating</span>
+            </div>
+            <div class="hero-slide-cta-row">
+              <button class="btn btn-primary hero-slide-cta-btn" data-category="all" type="button">
+                <span>Explore Catalog</span>
+                <span class="cta-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Slide 2: Studio Audio & Electronics -->
+          <div class="hero-info-slide" data-index="1">
+            <span class="hero-badge badge-indigo"><span class="badge-sparkle">🎧</span> Studio Electronics</span>
+            <h2 class="hero-title">Immersive Acoustics &amp; Wireless Freedom</h2>
+            <p class="hero-subtitle">Studio-calibrated active noise cancellation, deep punchy bass, and 40-hour battery life for uninterrupted sound.</p>
+            <div class="hero-slide-highlights">
+              <span class="hero-highlight-pill">🔋 40-Hour Battery</span>
+              <span class="hero-highlight-pill">⚡ Fast USB-C Charge</span>
+              <span class="hero-highlight-pill">🛡️ 1-Year Warranty</span>
+            </div>
+            <div class="hero-slide-cta-row">
+              <button class="btn btn-primary hero-slide-cta-btn" data-category="Electronics" type="button">
+                <span>Shop Electronics</span>
+                <span class="cta-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Slide 3: Precision Watches & Smart Gear -->
+          <div class="hero-info-slide" data-index="2">
+            <span class="hero-badge badge-amber"><span class="badge-sparkle">⌚</span> Precision Timepieces</span>
+            <h2 class="hero-title">Timeless Luxury Built for Every Moment</h2>
+            <p class="hero-subtitle">Smart health tracking, sapphire-coated crystal, and 5ATM water resistance crafted for understated elegance.</p>
+            <div class="hero-slide-highlights">
+              <span class="hero-highlight-pill">💎 Sapphire Glass</span>
+              <span class="hero-highlight-pill">💧 5ATM Waterproof</span>
+              <span class="hero-highlight-pill">✨ 100% Certified Brand</span>
+            </div>
+            <div class="hero-slide-cta-row">
+              <button class="btn btn-primary hero-slide-cta-btn" data-category="Electronics" type="button">
+                <span>View Wearables</span>
+                <span class="cta-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Slide 4: Active Footwear & Sneakers -->
+          <div class="hero-info-slide" data-index="3">
+            <span class="hero-badge badge-emerald"><span class="badge-sparkle">👟</span> Active Performance</span>
+            <h2 class="hero-title">Engineered Footwear for Daily Comfort</h2>
+            <p class="hero-subtitle">Ultralight responsive foam cushioning and breathable knit construction designed for workouts and urban commutes.</p>
+            <div class="hero-slide-highlights">
+              <span class="hero-highlight-pill">☁️ Cloud-Foam Soles</span>
+              <span class="hero-highlight-pill">⚡ Ultralight Breathable</span>
+              <span class="hero-highlight-pill">🚚 Free Express Delivery</span>
+            </div>
+            <div class="hero-slide-cta-row">
+              <button class="btn btn-primary hero-slide-cta-btn" data-category="Sports" type="button">
+                <span>Shop Footwear</span>
+                <span class="cta-arrow">→</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Slide 5: Workspace & Tech Accessories -->
+          <div class="hero-info-slide" data-index="4">
+            <span class="hero-badge badge-purple"><span class="badge-sparkle">⚡</span> Productivity Gear</span>
+            <h2 class="hero-title">Elevate Your Modern Desk Setup</h2>
+            <p class="hero-subtitle">Tactile mechanical keyboards, ergonomic accessories, and smart workspace essentials to supercharge daily focus.</p>
+            <div class="hero-slide-highlights">
+              <span class="hero-highlight-pill">⌨️ Tactile Switches</span>
+              <span class="hero-highlight-pill">🔌 Fast Passthrough</span>
+              <span class="hero-highlight-pill">📦 Dispatched in &lt; 4 Hours</span>
+            </div>
+            <div class="hero-slide-cta-row">
+              <button class="btn btn-primary hero-slide-cta-btn" data-category="Electronics" type="button">
+                <span>Upgrade Your Setup</span>
+                <span class="cta-arrow">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide Indicator Dots -->
+      <div class="hero-slider-indicators" id="hero-slider-indicators" role="tablist" aria-label="Hero background slide controls">
+        <div class="hero-slider-dots-group">
+          <button class="hero-slider-dot active" data-index="0" aria-label="Slide 1: Curated Essentials" role="tab" aria-selected="true"></button>
+          <button class="hero-slider-dot" data-index="1" aria-label="Slide 2: Studio Audio" role="tab" aria-selected="false"></button>
+          <button class="hero-slider-dot" data-index="2" aria-label="Slide 3: Watches &amp; Wearables" role="tab" aria-selected="false"></button>
+          <button class="hero-slider-dot" data-index="3" aria-label="Slide 4: Active Footwear" role="tab" aria-selected="false"></button>
+          <button class="hero-slider-dot" data-index="4" aria-label="Slide 5: Productivity Gear" role="tab" aria-selected="false"></button>
+        </div>
+        <span class="hero-slider-counter" id="hero-slider-counter" aria-hidden="true">1 / 5</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dedicated Commercial Trust & Value Proposition Bar -->
+  <section class="trust-features-section" id="trust-features-section" aria-label="Customer Guarantees and Store Highlights">
+    <div class="container trust-features-container">
+      <div class="hero-trust-grid" aria-label="Why Shop With Us">
+        <!-- Feature 1: Free Express Delivery -->
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our free express delivery" data-feature="shipping">
+          <div class="trust-card-icon icon-indigo">🚚</div>
+          <div class="trust-card-text">
+            <span class="trust-card-title">Free Express Delivery</span>
+            <span class="trust-card-desc">Orders over ₹499</span>
+          </div>
+          <span class="feature-hint" aria-hidden="true">ℹ️</span>
+
+          <!-- Popover Details -->
+          <div class="feature-popover popover-center" role="tooltip">
+            <div class="popover-header">
+              <span class="popover-tag tag-indigo">🚚 Pan-India Shipping</span>
+              <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
+            </div>
+            <h4 class="popover-title">Swift Express Shipping</h4>
+            <p class="popover-desc">Enjoy zero delivery fees on all orders above ₹499. Dispatched with tier-1 logistics partners for prompt, insured doorstep arrival in 2-4 days.</p>
+            <div class="popover-badges">
+              <span class="popover-badge-pill">✓ Zero Shipping &gt; ₹499</span>
+              <span class="popover-badge-pill">✓ Insured &amp; Tamper-Proof</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2: Same-Day Dispatch -->
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our same-day dispatch service" data-feature="dispatch">
+          <div class="trust-card-icon icon-emerald">⚡</div>
+          <div class="trust-card-text">
+            <span class="trust-card-title">Same-Day Dispatch</span>
+            <span class="trust-card-desc">Orders before 2 PM</span>
+          </div>
+          <span class="feature-hint" aria-hidden="true">ℹ️</span>
+
+          <!-- Popover Details -->
+          <div class="feature-popover popover-center" role="tooltip">
+            <div class="popover-header">
+              <span class="popover-tag tag-emerald">⚡ Superfast Fulfillment</span>
+              <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
+            </div>
+            <h4 class="popover-title">Lightning Fulfillment</h4>
+            <p class="popover-desc">Orders placed before 2:00 PM are rapidly inspected, carefully packaged, and handed over to express couriers on the exact same business day.</p>
+            <div class="popover-badges">
+              <span class="popover-badge-pill">✓ Dispatched in &lt; 4 Hours</span>
+              <span class="popover-badge-pill">✓ Live Tracking Updates</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3: 100% Genuine Quality -->
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our genuine quality assurance" data-feature="quality">
+          <div class="trust-card-icon icon-blue">🛡️</div>
+          <div class="trust-card-text">
+            <span class="trust-card-title">100% Genuine Quality</span>
+            <span class="trust-card-desc">7-Day easy returns</span>
+          </div>
+          <span class="feature-hint" aria-hidden="true">ℹ️</span>
+
+          <!-- Popover Details -->
+          <div class="feature-popover popover-center" role="tooltip">
+            <div class="popover-header">
+              <span class="popover-tag tag-emerald">🛡️ Peace of Mind</span>
+              <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
+            </div>
+            <h4 class="popover-title">Authentic &amp; Certified</h4>
+            <p class="popover-desc">Every product is directly sourced from certified manufacturers and passes strict multi-point inspection to ensure unbeatable quality.</p>
+            <div class="popover-badges">
+              <span class="popover-badge-pill">✓ 7-Day Easy Returns</span>
+              <span class="popover-badge-pill">✓ 100% Original Brand</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 4: Buyer Rating -->
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our customer satisfaction rating" data-feature="rating">
+          <div class="trust-card-icon icon-amber">⭐</div>
+          <div class="trust-card-text">
+            <span class="trust-card-title">4.9 / 5 Star Rating</span>
+            <span class="trust-card-desc">2,400+ Verified buyers</span>
+          </div>
+          <span class="feature-hint" aria-hidden="true">ℹ️</span>
+
+          <!-- Popover Details -->
+          <div class="feature-popover popover-center" role="tooltip">
+            <div class="popover-header">
+              <span class="popover-tag tag-amber">⭐ 100% Satisfaction</span>
+              <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
+            </div>
+            <h4 class="popover-title">Top Rated E-Commerce</h4>
+            <p class="popover-desc">We are the best rated E-commerce business with 100% satisfaction of our valuable customers. Every review is authentic from real verified buyers across the nation.</p>
+            <div class="popover-badges">
+              <span class="popover-badge-pill">✓ 4.9 / 5 Star Rating</span>
+              <span class="popover-badge-pill">✓ 2,400+ Verified Buyers</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 5: Transparent INR Deals -->
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our exclusive INR deals" data-feature="deals">
+          <div class="trust-card-icon icon-amber">🏷️</div>
+          <div class="trust-card-text">
+            <span class="trust-card-title">Exclusive INR Pricing</span>
+            <span class="trust-card-desc">No hidden checkout fees</span>
+          </div>
+          <span class="feature-hint" aria-hidden="true">ℹ️</span>
+
+          <!-- Popover Details -->
+          <div class="feature-popover popover-center" role="tooltip">
+            <div class="popover-header">
+              <span class="popover-tag tag-amber">🏷️ Fair Pricing</span>
+              <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
+            </div>
+            <h4 class="popover-title">Transparent INR Pricing</h4>
+            <p class="popover-desc">All prices are strictly listed in Indian Rupees (₹) with zero currency conversion markups or surprise checkout fees. Best value directly from verified suppliers.</p>
+            <div class="popover-badges">
+              <span class="popover-badge-pill">✓ All-Inclusive in ₹</span>
+              <span class="popover-badge-pill">✓ Direct Brand Rates</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 6: Handpicked Quality -->
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our handpicked quality items" data-feature="curated">
+          <div class="trust-card-icon icon-indigo">💎</div>
+          <div class="trust-card-text">
+            <span class="trust-card-title">Curated Quality</span>
+            <span class="trust-card-desc">Handpicked essentials</span>
+          </div>
+          <span class="feature-hint" aria-hidden="true">ℹ️</span>
+
+          <!-- Popover Details -->
+          <div class="feature-popover popover-center" role="tooltip">
+            <div class="popover-header">
+              <span class="popover-tag tag-indigo">💎 Premium Standard</span>
+              <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
+            </div>
+            <h4 class="popover-title">Curated With Passion</h4>
+            <p class="popover-desc">We filter out thousands of low-grade items to showcase only essentials crafted for everyday style, exceptional endurance, and long-lasting daily utility.</p>
+            <div class="popover-badges">
+              <span class="popover-badge-pill">✓ Premium Craftsmanship</span>
+              <span class="popover-badge-pill">✓ Multi-stage Testing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Section -->
+  <main class="container main-content" id="products-section">
+    <!-- Header with count and refresh -->
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <h2 class="section-title">All Products</h2>
+        <span class="product-badge" id="product-count">0 items</span>
+      </div>
+      <div class="section-actions-wrap">
+        <button class="btn btn-secondary" id="refresh-btn" title="Refresh catalog">
+          ↻ Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Filter Controls -->
+    <div class="filter-controls reveal-on-scroll" id="filter-controls">
+      <div class="category-select-wrap">
+        <span class="filter-label-icon" aria-hidden="true">📁</span>
+        <label for="category-select" class="filter-label">Category:</label>
+        <select id="category-select" class="category-select" aria-label="Filter products by category">
+          <option value="all">All Categories</option>
+          <!-- Dynamically populated from API products data -->
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading State with Skeleton Shimmer -->
+    <div class="loading-state-container" id="loading-state">
+      <div class="loading-header-banner">
+        <div class="spinner"></div>
+        <p class="state-text">Fetching products from catalog...</p>
+      </div>
+      <div class="skeleton-grid" aria-hidden="true">
+        <div class="skeleton-card">
+          <div class="skeleton-media shimmer"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-badge shimmer"></div>
+            <div class="skeleton-line shimmer title"></div>
+            <div class="skeleton-line shimmer desc"></div>
+            <div class="skeleton-line shimmer desc-short"></div>
+            <div class="skeleton-footer">
+              <div class="skeleton-line shimmer price"></div>
+              <div class="skeleton-btn shimmer"></div>
+            </div>
+          </div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-media shimmer"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-badge shimmer"></div>
+            <div class="skeleton-line shimmer title"></div>
+            <div class="skeleton-line shimmer desc"></div>
+            <div class="skeleton-line shimmer desc-short"></div>
+            <div class="skeleton-footer">
+              <div class="skeleton-line shimmer price"></div>
+              <div class="skeleton-btn shimmer"></div>
+            </div>
+          </div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-media shimmer"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-badge shimmer"></div>
+            <div class="skeleton-line shimmer title"></div>
+            <div class="skeleton-line shimmer desc"></div>
+            <div class="skeleton-line shimmer desc-short"></div>
+            <div class="skeleton-footer">
+              <div class="skeleton-line shimmer price"></div>
+              <div class="skeleton-btn shimmer"></div>
+            </div>
+          </div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-media shimmer"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-badge shimmer"></div>
+            <div class="skeleton-line shimmer title"></div>
+            <div class="skeleton-line shimmer desc"></div>
+            <div class="skeleton-line shimmer desc-short"></div>
+            <div class="skeleton-footer">
+              <div class="skeleton-line shimmer price"></div>
+              <div class="skeleton-btn shimmer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="state-container error-state" id="error-state" style="display: none;">
+      <div class="error-icon">⚠️</div>
+      <h3 class="error-title">Unable to Load Products</h3>
+      <p class="state-text" id="error-message">Could not connect to the backend API. Please make sure the server is running.</p>
+      <button class="btn btn-primary" id="retry-btn">Try Again</button>
+    </div>
+
+    <!-- Empty Catalog State (0 products in database) -->
+    <div class="state-container empty-state" id="empty-state" style="display: none;">
+      <div class="empty-icon">📦</div>
+      <h3 class="empty-title">Catalog is Empty</h3>
+      <p class="state-text">No products are currently available in the store.</p>
+    </div>
+
+    <!-- Empty Search/Filter State -->
+    <div class="state-container empty-filter-state" id="empty-filter-state" style="display: none;">
+      <div class="empty-icon">🔎</div>
+      <h3 class="empty-title">No Matching Products</h3>
+      <p class="state-text" id="empty-filter-text">No products matched your search or category filter.</p>
+      <button class="btn btn-secondary" id="reset-filters-btn">Clear All Filters</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" id="products-grid" style="display: none;">
+      <!-- Product cards injected dynamically by app.js -->
+    </div>
+  </main>
+
+  <!-- Product Details Modal -->
+  <div class="modal-backdrop" id="product-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-product-title">
+    <div class="modal-container product-modal-container">
+      <button class="modal-close-icon" id="modal-close-btn" aria-label="Close product details">✕</button>
+
+      <!-- Modal Loading State -->
+      <div class="modal-state" id="modal-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading product details...</p>
+      </div>
+
+      <!-- Modal Error State -->
+      <div class="modal-state modal-error" id="modal-error" style="display: none;">
+        <div class="error-icon">⚠️</div>
+        <h3 class="error-title">Product Not Found</h3>
+        <p class="state-text" id="modal-error-message">Unable to find or load the requested product details.</p>
+        <button class="btn btn-secondary" id="modal-error-back-btn">Back to Products</button>
+      </div>
+
+      <!-- Modal Product Content -->
+      <div class="modal-content" id="modal-content" style="display: none;">
+        <!-- Injected dynamically via GET /api/products/:id -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping Cart Modal -->
+  <div class="modal-backdrop" id="cart-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title">
+    <div class="modal-container cart-modal-container">
+      <button class="modal-close-icon" id="cart-close-btn" aria-label="Close cart">✕</button>
+      
+      <div class="cart-modal-header">
+        <h2 class="cart-modal-title" id="cart-modal-title">Shopping Cart</h2>
+        <span class="product-badge" id="cart-items-count-badge">0 items</span>
+      </div>
+
+      <!-- Cart Loading State -->
+      <div class="modal-state" id="cart-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your cart...</p>
+      </div>
+
+      <!-- Cart Unauthenticated State -->
+      <div class="modal-state" id="cart-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your shopping cart.</p>
+        <button class="btn btn-primary" id="cart-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <!-- Cart Empty State -->
+      <div class="modal-state" id="cart-empty-state" style="display: none;">
+        <div class="empty-icon">🛒</div>
+        <h3 class="empty-title">Your Cart is Empty</h3>
+        <p class="state-text">Browse our catalog and add items to your cart.</p>
+        <button class="btn btn-secondary" id="cart-browse-btn">Browse Catalog</button>
+      </div>
+
+      <!-- Cart Content (Items List & Total) -->
+      <div class="cart-content" id="cart-content" style="display: none;">
+        <div class="cart-items-list" id="cart-items-list">
+          <!-- Injected dynamically by app.js -->
+        </div>
+
+        <div class="cart-summary">
+          <div class="cart-summary-row">
+            <span class="summary-label">Estimated Total:</span>
+            <span class="summary-total" id="cart-total-amount">₹0.00</span>
+          </div>
+          <p class="summary-note">Prices and item totals are calculated dynamically from current catalog prices.</p>
+          <div class="cart-summary-actions">
+            <button class="btn btn-primary" id="cart-checkout-btn">Proceed to Checkout →</button>
+            <button class="btn btn-secondary" id="cart-continue-btn">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div class="modal-backdrop" id="wishlist-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wishlist-modal-title">
+    <div class="modal-container wishlist-modal-container">
+      <button class="modal-close-icon" id="wishlist-close-btn" aria-label="Close wishlist">✕</button>
+
+      <div class="wishlist-modal-header">
+        <h2 class="wishlist-modal-title" id="wishlist-modal-title">My Wishlist ❤️</h2>
+        <span class="product-badge" id="wishlist-items-count-badge">0 items</span>
+      </div>
+
+      <!-- Wishlist Loading State -->
+      <div class="modal-state" id="wishlist-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your wishlist...</p>
+      </div>
+
+      <!-- Wishlist Unauthenticated State -->
+      <div class="modal-state" id="wishlist-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your saved wishlist items.</p>
+        <button class="btn btn-primary" id="wishlist-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <!-- Wishlist Empty State -->
+      <div class="modal-state" id="wishlist-empty-state" style="display: none;">
+        <div class="empty-icon">❤️</div>
+        <h3 class="empty-title">Your wishlist is empty.</h3>
+        <p class="state-text">Explore our collection and add your favorite items to your wishlist!</p>
+        <button class="btn btn-primary" id="wishlist-continue-btn">Continue Shopping</button>
+      </div>
+
+      <!-- Wishlist Content (Items List) -->
+      <div class="wishlist-content" id="wishlist-content" style="display: none;">
+        <div class="wishlist-items-list" id="wishlist-items-list">
+          <!-- Injected dynamically by app.js -->
+        </div>
+        <div class="wishlist-modal-footer">
+          <button class="btn btn-secondary" id="wishlist-browse-more-btn">Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout & Order Confirmation Modal -->
+  <div class="modal-backdrop" id="checkout-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
+    <div class="modal-container checkout-modal-container">
+      <button class="modal-close-icon" id="checkout-close-btn" aria-label="Close checkout">✕</button>
+
+      <!-- Checkout Review Form -->
+      <div id="checkout-review-view">
+        <div class="cart-modal-header">
+          <h2 class="cart-modal-title" id="checkout-modal-title">Order Confirmation</h2>
+          <span class="product-badge">Demo Checkout</span>
+        </div>
+
+        <p class="checkout-intro">Review your order details below. Note: Payment processing is simulated for this demonstration.</p>
+
+        <!-- Delivery Address Selection Section -->
+        <div class="checkout-delivery-section" id="checkout-delivery-section">
+          <div class="checkout-section-header">
+            <h3 class="checkout-section-title">📍 Delivery Address</h3>
+            <button type="button" class="btn btn-secondary btn-sm" id="checkout-add-address-btn">
+              ➕ Add New
+            </button>
+          </div>
+
+          <div id="checkout-address-alert" class="auth-error-alert" style="display: none;"></div>
+
+          <div class="checkout-addresses-grid" id="checkout-addresses-grid">
+            <!-- Populated dynamically with selectable address cards -->
+          </div>
+
+          <div class="checkout-no-address-box" id="checkout-no-address-box" style="display: none;">
+            <p>No delivery address found. Please add a shipping address to place your order.</p>
+            <button type="button" class="btn btn-primary btn-sm" id="checkout-empty-add-btn">
+              ➕ Add Delivery Address
+            </button>
+          </div>
+        </div>
+
+        <!-- Payment Method Selection Section -->
+        <div class="checkout-payment-section" id="checkout-payment-section">
+          <div class="checkout-section-header">
+            <h3 class="checkout-section-title">💳 Payment Method</h3>
+          </div>
+
+          <div id="checkout-payment-alert" class="auth-error-alert" style="display: none;"></div>
+
+          <div class="checkout-payments-grid" id="checkout-payments-grid" role="radiogroup" aria-label="Select Payment Method">
+            <!-- UPI Option -->
+            <label class="checkout-payment-card" for="payment-method-upi" id="payment-card-upi">
+              <div class="checkout-payment-card-top">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-upi" value="UPI" class="checkout-payment-radio">
+                <div class="checkout-payment-card-title">
+                  <span class="payment-method-icon">⚡</span>
+                  <span class="payment-method-name">UPI</span>
+                </div>
+                <span class="payment-badge-pill">Instant</span>
+              </div>
+              <p class="checkout-payment-desc">
+                Pay securely using UPI. Online payment gateway integration can be connected later.
+              </p>
+            </label>
+
+            <!-- Cash on Delivery (COD) Option -->
+            <label class="checkout-payment-card is-selected" for="payment-method-cod" id="payment-card-cod">
+              <div class="checkout-payment-card-top">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-cod" value="COD" checked class="checkout-payment-radio">
+                <div class="checkout-payment-card-title">
+                  <span class="payment-method-icon">💵</span>
+                  <span class="payment-method-name">Cash on Delivery</span>
+                </div>
+                <span class="payment-badge-pill">Popular</span>
+              </div>
+              <p class="checkout-payment-desc">
+                Pay when your order is delivered.
+              </p>
+            </label>
+
+            <!-- Net Banking Option -->
+            <label class="checkout-payment-card" for="payment-method-netbanking" id="payment-card-netbanking">
+              <div class="checkout-payment-card-top">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-netbanking" value="NET_BANKING" class="checkout-payment-radio">
+                <div class="checkout-payment-card-title">
+                  <span class="payment-method-icon">🏦</span>
+                  <span class="payment-method-name">Net Banking</span>
+                </div>
+                <span class="payment-badge-pill">Bank Transfer</span>
+              </div>
+              <p class="checkout-payment-desc">
+                Pay using your bank account. Online payment gateway integration can be connected later.
+              </p>
+            </label>
+          </div>
+        </div>
+
+        <div class="checkout-section-header" style="margin-top: 20px; margin-bottom: 8px;">
+          <h3 class="checkout-section-title">📦 Order Summary</h3>
+        </div>
+
+        <div class="checkout-items-summary" id="checkout-items-summary">
+          <!-- Populated from current cart items -->
+        </div>
+
+        <div class="checkout-summary-review-card">
+          <div class="summary-review-row">
+            <span class="summary-review-label">📍 Delivery Address:</span>
+            <span class="summary-review-value" id="checkout-summary-address">Selecting address...</span>
+          </div>
+          <div class="summary-review-row">
+            <span class="summary-review-label">💳 Payment Method:</span>
+            <span class="summary-review-value" id="checkout-summary-payment">Cash on Delivery (COD)</span>
+          </div>
+        </div>
+
+        <div class="checkout-total-card">
+          <div class="cart-summary-row">
+            <span class="summary-label">Grand Total:</span>
+            <span class="summary-total" id="checkout-total-amount">₹0.00</span>
+          </div>
+        </div>
+
+        <div id="checkout-error-alert" class="auth-error-alert" style="display: none;"></div>
+
+        <div class="checkout-actions">
+          <button type="button" class="btn btn-primary btn-full" id="place-order-btn">
+            ✓ Place Order Now
+          </button>
+          <button type="button" class="btn btn-secondary btn-full" id="checkout-back-to-cart-btn">
+            Back to Cart
+          </button>
+        </div>
+      </div>
+
+      <!-- Checkout Success View -->
+      <div id="checkout-success-view" style="display: none;" class="modal-state">
+        <div class="success-icon">🎉</div>
+        <h2 class="modal-title" style="margin-bottom: 8px;">Order Placed Successfully!</h2>
+        <p class="state-text">Thank you for your purchase. Your order has been recorded in our system.</p>
+
+        <div class="order-receipt-box">
+          <div class="receipt-row">
+            <span class="receipt-label">Order ID:</span>
+            <span class="receipt-value" id="success-order-id">#---</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Order Date:</span>
+            <span class="receipt-value" id="success-order-date">Just now</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Order Status:</span>
+            <span class="stock-badge in-stock" id="success-order-status">Pending</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Payment Method:</span>
+            <span class="receipt-value font-bold" id="success-payment-method">Cash on Delivery</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Payment Status:</span>
+            <span class="payment-status-badge badge-pending" id="success-payment-status">Pending</span>
+          </div>
+          <div class="receipt-row" id="receipt-shipping-row">
+            <span class="receipt-label">Delivery Address:</span>
+            <span class="receipt-value" id="success-shipping-address">---</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Total Amount:</span>
+            <span class="receipt-value font-bold" id="success-order-total">₹0.00</span>
+          </div>
+        </div>
+
+        <div class="payment-note-box" id="success-payment-note">
+          💵 Order placed successfully. Payment will be collected on delivery.
+        </div>
+
+        <div class="checkout-success-actions">
+          <button type="button" class="btn btn-primary" id="view-my-orders-btn">View in My Orders</button>
+          <button type="button" class="btn btn-secondary" id="success-continue-shopping-btn">Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Orders Modal -->
+  <div class="modal-backdrop" id="orders-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="orders-modal-title">
+    <div class="modal-container orders-modal-container">
+      <button class="modal-close-icon" id="orders-close-btn" aria-label="Close orders dialog">✕</button>
+
+      <div class="cart-modal-header">
+        <h2 class="cart-modal-title" id="orders-modal-title">My Orders</h2>
+        <button class="btn btn-secondary btn-sm" id="refresh-orders-btn" title="Refresh orders">↻ Refresh</button>
+      </div>
+
+      <!-- Orders Loading State -->
+      <div class="modal-state" id="orders-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your order history...</p>
+      </div>
+
+      <!-- Orders Unauthenticated State -->
+      <div class="modal-state" id="orders-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to view your order history.</p>
+        <button class="btn btn-primary" id="orders-login-prompt-btn">Log In</button>
+      </div>
+
+      <!-- Orders Empty State -->
+      <div class="modal-state" id="orders-empty-state" style="display: none;">
+        <div class="empty-icon">📦</div>
+        <h3 class="empty-title">No Orders Yet</h3>
+        <p class="state-text">You haven't placed any orders yet. Start exploring our catalog!</p>
+        <button class="btn btn-secondary" id="orders-browse-catalog-btn">Browse Products</button>
+      </div>
+
+      <!-- Orders List Container -->
+      <div class="orders-list-content" id="orders-list-content" style="display: none;">
+        <!-- Injected dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Addresses Modal -->
+  <div class="modal-backdrop" id="address-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="address-modal-title">
+    <div class="modal-container address-modal-container">
+      <button class="modal-close-icon" id="address-close-btn" aria-label="Close addresses dialog">✕</button>
+
+      <div class="cart-modal-header">
+        <div>
+          <h2 class="cart-modal-title" id="address-modal-title">Saved Addresses</h2>
+          <span class="product-badge" id="address-count-badge">0 saved</span>
+        </div>
+        <button class="btn btn-primary btn-sm" id="open-add-address-btn">
+          ➕ Add New Address
+        </button>
+      </div>
+
+      <!-- Address Loading State -->
+      <div class="modal-state" id="address-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your addresses...</p>
+      </div>
+
+      <!-- Address Unauthenticated State -->
+      <div class="modal-state" id="address-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to manage your delivery addresses.</p>
+        <button class="btn btn-primary" id="address-login-prompt-btn">Log In</button>
+      </div>
+
+      <!-- Address Form Drawer / Section -->
+      <div class="address-form-wrap" id="address-form-wrap" style="display: none;">
+        <div class="address-form-header">
+          <h3 class="address-form-title" id="address-form-title">Add New Address</h3>
+          <button type="button" class="btn-text" id="cancel-address-form-btn-top">✕ Cancel</button>
+        </div>
+
+        <div id="address-form-error" class="auth-error-alert" style="display: none;"></div>
+
+        <form id="address-form" class="address-form">
+          <input type="hidden" id="address-id" value="" />
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="address-full-name" class="form-label">Full Name *</label>
+              <input type="text" id="address-full-name" required placeholder="e.g. Saif Ali" class="form-input" autocomplete="name" />
+            </div>
+
+            <div class="form-group">
+              <label for="address-phone" class="form-label">Phone Number * (10 Digits)</label>
+              <input type="tel" id="address-phone" required placeholder="e.g. 9876543210" class="form-input" autocomplete="tel" />
+            </div>
+
+            <div class="form-group form-full-width">
+              <label for="address-line1" class="form-label">Flat / House No. / Street Address *</label>
+              <input type="text" id="address-line1" required placeholder="e.g. Flat 402, Sunshine Heights, MG Road" class="form-input" autocomplete="address-line1" />
+            </div>
+
+            <div class="form-group form-full-width">
+              <label for="address-line2" class="form-label">Area / Sector / Landmark (Optional)</label>
+              <input type="text" id="address-line2" placeholder="e.g. Near City Mall" class="form-input" autocomplete="address-line2" />
+            </div>
+
+            <div class="form-group">
+              <label for="address-city" class="form-label">City *</label>
+              <input type="text" id="address-city" required placeholder="e.g. Ahmedabad" class="form-input" autocomplete="address-level2" />
+            </div>
+
+            <div class="form-group">
+              <label for="address-state" class="form-label">State *</label>
+              <input type="text" id="address-state" required placeholder="e.g. Gujarat" class="form-input" autocomplete="address-level1" />
+            </div>
+
+            <div class="form-group">
+              <label for="address-postal-code" class="form-label">PIN Code * (6 Digits)</label>
+              <input type="text" id="address-postal-code" required placeholder="e.g. 380001" maxlength="6" class="form-input" autocomplete="postal-code" />
+            </div>
+
+            <div class="form-group">
+              <label for="address-country" class="form-label">Country *</label>
+              <input type="text" id="address-country" required value="India" class="form-input" autocomplete="country-name" />
+            </div>
+
+            <div class="form-group">
+              <label for="address-type-select" class="form-label">Address Type</label>
+              <select id="address-type-select" class="form-input">
+                <option value="Home">Home (All-day delivery)</option>
+                <option value="Work">Work (Delivery between 9 AM - 6 PM)</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group address-default-checkbox-wrap">
+              <label class="checkbox-label" for="address-is-default-checkbox">
+                <input type="checkbox" id="address-is-default-checkbox" />
+                <span>Make this my default delivery address</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="address-submit-btn">Save Address</button>
+            <button type="button" class="btn btn-secondary" id="cancel-address-form-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Address Empty State -->
+      <div class="modal-state" id="address-empty-state" style="display: none;">
+        <div class="empty-icon">📍</div>
+        <h3 class="empty-title">No Saved Addresses</h3>
+        <p class="state-text">You haven't saved any delivery addresses yet. Add one for quick, seamless checkout.</p>
+        <button class="btn btn-primary" id="address-empty-add-btn">➕ Add Address</button>
+      </div>
+
+      <!-- Address Cards List Container -->
+      <div class="address-cards-list" id="address-cards-list">
+        <!-- Injected dynamically by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Modal -->
+  <div class="modal-backdrop" id="admin-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
+    <div class="modal-container admin-modal-container">
+      <button class="modal-close-icon" id="admin-close-btn" aria-label="Close admin dashboard">✕</button>
+
+      <div class="admin-modal-header">
+        <div class="admin-header-title-wrap">
+          <span class="admin-badge">Admin Workspace</span>
+          <h2 class="cart-modal-title" id="admin-modal-title">Admin Dashboard</h2>
+        </div>
+        <div class="admin-header-actions">
+          <div class="nav-status admin-api-status" id="backend-status">
+            <span class="status-dot"></span>
+            <span class="status-label">API Connected</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="refresh-admin-btn" title="Refresh admin data">↻ Refresh</button>
+        </div>
+      </div>
+
+      <!-- Admin Navigation Tabs -->
+      <div class="admin-nav-tabs">
+        <button type="button" class="admin-tab active" id="admin-tab-overview">📊 Overview</button>
+        <button type="button" class="admin-tab" id="admin-tab-products">📦 Products</button>
+        <button type="button" class="admin-tab" id="admin-tab-orders">📋 Orders</button>
+        <button type="button" class="admin-tab" id="admin-tab-reviews">⭐ Reviews</button>
+        <button type="button" class="admin-tab" id="admin-tab-analytics">📈 Analytics</button>
+      </div>
+
+      <!-- Admin Alert / Status Box -->
+      <div id="admin-alert-box" class="auth-error-alert" style="display: none;"></div>
+
+      <!-- Section 1: Dashboard Overview -->
+      <div class="admin-section" id="admin-overview-section">
+        <div class="stats-grid" id="admin-stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+              <span class="stat-label">Total Users</span>
+              <span class="stat-value" id="stat-total-users">-</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🛍️</div>
+            <div class="stat-content">
+              <span class="stat-label">Total Products</span>
+              <span class="stat-value" id="stat-total-products">-</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-content">
+              <span class="stat-label">Total Orders</span>
+              <span class="stat-value" id="stat-total-orders">-</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-content">
+              <span class="stat-label">Total Reviews</span>
+              <span class="stat-value" id="stat-total-reviews">-</span>
+            </div>
+          </div>
+          <div class="stat-card highlight">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-content">
+              <span class="stat-label">Pending Orders</span>
+              <span class="stat-value" id="stat-pending-orders">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Product Management -->
+      <div class="admin-section" id="admin-products-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">Product Management</h3>
+            <p class="admin-subdesc">Create, edit, and remove products in your catalog.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="open-add-product-btn">➕ Add New Product</button>
+        </div>
+
+        <!-- Add / Edit Product Form Container -->
+        <div class="admin-product-form-card" id="admin-product-form-wrap" style="display: none;">
+          <div class="form-header">
+            <h4 id="admin-product-form-title">Add New Product</h4>
+            <button type="button" class="btn-text" id="cancel-product-form-btn">✕ Cancel</button>
+          </div>
+          <form id="admin-product-form">
+            <input type="hidden" id="admin-product-id" value="">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="admin-prod-name" class="form-label">Product Name *</label>
+                <input type="text" id="admin-prod-name" required class="form-input" placeholder="e.g. Ergonomic Keyboard" />
+              </div>
+              <div class="form-group">
+                <label for="admin-prod-category" class="form-label">Category *</label>
+                <input type="text" id="admin-prod-category" required class="form-input" placeholder="e.g. Electronics" />
+              </div>
+              <div class="form-group">
+                <label for="admin-prod-price" class="form-label">Price (₹) *</label>
+                <input type="number" id="admin-prod-price" step="0.01" min="0" required class="form-input" placeholder="e.g. 79.99" />
+              </div>
+              <div class="form-group">
+                <label for="admin-prod-stock" class="form-label">Stock Quantity *</label>
+                <input type="number" id="admin-prod-stock" min="0" required class="form-input" placeholder="e.g. 15" />
+              </div>
+              <div class="form-group form-full-width">
+                <label for="admin-prod-image" class="form-label">Image URL *</label>
+                <input type="url" id="admin-prod-image" required class="form-input" placeholder="https://example.com/image.jpg" />
+              </div>
+              <div class="form-group form-full-width">
+                <label for="admin-prod-desc" class="form-label">Description *</label>
+                <textarea id="admin-prod-desc" required class="form-input" rows="3" placeholder="Detailed product description..."></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="save-product-btn">Save Product</button>
+              <button type="button" class="btn btn-secondary" id="cancel-product-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Products Table -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-products-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-products-tbody">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 3: Order Management -->
+      <div class="admin-section" id="admin-orders-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">Order Management</h3>
+            <p class="admin-subdesc">View all user orders and update shipping / fulfillment status.</p>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-tbody">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 4: Customer Review Management -->
+      <div class="admin-section" id="admin-reviews-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">Customer Review Management</h3>
+            <p class="admin-subdesc">View real customer reviews across products and remove inappropriate content.</p>
+          </div>
+        </div>
+
+        <!-- Reviews Table -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-reviews-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Customer</th>
+                <th>Rating</th>
+                <th>Review Comment</th>
+                <th>Date</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-reviews-tbody">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 5: Analytics Dashboard -->
+      <div class="admin-section" id="admin-analytics-section" style="display: none;">
+        <!-- Top Toolbar: Title & Date Range Selector -->
+        <div class="analytics-toolbar">
+          <div class="analytics-toolbar-info">
+            <h3 class="admin-subtitle">Store Performance Analytics</h3>
+            <p class="admin-subdesc">Real-time revenue, sales trends, settlement metrics, and customer insights calculated dynamically from MongoDB.</p>
+          </div>
+          <div class="analytics-toolbar-controls">
+            <div class="analytics-range-selector" role="group" aria-label="Select Date Range">
+              <button type="button" class="analytics-range-btn active" data-range="7d" id="range-btn-7d">7 Days</button>
+              <button type="button" class="analytics-range-btn" data-range="30d" id="range-btn-30d">30 Days</button>
+              <button type="button" class="analytics-range-btn" data-range="90d" id="range-btn-90d">90 Days</button>
+              <button type="button" class="analytics-range-btn" data-range="all" id="range-btn-all">All Time</button>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="refresh-analytics-btn" title="Refresh analytics data">↻ Refresh</button>
+          </div>
+        </div>
+
+        <!-- Analytics Loading State -->
+        <div class="analytics-state-box" id="analytics-loading" style="display: none;">
+          <div class="spinner"></div>
+          <p class="state-text">Calculating live analytics from MongoDB...</p>
+        </div>
+
+        <!-- Analytics Error Alert -->
+        <div class="auth-error-alert" id="analytics-error" style="display: none;">
+          <span id="analytics-error-text">Failed to load analytics.</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="retry-analytics-btn" style="margin-left: 10px;">Retry</button>
+        </div>
+
+        <!-- Analytics Main Content Container -->
+        <div id="analytics-content" class="analytics-main-content">
+          <!-- 1. Overview Metric Cards Grid (8 Cards) -->
+          <div class="analytics-overview-grid" id="analytics-overview-grid">
+            <!-- Total Order Value -->
+            <div class="analytics-card metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Total Order Value</span>
+                <span class="metric-icon">💰</span>
+              </div>
+              <div class="metric-value" id="metric-order-value">₹0.00</div>
+              <div class="metric-footer">
+                <span class="metric-subtext">Non-cancelled orders in period</span>
+              </div>
+            </div>
+
+            <!-- Paid Revenue -->
+            <div class="analytics-card metric-card metric-card-success">
+              <div class="metric-header">
+                <span class="metric-title">Paid Revenue</span>
+                <span class="metric-icon">✅</span>
+              </div>
+              <div class="metric-value" id="metric-paid-revenue">₹0.00</div>
+              <div class="metric-footer">
+                <span class="payment-status-badge badge-paid">Verified Paid</span>
+              </div>
+            </div>
+
+            <!-- Pending Payment Value -->
+            <div class="analytics-card metric-card metric-card-warning">
+              <div class="metric-header">
+                <span class="metric-title">Pending Payment</span>
+                <span class="metric-icon">⏳</span>
+              </div>
+              <div class="metric-value" id="metric-pending-value">₹0.00</div>
+              <div class="metric-footer">
+                <span class="payment-status-badge badge-pending">Awaiting Settlement</span>
+              </div>
+            </div>
+
+            <!-- Failed Payment Value -->
+            <div class="analytics-card metric-card metric-card-danger">
+              <div class="metric-header">
+                <span class="metric-title">Failed Payment</span>
+                <span class="metric-icon">❌</span>
+              </div>
+              <div class="metric-value" id="metric-failed-value">₹0.00</div>
+              <div class="metric-footer">
+                <span class="payment-status-badge badge-failed">Declined / Failed</span>
+              </div>
+            </div>
+
+            <!-- Total Orders -->
+            <div class="analytics-card metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Total Orders</span>
+                <span class="metric-icon">📦</span>
+              </div>
+              <div class="metric-value" id="metric-total-orders">0</div>
+              <div class="metric-footer">
+                <span class="metric-subtext">Orders placed in range</span>
+              </div>
+            </div>
+
+            <!-- Pending Orders -->
+            <div class="analytics-card metric-card highlight">
+              <div class="metric-header">
+                <span class="metric-title">Pending Fulfillment</span>
+                <span class="metric-icon">⏱️</span>
+              </div>
+              <div class="metric-value" id="metric-pending-orders">0</div>
+              <div class="metric-footer">
+                <span class="metric-subtext">Awaiting processing/shipping</span>
+              </div>
+            </div>
+
+            <!-- Total Customers -->
+            <div class="analytics-card metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Total Customers</span>
+                <span class="metric-icon">👥</span>
+              </div>
+              <div class="metric-value" id="metric-total-customers">0</div>
+              <div class="metric-footer">
+                <span class="metric-subtext">Registered shopper accounts</span>
+              </div>
+            </div>
+
+            <!-- Total Products / Reviews -->
+            <div class="analytics-card metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Inventory &amp; Reviews</span>
+                <span class="metric-icon">🛍️</span>
+              </div>
+              <div class="metric-value" id="metric-products-reviews">0 / 0</div>
+              <div class="metric-footer">
+                <span class="metric-subtext"><span id="metric-products-count">0</span> Products · <span id="metric-reviews-count">0</span> Reviews</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Sales Trend Section (Interactive Visual Chart & Table) -->
+          <div class="analytics-card analytics-trend-card">
+            <div class="card-section-header">
+              <div>
+                <h4 class="card-section-title">📊 Sales Trend Analysis</h4>
+                <p class="card-section-desc">Daily order volume, gross order value, and verified paid revenue.</p>
+              </div>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot dot-value"></span> Order Value (₹)</span>
+                <span class="legend-item"><span class="legend-dot dot-paid"></span> Paid Revenue (₹)</span>
+                <span class="legend-item"><span class="legend-dot dot-orders"></span> Orders Count</span>
+              </div>
+            </div>
+
+            <!-- SVG Visual Chart Container -->
+            <div class="trend-chart-container" id="trend-chart-container">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+
+            <!-- Trend Breakdown Table Toggle -->
+            <div class="trend-table-toggle-wrap">
+              <button type="button" class="btn btn-secondary btn-sm" id="toggle-trend-table-btn">
+                <span>📋 View Daily Ledger</span>
+              </button>
+            </div>
+
+            <div class="admin-table-wrap" id="trend-table-wrap" style="display: none; margin-top: 12px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Orders</th>
+                    <th>Gross Order Value</th>
+                    <th>Paid Revenue</th>
+                  </tr>
+                </thead>
+                <tbody id="trend-table-tbody">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 3. Dual Section: Order Fulfillment Status & Payment Methods Analytics -->
+          <div class="analytics-dual-grid">
+            <!-- Order Status Breakdown -->
+            <div class="analytics-card">
+              <div class="card-section-header">
+                <h4 class="card-section-title">🚚 Order Status Breakdown</h4>
+                <p class="card-section-desc">Fulfillment distribution across all orders in selected period.</p>
+              </div>
+              <div class="status-breakdown-list" id="status-breakdown-list">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Payment Analytics -->
+            <div class="analytics-card">
+              <div class="card-section-header">
+                <h4 class="card-section-title">💳 Payment Method Settlement</h4>
+                <p class="card-section-desc">Settlement metrics per method (Pending until gateway verification).</p>
+              </div>
+              <div class="payment-methods-analytics-list" id="payment-analytics-list">
+                <!-- Injected dynamically -->
+              </div>
+              <div class="payment-settlement-note">
+                ℹ️ <em>Online payments (UPI &amp; Net Banking) remain Pending until a real payment gateway callback verifies the transaction.</em>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Dual Section: Top-Selling Products & Category Sales -->
+          <div class="analytics-dual-grid">
+            <!-- Top-Selling Products -->
+            <div class="analytics-card">
+              <div class="card-section-header">
+                <h4 class="card-section-title">🏆 Top-Selling Products</h4>
+                <p class="card-section-desc">Calculated directly from actual order item snapshots.</p>
+              </div>
+              <div class="top-products-list" id="top-products-list">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Sales by Category -->
+            <div class="analytics-card">
+              <div class="card-section-header">
+                <h4 class="card-section-title">🏷️ Sales by Category</h4>
+                <p class="card-section-desc">Product categories driving the highest order volume.</p>
+              </div>
+              <div class="category-sales-list" id="category-sales-list">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Recent Orders in Range -->
+          <div class="analytics-card">
+            <div class="card-section-header">
+              <h4 class="card-section-title">🕒 Recent Orders in Range</h4>
+              <p class="card-section-desc">Latest transactions recorded within the chosen timeframe.</p>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table" id="analytics-recent-orders-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Order Status</th>
+                  </tr>
+                </thead>
+                <tbody id="analytics-recent-orders-tbody">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Modal (Log In / Register) -->
+  <div class="modal-backdrop" id="auth-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal-container auth-modal-container">
+      <button class="modal-close-icon" id="auth-close-btn" aria-label="Close auth dialog">✕</button>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-login-btn">Log In</button>
+        <button type="button" class="auth-tab" id="tab-register-btn">Register</button>
+      </div>
+
+      <div id="auth-error-alert" class="auth-error-alert" style="display: none;"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email Address</label>
+          <input type="email" id="login-email" required placeholder="you@example.com" class="form-input" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="form-input" autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="reg-name" class="form-label">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="John Doe" class="form-input" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="reg-email" class="form-label">Email Address</label>
+          <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="reg-password" class="form-label">Password (min 8 chars, letters &amp; numbers)</label>
+          <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer" id="main-footer">
+    <div class="container footer-main-grid">
+      <div class="footer-col footer-col-brand">
+        <a href="#" class="brand footer-brand">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">MiniStore</span>
+        </a>
+        <p class="footer-tagline">Curated essentials engineered for daily durability, modern aesthetics, and verified performance.</p>
+        <div class="footer-trust-chips">
+          <span class="footer-chip">🛡️ 100% Genuine</span>
+          <span class="footer-chip">🚚 Pan-India Shipping</span>
+          <span class="footer-chip">💳 Secure Payments</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Shop Categories</h4>
+        <ul class="footer-links">
+          <li><a href="#products-section">Electronics &amp; Audio</a></li>
+          <li><a href="#products-section">Watches &amp; Wearables</a></li>
+          <li><a href="#products-section">Footwear &amp; Apparel</a></li>
+          <li><a href="#products-section">Productivity &amp; Tech</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Customer Care</h4>
+        <ul class="footer-links">
+          <li><a href="#products-section">Order Tracking</a></li>
+          <li><a href="#products-section">Shipping &amp; Delivery</a></li>
+          <li><a href="#products-section">7-Day Easy Returns</a></li>
+          <li><a href="#products-section">Verified Customer Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Accepted Payments</h4>
+        <div class="footer-payment-badges">
+          <span class="payment-badge-tag">⚡ UPI Instant</span>
+          <span class="payment-badge-tag">💵 Cash on Delivery</span>
+          <span class="payment-badge-tag">🏦 Net Banking</span>
+        </div>
+        <p class="footer-payment-note">All transactions processed with multi-tier encryption and zero hidden conversion fees.</p>
+      </div>
+    </div>
+    <div class="container footer-bottom-bar">
+      <p class="footer-text">&copy; 2026 MiniStore. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
+      <div class="footer-bottom-links">
+        <span>Privacy Policy</span>
+        <span>•</span>
+        <span>Terms of Service</span>
+        <span>•</span>
+        <span>Security Verified</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
