@@ -66,48 +66,116 @@
       </div>
 
       <div class="nav-actions">
-        <button class="btn btn-secondary btn-sm" id="nav-orders-btn" style="display: none;" aria-label="View My Orders">
-          <span class="nav-btn-icon">📦</span>
-          <span class="nav-btn-label">My Orders</span>
-        </button>
-
-        <button class="btn btn-secondary btn-sm" id="nav-addresses-btn" style="display: none;" aria-label="Manage Addresses">
-          <span class="nav-btn-icon">📍</span>
-          <span class="nav-btn-label">Addresses</span>
-        </button>
-
-        <button class="btn btn-secondary btn-sm" id="nav-admin-btn" style="display: none;" aria-label="Admin Dashboard">
-          <span class="nav-btn-icon">🛡️</span>
-          <span class="nav-btn-label">Admin Panel</span>
-        </button>
-
-        <div id="auth-nav-cluster" class="auth-nav-cluster">
-          <button class="btn btn-secondary btn-sm" id="nav-login-btn">
-            <span class="nav-btn-icon">👤</span>
-            <span class="nav-btn-label">Log In</span>
-          </button>
-          <div id="nav-user-info" style="display: none;" class="nav-user-info">
-            <span class="user-greeting" id="nav-user-name">User</span>
-            <button class="btn btn-secondary btn-sm nav-logout-btn" id="nav-logout-btn">Log Out</button>
-          </div>
-        </div>
-
-        <button class="btn btn-secondary btn-sm wishlist-nav-btn" id="nav-wishlist-btn" aria-label="View Wishlist">
-          <span class="nav-btn-icon">❤️</span>
-          <span class="nav-btn-label">Wishlist</span>
-          <span class="nav-badge-pill" id="wishlist-nav-badge">0</span>
-        </button>
-
+        <!-- Shopping Cart Button -->
         <button class="btn btn-primary btn-sm cart-nav-btn" id="nav-cart-btn" aria-label="Shopping Cart">
           <span class="nav-btn-icon">🛒</span>
           <span class="nav-btn-label">Cart</span>
           <span class="nav-badge-pill" id="cart-nav-badge">0</span>
         </button>
 
-        <button class="btn btn-secondary btn-sm theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle theme">
+        <!-- Dark / Light Mode Toggle Button (Symbol Only, No Text) -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode" type="button">
           <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
-          <span class="theme-toggle-label" id="theme-toggle-label">Dark</span>
+          <span class="theme-toggle-label" id="theme-toggle-label" style="display: none;"></span>
         </button>
+
+        <!-- User Profile Dropdown Cluster (Top Right Corner) -->
+        <div class="profile-nav-wrapper" id="profile-nav-wrapper">
+          <!-- Unauthenticated State: Log In Button -->
+          <button class="btn btn-secondary btn-sm nav-login-btn" id="nav-login-btn" aria-label="Log in or register">
+            <span class="nav-btn-icon">👤</span>
+            <span class="nav-btn-label">Log In</span>
+          </button>
+
+          <!-- Authenticated State: User Profile Trigger & Dropdown Menu -->
+          <div id="nav-user-info" style="display: none;" class="nav-user-cluster">
+            <button class="nav-profile-trigger-btn" id="nav-profile-trigger-btn" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Open user profile menu">
+              <div class="nav-profile-avatar" id="nav-profile-avatar">
+                <span class="nav-avatar-initials" id="nav-avatar-initials">U</span>
+                <img src="" alt="User avatar" class="nav-avatar-img" id="nav-avatar-img" style="display: none;" />
+              </div>
+              <span class="user-greeting" id="nav-user-name">User</span>
+              <span class="nav-profile-chevron" aria-hidden="true">▾</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="profile-dropdown-menu" id="profile-dropdown-menu" role="menu" aria-label="User Account Menu" style="display: none;">
+              <!-- Dropdown Header -->
+              <div class="dropdown-user-header">
+                <div class="dropdown-avatar-circle" id="dropdown-avatar-display">
+                  <span class="dropdown-avatar-initials" id="dropdown-avatar-initials">U</span>
+                  <img src="" alt="User avatar" class="dropdown-avatar-img" id="dropdown-avatar-img" style="display: none;" />
+                </div>
+                <div class="dropdown-user-meta">
+                  <span class="dropdown-user-name" id="dropdown-user-name">User</span>
+                  <span class="dropdown-user-email" id="dropdown-user-email">user@example.com</span>
+                  <span class="dropdown-role-badge" id="dropdown-user-role">Customer</span>
+                </div>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Menu Items List -->
+              <div class="dropdown-items-list">
+                <!-- 1. Profile Option -->
+                <button class="dropdown-item" id="dropdown-profile-btn" role="menuitem" type="button">
+                  <span class="dropdown-item-icon">👤</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Profile</span>
+                    <span class="dropdown-item-desc">View &amp; edit details, change photo</span>
+                  </div>
+                </button>
+
+                <!-- 2. Wishlist Option (Transferred into profile menu) -->
+                <button class="dropdown-item wishlist-nav-btn" id="nav-wishlist-btn" role="menuitem" type="button" aria-label="View Wishlist">
+                  <span class="dropdown-item-icon">❤️</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Wishlist</span>
+                    <span class="dropdown-item-desc">Saved favorite products</span>
+                  </div>
+                  <span class="nav-badge-pill" id="wishlist-nav-badge">0</span>
+                </button>
+
+                <!-- 3. My Orders Option (Transferred into profile menu) -->
+                <button class="dropdown-item" id="nav-orders-btn" role="menuitem" type="button" aria-label="View My Orders">
+                  <span class="dropdown-item-icon">📦</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Orders</span>
+                    <span class="dropdown-item-desc">Track and review past orders</span>
+                  </div>
+                </button>
+
+                <!-- 4. Saved Addresses Option -->
+                <button class="dropdown-item" id="nav-addresses-btn" role="menuitem" type="button" aria-label="Manage Addresses">
+                  <span class="dropdown-item-icon">📍</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Saved Addresses</span>
+                    <span class="dropdown-item-desc">Manage delivery locations</span>
+                  </div>
+                </button>
+
+                <!-- 5. Admin Panel (Shown for admin only) -->
+                <button class="dropdown-item" id="nav-admin-btn" role="menuitem" type="button" style="display: none;" aria-label="Admin Dashboard">
+                  <span class="dropdown-item-icon">🛡️</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Admin Dashboard</span>
+                    <span class="dropdown-item-desc">Store statistics &amp; controls</span>
+                  </div>
+                </button>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Sign Out Option -->
+              <div class="dropdown-footer">
+                <button class="dropdown-item dropdown-logout-item nav-logout-btn" id="nav-logout-btn" role="menuitem" type="button">
+                  <span class="dropdown-item-icon">🚪</span>
+                  <span class="dropdown-item-title">Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -1508,7 +1576,123 @@
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
+  <!-- User Profile Modal (View & Edit Details, Avatar/Photo) -->
+  <div class="modal-backdrop" id="profile-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal-container profile-modal-container">
+      <button class="modal-close-icon" id="profile-close-btn" aria-label="Close profile modal">✕</button>
+
+      <div class="profile-modal-header">
+        <div>
+          <span class="info-header-badge badge-indigo">👤 Account Settings</span>
+          <h2 class="profile-modal-title" id="profile-modal-title">My Profile</h2>
+        </div>
+        <span class="user-role-badge" id="profile-role-badge">Customer</span>
+      </div>
+
+      <!-- Feedback Alerts -->
+      <div class="auth-error-alert" id="profile-alert-error" style="display: none;" role="alert"></div>
+      <div class="alert-box alert-success" id="profile-alert-success" style="display: none;" role="alert"></div>
+
+      <div class="profile-modal-body">
+        <!-- 1. Avatar Section -->
+        <div class="profile-avatar-card">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-circle" id="profile-avatar-display">
+              <span class="profile-avatar-initials" id="profile-modal-initials">U</span>
+              <img src="" alt="Profile avatar" class="profile-avatar-img" id="profile-modal-img" style="display: none;" />
+            </div>
+            <label for="profile-avatar-file" class="profile-avatar-upload-badge" title="Upload photo from your device" aria-label="Upload photo from device">
+              📷
+              <input type="file" id="profile-avatar-file" accept="image/*" style="display: none;" />
+            </label>
+          </div>
+
+          <div class="profile-avatar-controls">
+            <div class="profile-avatar-titles">
+              <h4 class="profile-avatar-title">Profile Picture</h4>
+              <p class="profile-avatar-subtitle">Choose a preset avatar below or upload a photo from your device</p>
+            </div>
+
+            <!-- Preset Quick Avatars -->
+            <div class="avatar-presets-wrap">
+              <span class="presets-label">Quick Avatars:</span>
+              <div class="avatar-presets-grid" id="avatar-presets-grid">
+                <!-- Dynamically populated by app.js -->
+              </div>
+            </div>
+
+            <!-- Image URL Alternative -->
+            <div class="avatar-url-row">
+              <input type="url" id="profile-avatar-url-input" class="form-input form-input-sm" placeholder="Or enter image URL (https://...)" />
+              <button type="button" class="btn btn-secondary btn-sm" id="profile-avatar-url-apply-btn">Apply</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="profile-avatar-remove-btn" title="Reset to initials">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Personal Details Form -->
+        <form class="profile-form" id="profile-form">
+          <div class="form-grid profile-form-grid">
+            <div class="form-group">
+              <label for="profile-name-input" class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" id="profile-name-input" class="form-input" required placeholder="Enter your full name" />
+            </div>
+
+            <div class="form-group">
+              <label for="profile-email-input" class="form-label">Email Address <span class="badge-verified">✓ Verified</span></label>
+              <input type="email" id="profile-email-input" class="form-input form-input-readonly" readonly title="Primary account email cannot be changed" />
+            </div>
+
+            <div class="form-group">
+              <label for="profile-phone-input" class="form-label">Phone Number</label>
+              <input type="tel" id="profile-phone-input" class="form-input" placeholder="+91 98765 43210" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Member Since</label>
+              <input type="text" id="profile-created-input" class="form-input form-input-readonly" readonly />
+            </div>
+          </div>
+
+          <div class="profile-modal-actions">
+            <button type="submit" class="btn btn-primary" id="profile-save-btn">
+              <span id="profile-save-btn-text">Save Changes</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Cancel</button>
+          </div>
+        </form>
+
+        <!-- 3. Quick Account Shortcuts Hub -->
+        <div class="profile-quick-hub">
+          <h4 class="quick-hub-title">My Account Shortcuts</h4>
+          <div class="quick-hub-grid">
+            <button type="button" class="quick-hub-card" id="profile-shortcut-wishlist">
+              <span class="quick-hub-icon">❤️</span>
+              <div class="quick-hub-info">
+                <span class="quick-hub-name">My Wishlist</span>
+                <span class="quick-hub-desc">Saved favorite products</span>
+              </div>
+            </button>
+            <button type="button" class="quick-hub-card" id="profile-shortcut-orders">
+              <span class="quick-hub-icon">📦</span>
+              <div class="quick-hub-info">
+                <span class="quick-hub-name">My Orders</span>
+                <span class="quick-hub-desc">Track and review purchases</span>
+              </div>
+            </button>
+            <button type="button" class="quick-hub-card" id="profile-shortcut-addresses">
+              <span class="quick-hub-icon">📍</span>
+              <div class="quick-hub-info">
+                <span class="quick-hub-name">Saved Addresses</span>
+                <span class="quick-hub-desc">Manage delivery locations</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
 

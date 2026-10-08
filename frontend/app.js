@@ -14,11 +14,14 @@ let allProducts = [];
 let currentSearchTerm = '';
 let currentCategory = 'all';
 let currentCart = null;
+let isCartLoaded = false;
 let currentWishlist = null;
+let isWishlistLoaded = false;
 let wishlistProductIds = new Set();
 let userAddresses = [];
 let selectedCheckoutAddressId = null;
 let selectedPaymentMethod = 'COD';
+let searchDebounceTimeout = null;
 
 // Currency Formatter (Indian Rupees)
 const currencyFormatter = new Intl.NumberFormat('en-IN', {
@@ -273,6 +276,46 @@ const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const themeToggleIcon = document.getElementById('theme-toggle-icon');
 const themeToggleLabel = document.getElementById('theme-toggle-label');
 
+// DOM Elements - User Profile Dropdown & Modal
+const profileNavWrapper = document.getElementById('profile-nav-wrapper');
+const navProfileTriggerBtn = document.getElementById('nav-profile-trigger-btn');
+const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
+const navAvatarInitials = document.getElementById('nav-avatar-initials');
+const navAvatarImg = document.getElementById('nav-avatar-img');
+const dropdownAvatarInitials = document.getElementById('dropdown-avatar-initials');
+const dropdownAvatarImg = document.getElementById('dropdown-avatar-img');
+const dropdownUserName = document.getElementById('dropdown-user-name');
+const dropdownUserEmail = document.getElementById('dropdown-user-email');
+const dropdownUserRole = document.getElementById('dropdown-user-role');
+const dropdownProfileBtn = document.getElementById('dropdown-profile-btn');
+
+// DOM Elements - Profile Modal
+const profileModal = document.getElementById('profile-modal');
+const profileCloseBtn = document.getElementById('profile-close-btn');
+const profileCancelBtn = document.getElementById('profile-cancel-btn');
+const profileForm = document.getElementById('profile-form');
+const profileNameInput = document.getElementById('profile-name-input');
+const profileEmailInput = document.getElementById('profile-email-input');
+const profilePhoneInput = document.getElementById('profile-phone-input');
+const profileCreatedInput = document.getElementById('profile-created-input');
+const profileRoleBadge = document.getElementById('profile-role-badge');
+const profileAlertError = document.getElementById('profile-alert-error');
+const profileAlertSuccess = document.getElementById('profile-alert-success');
+const profileSaveBtn = document.getElementById('profile-save-btn');
+const profileSaveBtnText = document.getElementById('profile-save-btn-text');
+const profileModalInitials = document.getElementById('profile-modal-initials');
+const profileModalImg = document.getElementById('profile-modal-img');
+const profileAvatarFile = document.getElementById('profile-avatar-file');
+const profileAvatarUrlInput = document.getElementById('profile-avatar-url-input');
+const profileAvatarUrlApplyBtn = document.getElementById('profile-avatar-url-apply-btn');
+const profileAvatarRemoveBtn = document.getElementById('profile-avatar-remove-btn');
+const avatarPresetsGrid = document.getElementById('avatar-presets-grid');
+
+// DOM Elements - Profile Modal Shortcuts
+const profileShortcutWishlist = document.getElementById('profile-shortcut-wishlist');
+const profileShortcutOrders = document.getElementById('profile-shortcut-orders');
+const profileShortcutAddresses = document.getElementById('profile-shortcut-addresses');
+
 // Toast Notification
 const toastNotification = document.getElementById('toast-notification');
 let toastTimer = null;
@@ -503,17 +546,19 @@ function getCurrentTheme() {
 }
 
 function updateThemeToggleUI(theme) {
-  if (!themeToggleIcon || !themeToggleLabel) return;
+  if (!themeToggleIcon) return;
+  if (themeToggleLabel) {
+    themeToggleLabel.textContent = '';
+    themeToggleLabel.style.display = 'none';
+  }
   if (theme === 'dark') {
     themeToggleIcon.textContent = '☀️';
-    themeToggleLabel.textContent = 'Light';
     if (themeToggleBtn) {
       themeToggleBtn.setAttribute('aria-label', 'Switch to light mode');
       themeToggleBtn.setAttribute('title', 'Switch to light mode');
     }
   } else {
     themeToggleIcon.textContent = '🌙';
-    themeToggleLabel.textContent = 'Dark';
     if (themeToggleBtn) {
       themeToggleBtn.setAttribute('aria-label', 'Switch to dark mode');
       themeToggleBtn.setAttribute('title', 'Switch to dark mode');
@@ -549,6 +594,227 @@ function initTheme() {
 }
 
 // ============================================================
+// User Avatar & Profile Management
+// ============================================================
+
+const PRESET_AVATARS = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+  'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80'
+];
+
+let currentEditingAvatar = '';
+
+function renderUserAvatar(avatarUrl, name, initialsEl, imgEl) {
+  const initial = (name || 'U').charAt(0).toUpperCase();
+  if (avatarUrl && avatarUrl.trim()) {
+    if (imgEl) {
+      imgEl.src = avatarUrl;
+      imgEl.style.display = 'block';
+    }
+    if (initialsEl) initialsEl.style.display = 'none';
+  } else {
+    if (imgEl) {
+      imgEl.removeAttribute('src');
+      imgEl.style.display = 'none';
+    }
+    if (initialsEl) {
+      initialsEl.textContent = initial;
+      initialsEl.style.display = 'inline-block';
+    }
+  }
+}
+
+function toggleProfileDropdown() {
+  if (!profileDropdownMenu) return;
+  const isCurrentlyOpen = profileDropdownMenu.style.display === 'block';
+  if (isCurrentlyOpen) {
+    closeProfileDropdown();
+  } else {
+    openProfileDropdown();
+  }
+}
+
+function openProfileDropdown() {
+  if (!profileDropdownMenu) return;
+  profileDropdownMenu.style.display = 'block';
+  if (navProfileTriggerBtn) {
+    navProfileTriggerBtn.classList.add('is-active');
+    navProfileTriggerBtn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function closeProfileDropdown() {
+  if (!profileDropdownMenu) return;
+  profileDropdownMenu.style.display = 'none';
+  if (navProfileTriggerBtn) {
+    navProfileTriggerBtn.classList.remove('is-active');
+    navProfileTriggerBtn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+function renderAvatarPresets() {
+  if (!avatarPresetsGrid) return;
+  avatarPresetsGrid.innerHTML = '';
+  PRESET_AVATARS.forEach((url, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'avatar-preset-btn' + (currentEditingAvatar === url ? ' is-selected' : '');
+    btn.title = `Choose avatar preset ${idx + 1}`;
+    btn.setAttribute('aria-label', `Choose avatar preset ${idx + 1}`);
+    btn.innerHTML = `<img src="${url}" alt="Preset avatar ${idx + 1}" class="avatar-preset-thumb" />`;
+    btn.addEventListener('click', () => {
+      currentEditingAvatar = url;
+      updateProfileModalAvatarPreview();
+      renderAvatarPresets();
+    });
+    avatarPresetsGrid.appendChild(btn);
+  });
+}
+
+function updateProfileModalAvatarPreview() {
+  const user = getAuthUser() || {};
+  const name = (profileNameInput && profileNameInput.value.trim()) || user.name || 'User';
+  renderUserAvatar(currentEditingAvatar, name, profileModalInitials, profileModalImg);
+  if (profileAvatarUrlInput) {
+    profileAvatarUrlInput.value = (currentEditingAvatar && !currentEditingAvatar.startsWith('data:')) ? currentEditingAvatar : '';
+  }
+}
+
+function openProfileModal() {
+  closeProfileDropdown();
+  const token = getAuthToken();
+  const user = getAuthUser();
+
+  if (!token || !user) {
+    openAuthModal('login', 'Please log in to view and edit your profile.');
+    return;
+  }
+
+  if (profileAlertError) profileAlertError.style.display = 'none';
+  if (profileAlertSuccess) profileAlertSuccess.style.display = 'none';
+
+  if (profileNameInput) profileNameInput.value = user.name || '';
+  if (profileEmailInput) profileEmailInput.value = user.email || '';
+  if (profilePhoneInput) profilePhoneInput.value = user.phone || '';
+
+  if (profileRoleBadge) {
+    profileRoleBadge.textContent = user.role === 'admin' ? 'Administrator' : 'Customer';
+    profileRoleBadge.className = 'user-role-badge ' + (user.role === 'admin' ? 'role-admin' : 'role-customer');
+  }
+
+  if (profileCreatedInput) {
+    if (user.createdAt) {
+      try {
+        const d = new Date(user.createdAt);
+        profileCreatedInput.value = d.toLocaleDateString('en-IN', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (e) {
+        profileCreatedInput.value = 'Member';
+      }
+    } else {
+      profileCreatedInput.value = 'Active Member';
+    }
+  }
+
+  currentEditingAvatar = user.avatar || '';
+  updateProfileModalAvatarPreview();
+  renderAvatarPresets();
+
+  if (profileModal) {
+    profileModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeProfileModal() {
+  if (profileModal) {
+    closeModalWithAnimation(profileModal, () => {
+      if (profileAlertError) profileAlertError.style.display = 'none';
+      if (profileAlertSuccess) profileAlertSuccess.style.display = 'none';
+      if (profileAvatarFile) profileAvatarFile.value = '';
+    });
+  }
+}
+
+async function handleProfileSave(e) {
+  e.preventDefault();
+  const token = getAuthToken();
+  if (!token) {
+    openAuthModal('login');
+    return;
+  }
+
+  const name = profileNameInput.value.trim();
+  const phone = profilePhoneInput ? profilePhoneInput.value.trim() : '';
+
+  if (!name) {
+    if (profileAlertError) {
+      profileAlertError.textContent = 'Full name is required.';
+      profileAlertError.style.display = 'block';
+    }
+    return;
+  }
+
+  if (profileSaveBtn) profileSaveBtn.disabled = true;
+  if (profileSaveBtnText) profileSaveBtnText.textContent = 'Saving...';
+  if (profileAlertError) profileAlertError.style.display = 'none';
+  if (profileAlertSuccess) profileAlertSuccess.style.display = 'none';
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name,
+        phone,
+        avatar: currentEditingAvatar
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Failed to update profile');
+    }
+
+    // Save updated user to localStorage
+    const updatedUser = result.data;
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    updateAuthUI();
+
+    if (profileAlertSuccess) {
+      profileAlertSuccess.textContent = 'Profile updated successfully!';
+      profileAlertSuccess.style.display = 'block';
+    }
+
+    showToast('Profile updated successfully! ✨');
+
+    setTimeout(() => {
+      closeProfileModal();
+    }, 800);
+  } catch (err) {
+    console.error('Profile update error:', err);
+    if (profileAlertError) {
+      profileAlertError.textContent = err.message || 'Error updating profile. Please try again.';
+      profileAlertError.style.display = 'block';
+    }
+  } finally {
+    if (profileSaveBtn) profileSaveBtn.disabled = false;
+    if (profileSaveBtnText) profileSaveBtnText.textContent = 'Save Changes';
+  }
+}
+
+// ============================================================
 // Authentication Client State & UI
 // ============================================================
 
@@ -573,27 +839,68 @@ function updateAuthUI() {
     navLoginBtn.style.display = 'none';
     navUserInfo.style.display = 'flex';
     navUserName.textContent = user.name || 'User';
+
+    // Render user avatar in navbar trigger & dropdown header
+    renderUserAvatar(user.avatar, user.name, navAvatarInitials, navAvatarImg);
+    renderUserAvatar(user.avatar, user.name, dropdownAvatarInitials, dropdownAvatarImg);
+
+    // Populate dropdown header meta
+    if (dropdownUserName) dropdownUserName.textContent = user.name || 'User';
+    if (dropdownUserEmail) dropdownUserEmail.textContent = user.email || '';
+    if (dropdownUserRole) {
+      dropdownUserRole.textContent = user.role === 'admin' ? 'Administrator' : 'Customer';
+    }
+
     if (navAddressesBtn) navAddressesBtn.style.display = 'inline-flex';
     if (navOrdersBtn) navOrdersBtn.style.display = 'inline-flex';
     if (navAdminBtn) {
       navAdminBtn.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
     }
+
+    // Restore cached lightweight badge/state from localStorage without making API calls
+    const savedCartCount = parseInt(localStorage.getItem('ministore_cart_count') || '0', 10);
+    updateCartCountBadge(savedCartCount);
+
+    try {
+      const savedWishlistIds = JSON.parse(localStorage.getItem('ministore_wishlist_ids') || '[]');
+      if (Array.isArray(savedWishlistIds)) {
+        wishlistProductIds = new Set(savedWishlistIds.map(String));
+      }
+    } catch (e) {
+      wishlistProductIds = new Set();
+    }
+    updateWishlistCountBadge(wishlistProductIds.size);
+    updateAllWishlistHeartButtons();
   } else {
+    closeProfileDropdown();
     navLoginBtn.style.display = 'inline-flex';
     navUserInfo.style.display = 'none';
     navUserName.textContent = '';
+
+    renderUserAvatar('', 'U', navAvatarInitials, navAvatarImg);
+    renderUserAvatar('', 'U', dropdownAvatarInitials, dropdownAvatarImg);
+    if (dropdownUserName) dropdownUserName.textContent = 'User';
+    if (dropdownUserEmail) dropdownUserEmail.textContent = '';
+
     if (navAddressesBtn) navAddressesBtn.style.display = 'none';
     if (navOrdersBtn) navOrdersBtn.style.display = 'none';
     if (navAdminBtn) navAdminBtn.style.display = 'none';
     if (adminModal) adminModal.style.display = 'none';
     if (addressModal) addressModal.style.display = 'none';
+    if (profileModal) profileModal.style.display = 'none';
     userAddresses = [];
     selectedCheckoutAddressId = null;
     selectedPaymentMethod = 'COD';
+    currentCart = null;
+    isCartLoaded = false;
     currentWishlist = null;
+    isWishlistLoaded = false;
     wishlistProductIds.clear();
+    updateCartCountBadge(0);
     updateWishlistCountBadge(0);
     updateAllWishlistHeartButtons();
+    localStorage.removeItem('ministore_cart_count');
+    localStorage.removeItem('ministore_wishlist_ids');
   }
 }
 
@@ -675,6 +982,7 @@ async function fetchWishlist() {
   const token = getAuthToken();
   if (!token) {
     currentWishlist = null;
+    isWishlistLoaded = false;
     wishlistProductIds.clear();
     updateWishlistCountBadge(0);
     updateAllWishlistHeartButtons();
@@ -690,6 +998,7 @@ async function fetchWishlist() {
 
     if (response.status === 401) {
       currentWishlist = null;
+      isWishlistLoaded = false;
       wishlistProductIds.clear();
       updateWishlistCountBadge(0);
       updateAllWishlistHeartButtons();
@@ -699,8 +1008,10 @@ async function fetchWishlist() {
     const result = await response.json();
     if (response.ok && result.success && result.data) {
       currentWishlist = result.data;
+      isWishlistLoaded = true;
       const prods = currentWishlist.products || [];
       wishlistProductIds = new Set(prods.map((p) => String(p._id || p)));
+      localStorage.setItem('ministore_wishlist_ids', JSON.stringify(Array.from(wishlistProductIds)));
       updateWishlistCountBadge(wishlistProductIds.size);
       updateAllWishlistHeartButtons();
     }
@@ -770,6 +1081,7 @@ async function toggleWishlistProduct(productId, triggerBtn = null) {
       showToast('Added to wishlist ❤️');
     }
 
+    localStorage.setItem('ministore_wishlist_ids', JSON.stringify(Array.from(wishlistProductIds)));
     updateWishlistCountBadge(wishlistProductIds.size);
     updateAllWishlistHeartButtons();
 
@@ -784,6 +1096,7 @@ async function toggleWishlistProduct(productId, triggerBtn = null) {
 }
 
 async function openWishlistModal() {
+  closeProfileDropdown();
   wishlistModal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
@@ -797,6 +1110,14 @@ async function openWishlistModal() {
   }
 
   wishlistUnauthState.style.display = 'none';
+
+  // If wishlist is already loaded in memory, render immediately without an unnecessary fetch
+  if (isWishlistLoaded && currentWishlist) {
+    wishlistLoading.style.display = 'none';
+    renderWishlistContent();
+    return;
+  }
+
   wishlistLoading.style.display = 'flex';
   wishlistContent.style.display = 'none';
   wishlistEmptyState.style.display = 'none';
@@ -946,10 +1267,21 @@ function showError(msg) {
   }
 }
 
-function populateCategories(products) {
-  const categories = Array.from(
-    new Set(products.map(p => p.category?.trim()).filter(Boolean))
-  ).sort();
+function populateCategories(categorySource) {
+  if (categorySelect && categorySelect.options.length > 1) {
+    return; // Already populated
+  }
+
+  let categories = [];
+  if (Array.isArray(categorySource) && categorySource.length > 0) {
+    if (typeof categorySource[0] === 'string') {
+      categories = [...categorySource].filter(Boolean).sort();
+    } else {
+      categories = Array.from(
+        new Set(categorySource.map(p => p.category?.trim()).filter(Boolean))
+      ).sort();
+    }
+  }
 
   const previousSelection = categorySelect.value;
   categorySelect.innerHTML = '<option value="all">All Categories</option>';
@@ -965,8 +1297,7 @@ function populateCategories(products) {
     categorySelect.value = previousSelection;
     currentCategory = previousSelection;
   } else {
-    categorySelect.value = 'all';
-    currentCategory = 'all';
+    categorySelect.value = currentCategory || 'all';
   }
 }
 
@@ -1077,69 +1408,7 @@ function applyFiltersAndRender(resetPage = true) {
   if (resetPage) {
     currentPage = 1;
   }
-
-  if (allProducts.length === 0) {
-    loadingState.style.display = 'none';
-    errorState.style.display = 'none';
-    emptyFilterState.style.display = 'none';
-    productsGrid.style.display = 'none';
-    if (paginationContainer) paginationContainer.style.display = 'none';
-    emptyState.style.display = 'flex';
-    productCount.textContent = '0 items';
-    return;
-  }
-
-  const query = currentSearchTerm.trim().toLowerCase();
-
-  const filtered = allProducts.filter(product => {
-    const matchesCategory =
-      currentCategory === 'all' ||
-      (product.category && product.category.toLowerCase() === currentCategory.toLowerCase());
-
-    const matchesSearch =
-      !query ||
-      (product.name && product.name.toLowerCase().includes(query)) ||
-      (product.category && product.category.toLowerCase().includes(query));
-
-    return matchesCategory && matchesSearch;
-  });
-
-  if (filtered.length === 0) {
-    productsGrid.style.display = 'none';
-    emptyState.style.display = 'none';
-    emptyFilterState.style.display = 'flex';
-    if (paginationContainer) paginationContainer.style.display = 'none';
-    productCount.textContent = `0 of ${allProducts.length} items`;
-    return;
-  }
-
-  emptyFilterState.style.display = 'none';
-  emptyState.style.display = 'none';
-  productsGrid.innerHTML = '';
-
-  // Pagination calculation (12 items per page)
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-  if (currentPage > totalPages) currentPage = totalPages;
-  if (currentPage < 1) currentPage = 1;
-
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filtered.length);
-  const paginatedItems = filtered.slice(startIndex, endIndex);
-
-  paginatedItems.forEach((product, index) => {
-    productsGrid.appendChild(createProductCard(product, startIndex + index));
-  });
-
-  if (filtered.length === allProducts.length) {
-    productCount.textContent = `${filtered.length} ${filtered.length === 1 ? 'item' : 'items'}`;
-  } else {
-    productCount.textContent = `${filtered.length} of ${allProducts.length} items`;
-  }
-
-  productsGrid.style.display = 'grid';
-
-  // Render pagination controls (previous, next, page numbers, page indicator)
-  renderPaginationControls(filtered.length, totalPages, startIndex, endIndex);
+  return fetchProducts(currentPage);
 }
 
 function renderPaginationControls(totalItems, totalPages, startIndex, endIndex) {
@@ -1218,10 +1487,10 @@ function getPaginationPagesList(current, total) {
   }
 }
 
-function goToPage(pageNum) {
+async function goToPage(pageNum) {
   if (pageNum === currentPage || pageNum < 1) return;
   currentPage = pageNum;
-  applyFiltersAndRender(false);
+  await fetchProducts(currentPage);
 
   const productsSection = document.getElementById('products-section');
   if (productsSection) {
@@ -1231,11 +1500,23 @@ function goToPage(pageNum) {
   }
 }
 
-async function fetchProducts() {
+async function fetchProducts(page = 1) {
+  currentPage = page;
   showLoading();
 
   try {
-    const response = await fetch(`${API_BASE_URL}/products`);
+    const params = new URLSearchParams();
+    params.set('page', page);
+    params.set('limit', ITEMS_PER_PAGE);
+
+    if (currentCategory && currentCategory !== 'all') {
+      params.set('category', currentCategory);
+    }
+    if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+      params.set('search', currentSearchTerm.trim());
+    }
+
+    const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`);
 
     if (!response.ok) {
       throw new Error(`Server returned status ${response.status} (${response.statusText})`);
@@ -1248,10 +1529,64 @@ async function fetchProducts() {
     }
 
     allProducts = result.data;
-    populateCategories(allProducts);
+
+    if (result.categories && Array.isArray(result.categories) && result.categories.length > 0) {
+      populateCategories(result.categories);
+    } else if (allProducts.length > 0) {
+      populateCategories(allProducts);
+    }
 
     loadingState.style.display = 'none';
-    applyFiltersAndRender();
+    errorState.style.display = 'none';
+
+    const pagination = result.pagination || {
+      page: page,
+      limit: ITEMS_PER_PAGE,
+      totalProducts: result.count,
+      totalPages: Math.max(1, Math.ceil(result.count / ITEMS_PER_PAGE)),
+      hasNextPage: false,
+      hasPreviousPage: false
+    };
+
+    currentPage = pagination.page;
+    const totalProducts = pagination.totalProducts;
+    const totalPages = pagination.totalPages;
+
+    if (totalProducts === 0) {
+      productsGrid.style.display = 'none';
+      if (paginationContainer) paginationContainer.style.display = 'none';
+      if (currentSearchTerm || (currentCategory && currentCategory !== 'all')) {
+        emptyFilterState.style.display = 'flex';
+        emptyState.style.display = 'none';
+      } else {
+        emptyFilterState.style.display = 'none';
+        emptyState.style.display = 'flex';
+      }
+      productCount.textContent = '0 items';
+      return;
+    }
+
+    emptyState.style.display = 'none';
+    emptyFilterState.style.display = 'none';
+    productsGrid.innerHTML = '';
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + allProducts.length;
+
+    allProducts.forEach((product, index) => {
+      productsGrid.appendChild(createProductCard(product, startIndex + index));
+    });
+
+    if (currentSearchTerm || (currentCategory && currentCategory !== 'all')) {
+      productCount.textContent = `${totalProducts} of ${totalProducts} items`;
+    } else {
+      productCount.textContent = `${totalProducts} ${totalProducts === 1 ? 'item' : 'items'}`;
+    }
+
+    productsGrid.style.display = 'grid';
+
+    // Render pagination controls (previous, next, page numbers, page indicator)
+    renderPaginationControls(totalProducts, totalPages, startIndex, endIndex);
 
     if (backendStatus) {
       backendStatus.innerHTML = `
@@ -2143,6 +2478,7 @@ async function fetchCart() {
 
   if (!token) {
     currentCart = null;
+    isCartLoaded = false;
     updateCartCountBadge(0);
     return;
   }
@@ -2159,6 +2495,7 @@ async function fetchCart() {
       localStorage.removeItem('user');
       updateAuthUI();
       currentCart = null;
+      isCartLoaded = false;
       updateCartCountBadge(0);
       return;
     }
@@ -2166,6 +2503,7 @@ async function fetchCart() {
     const result = await response.json();
     if (result.success && result.data) {
       currentCart = result.data;
+      isCartLoaded = true;
       const totalItems = (currentCart.items || []).reduce((sum, item) => sum + item.quantity, 0);
       updateCartCountBadge(totalItems);
     }
@@ -2187,6 +2525,11 @@ function updateCartCountBadge(count) {
   if (cartItemsCountBadge) {
     cartItemsCountBadge.textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
   }
+  if (getAuthToken()) {
+    localStorage.setItem('ministore_cart_count', String(count));
+  } else {
+    localStorage.removeItem('ministore_cart_count');
+  }
 }
 
 async function openCartModal() {
@@ -2204,6 +2547,19 @@ async function openCartModal() {
   }
 
   cartUnauthState.style.display = 'none';
+
+  // If cart is already cached in memory, use it without an extra network call
+  if (isCartLoaded && currentCart) {
+    cartLoading.style.display = 'none';
+    if (!currentCart.items || currentCart.items.length === 0) {
+      cartEmptyState.style.display = 'flex';
+      cartContent.style.display = 'none';
+    } else {
+      renderCartContent();
+    }
+    return;
+  }
+
   cartLoading.style.display = 'flex';
   cartContent.style.display = 'none';
   cartEmptyState.style.display = 'none';
@@ -2367,6 +2723,7 @@ async function addToCart(productId, quantity = 1, sourceImg = null) {
     }
 
     currentCart = result.data;
+    isCartLoaded = true;
     const totalItems = (currentCart.items || []).reduce((sum, item) => sum + item.quantity, 0);
     updateCartCountBadge(totalItems);
 
@@ -2403,6 +2760,7 @@ async function updateCartItemQuantity(productId, newQuantity) {
     }
 
     currentCart = result.data;
+    isCartLoaded = true;
     renderCartContent();
   } catch (error) {
     console.error('Update cart item error:', error);
@@ -2436,6 +2794,7 @@ async function removeCartItem(productId) {
     }
 
     currentCart = result.data;
+    isCartLoaded = true;
     setTimeout(() => {
       renderCartContent();
       showToast('Item removed from cart.');
@@ -2453,6 +2812,7 @@ async function removeCartItem(productId) {
 
 async function openAddressModal() {
   if (!addressModal) return;
+  closeProfileDropdown();
   addressModal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
@@ -3164,6 +3524,7 @@ async function placeOrder() {
 
     // Reset local cart
     currentCart = null;
+    isCartLoaded = false;
     updateCartCountBadge(0);
 
     // Populate success receipt
@@ -3222,6 +3583,7 @@ async function placeOrder() {
 // ============================================================
 
 async function openOrdersModal() {
+  closeProfileDropdown();
   ordersModal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
@@ -3383,12 +3745,7 @@ function initScrollReveal() {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updateAuthUI();
-  fetchProducts();
-  fetchCart();
-  fetchWishlist();
-  if (getAuthToken()) {
-    fetchAddresses();
-  }
+  fetchProducts(1);
   initScrollReveal();
   initHeroInteractiveFeatures();
   initHeroBackgroundSlider();
@@ -3401,24 +3758,36 @@ if (themeToggleBtn) {
 }
 
 // Refresh Catalog
-if (refreshBtn) refreshBtn.addEventListener('click', fetchProducts);
-if (retryBtn) retryBtn.addEventListener('click', fetchProducts);
+if (refreshBtn) refreshBtn.addEventListener('click', () => fetchProducts(currentPage));
+if (retryBtn) retryBtn.addEventListener('click', () => fetchProducts(currentPage));
 
 // Search
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     currentSearchTerm = e.target.value;
     clearSearchBtn.style.display = currentSearchTerm ? 'block' : 'none';
-    applyFiltersAndRender();
+    clearTimeout(searchDebounceTimeout);
+    searchDebounceTimeout = setTimeout(() => {
+      applyFiltersAndRender(true);
+    }, 250);
+  });
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      clearTimeout(searchDebounceTimeout);
+      applyFiltersAndRender(true);
+    }
   });
 }
 
 if (clearSearchBtn) {
   clearSearchBtn.addEventListener('click', () => {
+    clearTimeout(searchDebounceTimeout);
     searchInput.value = '';
     currentSearchTerm = '';
     clearSearchBtn.style.display = 'none';
-    applyFiltersAndRender();
+    applyFiltersAndRender(true);
     searchInput.focus();
   });
 }
@@ -3427,19 +3796,20 @@ if (clearSearchBtn) {
 if (categorySelect) {
   categorySelect.addEventListener('change', (e) => {
     currentCategory = e.target.value;
-    applyFiltersAndRender();
+    applyFiltersAndRender(true);
   });
 }
 
 // Reset filters
 if (resetFiltersBtn) {
   resetFiltersBtn.addEventListener('click', () => {
+    clearTimeout(searchDebounceTimeout);
     searchInput.value = '';
     currentSearchTerm = '';
     clearSearchBtn.style.display = 'none';
     categorySelect.value = 'all';
     currentCategory = 'all';
-    applyFiltersAndRender();
+    applyFiltersAndRender(true);
   });
 }
 
@@ -3575,6 +3945,7 @@ if (ordersModal) {
 if (navLoginBtn) navLoginBtn.addEventListener('click', () => openAuthModal('login'));
 if (navLogoutBtn) {
   navLogoutBtn.addEventListener('click', () => {
+    closeProfileDropdown();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     updateAuthUI();
@@ -3592,6 +3963,123 @@ if (navLogoutBtn) {
 }
 
 if (authCloseBtn) authCloseBtn.addEventListener('click', closeAuthModal);
+
+// Profile Dropdown & Modal Controls
+if (navProfileTriggerBtn) {
+  navProfileTriggerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleProfileDropdown();
+  });
+}
+
+if (dropdownProfileBtn) {
+  dropdownProfileBtn.addEventListener('click', () => {
+    closeProfileDropdown();
+    openProfileModal();
+  });
+}
+
+// Close profile dropdown when clicking any dropdown item inside it
+if (profileDropdownMenu) {
+  profileDropdownMenu.querySelectorAll('.dropdown-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      closeProfileDropdown();
+    });
+  });
+}
+
+// Profile Modal Actions
+if (profileCloseBtn) profileCloseBtn.addEventListener('click', closeProfileModal);
+if (profileCancelBtn) profileCancelBtn.addEventListener('click', closeProfileModal);
+if (profileForm) profileForm.addEventListener('submit', handleProfileSave);
+
+if (profileModal) {
+  profileModal.addEventListener('click', (e) => {
+    if (e.target === profileModal) closeProfileModal();
+  });
+}
+
+// Profile Avatar File Upload
+if (profileAvatarFile) {
+  profileAvatarFile.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Please select an image smaller than 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => {
+      currentEditingAvatar = loadEvent.target.result;
+      updateProfileModalAvatarPreview();
+      renderAvatarPresets();
+      showToast('Photo loaded! Click Save to apply.');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Profile Avatar URL Apply & Reset
+if (profileAvatarUrlApplyBtn) {
+  profileAvatarUrlApplyBtn.addEventListener('click', () => {
+    const url = profileAvatarUrlInput.value.trim();
+    if (!url) {
+      showToast('Please enter an image URL');
+      return;
+    }
+    currentEditingAvatar = url;
+    updateProfileModalAvatarPreview();
+    renderAvatarPresets();
+    showToast('Image URL applied! Click Save to confirm.');
+  });
+}
+
+if (profileAvatarRemoveBtn) {
+  profileAvatarRemoveBtn.addEventListener('click', () => {
+    currentEditingAvatar = '';
+    if (profileAvatarUrlInput) profileAvatarUrlInput.value = '';
+    if (profileAvatarFile) profileAvatarFile.value = '';
+    updateProfileModalAvatarPreview();
+    renderAvatarPresets();
+    showToast('Avatar reset to default initials.');
+  });
+}
+
+// Profile Shortcuts to Wishlist, Orders, Addresses
+if (profileShortcutWishlist) {
+  profileShortcutWishlist.addEventListener('click', () => {
+    closeProfileModal();
+    openWishlistModal();
+  });
+}
+
+if (profileShortcutOrders) {
+  profileShortcutOrders.addEventListener('click', () => {
+    closeProfileModal();
+    openOrdersModal();
+  });
+}
+
+if (profileShortcutAddresses) {
+  profileShortcutAddresses.addEventListener('click', () => {
+    closeProfileModal();
+    openAddressModal();
+  });
+}
+
+// Close profile dropdown on click outside
+document.addEventListener('click', (e) => {
+  if (profileNavWrapper && !profileNavWrapper.contains(e.target)) {
+    closeProfileDropdown();
+  }
+});
 
 // Addresses Modal Actions
 if (navAddressesBtn) navAddressesBtn.addEventListener('click', openAddressModal);
@@ -3754,6 +4242,8 @@ if (registerForm) {
 // Global Keyboard (Escape closes active modal)
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    closeProfileDropdown();
+    if (profileModal && profileModal.style.display === 'flex') closeProfileModal();
     if (addressModal && addressModal.style.display === 'flex') closeAddressModal();
     if (adminModal && adminModal.style.display === 'flex') closeAdminModal();
     if (checkoutModal && checkoutModal.style.display === 'flex') closeCheckoutModal();
@@ -3801,6 +4291,7 @@ function setAdminTab(tabName) {
 }
 
 function openAdminModal() {
+  closeProfileDropdown();
   const user = getAuthUser();
   if (!user || user.role !== 'admin') {
     showToast('Admin privileges required.');

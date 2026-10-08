@@ -63,7 +63,10 @@ router.post('/register', async (req, res) => {
         id: savedUser._id,
         name: savedUser.name,
         email: savedUser.email,
-        role: savedUser.role || 'customer'
+        role: savedUser.role || 'customer',
+        phone: savedUser.phone || '',
+        avatar: savedUser.avatar || '',
+        createdAt: savedUser.createdAt
       }
     });
   } catch (error) {
@@ -134,7 +137,10 @@ router.post('/login', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role || 'customer'
+        role: user.role || 'customer',
+        phone: user.phone || '',
+        avatar: user.avatar || '',
+        createdAt: user.createdAt
       }
     });
   } catch (error) {
@@ -167,13 +173,67 @@ router.get('/me', authMiddleware, async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role || 'customer'
+        role: user.role || 'customer',
+        phone: user.phone || '',
+        avatar: user.avatar || '',
+        createdAt: user.createdAt
       }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Server error retrieving user profile',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 4. PUT /api/auth/profile - Protected route: Update user profile
+// ============================================================
+router.put('/profile', authMiddleware, async (req, res) => {
+  try {
+    const { name, phone, avatar } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (name && typeof name === 'string' && name.trim().length > 0) {
+      user.name = name.trim();
+    }
+
+    if (phone !== undefined && typeof phone === 'string') {
+      user.phone = phone.trim();
+    }
+
+    if (avatar !== undefined && typeof avatar === 'string') {
+      user.avatar = avatar.trim();
+    }
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role || 'customer',
+        phone: updatedUser.phone || '',
+        avatar: updatedUser.avatar || '',
+        createdAt: updatedUser.createdAt
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error updating profile',
       error: error.message
     });
   }

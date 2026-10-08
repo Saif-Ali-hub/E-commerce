@@ -27,6 +27,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ['customer', 'admin'],
       default: 'customer'
+    },
+    avatar: {
+      type: String,
+      default: ''
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: ''
     }
   },
   {
