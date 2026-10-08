@@ -513,6 +513,33 @@
     <div class="products-grid" id="products-grid" style="display: none;">
       <!-- Product cards injected dynamically by app.js -->
     </div>
+
+    <!-- Catalog Pagination Controls (12 items per page) -->
+    <nav class="pagination-container" id="pagination-container" style="display: none;" aria-label="Product catalog navigation">
+      <div class="pagination-summary" id="pagination-summary" aria-live="polite">
+        Showing <span id="pagination-range-start">1</span>–<span id="pagination-range-end">12</span> of <span id="pagination-total-items">0</span> products
+      </div>
+
+      <div class="pagination-controls">
+        <button class="pagination-nav-btn pagination-prev-btn" id="pagination-prev-btn" type="button" aria-label="Go to previous page" title="Previous page">
+          <span class="pagination-arrow" aria-hidden="true">←</span>
+          <span class="pagination-btn-label">Previous</span>
+        </button>
+
+        <div class="pagination-pages" id="pagination-pages" role="group" aria-label="Page navigation">
+          <!-- Page numbers dynamically populated by app.js -->
+        </div>
+
+        <button class="pagination-nav-btn pagination-next-btn" id="pagination-next-btn" type="button" aria-label="Go to next page" title="Next page">
+          <span class="pagination-btn-label">Next</span>
+          <span class="pagination-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <div class="pagination-page-indicator" id="pagination-page-indicator" aria-live="polite">
+        Page <span id="current-page-num" class="current-page-num">1</span> of <span id="total-pages-num" class="total-pages-num">1</span>
+      </div>
+    </nav>
   </main>
 
   <!-- Product Details Modal -->
@@ -1482,7 +1509,443 @@
   </div>
 
   <!-- Toast Notification Container -->
+  <!-- Toast Notification Container -->
   <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
+
+  <!-- Order Tracking Modal -->
+  <div class="modal-backdrop" id="order-tracking-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="order-tracking-title">
+    <div class="modal-container tracking-modal-container">
+      <button class="modal-close-icon" id="order-tracking-close-btn" aria-label="Close order tracking dialog">✕</button>
+
+      <div class="info-modal-header">
+        <span class="info-header-badge badge-indigo">📦 Real-Time Tracking</span>
+        <h3 class="modal-title" id="order-tracking-title">Track Your Order</h3>
+        <p class="modal-subtitle">Enter your 24-character Order ID to view current fulfillment status and shipment details.</p>
+      </div>
+
+      <!-- Tracking Input Form -->
+      <form id="order-tracking-form" class="tracking-input-form">
+        <div class="tracking-input-group">
+          <input type="text" id="track-order-id-input" class="form-input tracking-input" placeholder="Enter Order ID (e.g., 65f1a2b3c4d5e6f7a8b9c0d1)" maxlength="24" required autocomplete="off" />
+          <button type="submit" id="track-order-submit-btn" class="btn btn-primary tracking-submit-btn">
+            <span>Track Order</span>
+            <span>→</span>
+          </button>
+        </div>
+        <p class="tracking-form-hint">Tip: Your Order ID is shown upon placing an order and listed in your order history.</p>
+      </form>
+
+      <!-- Loading State -->
+      <div id="track-order-loading" class="tracking-state-box" style="display: none;">
+        <div class="spinner"></div>
+        <p>Querying verified order records...</p>
+      </div>
+
+      <!-- Error State -->
+      <div id="track-order-error" class="alert-box alert-danger tracking-alert" style="display: none;"></div>
+
+      <!-- Unauthenticated State -->
+      <div id="track-order-unauth" class="tracking-unauth-box" style="display: none;">
+        <div class="unauth-icon">🔒</div>
+        <h4>Authentication Required</h4>
+        <p>Orders are private and protected. Please sign in to the account that placed the order to view its verified details.</p>
+        <button type="button" class="btn btn-primary btn-sm" id="track-order-unauth-login-btn">Log In to View Order</button>
+      </div>
+
+      <!-- Result Card -->
+      <div id="track-order-result" class="tracking-result-card" style="display: none;">
+        <div class="tracking-result-header">
+          <div>
+            <span class="tracking-order-id" id="track-result-id">Order #</span>
+            <div class="tracking-date" id="track-result-date">Placed: -</div>
+          </div>
+          <div class="tracking-header-badges">
+            <span class="status-badge" id="track-result-status">Pending</span>
+            <span class="payment-method-pill" id="track-result-payment">UPI</span>
+            <span class="payment-status-badge" id="track-result-payment-status">Pending</span>
+          </div>
+        </div>
+
+        <!-- Visual Progress Stepper -->
+        <div class="tracking-stepper" id="track-stepper">
+          <div class="stepper-step" id="step-placed">
+            <div class="stepper-dot">✓</div>
+            <span class="stepper-label">Placed</span>
+          </div>
+          <div class="stepper-line" id="line-1"></div>
+          <div class="stepper-step" id="step-processing">
+            <div class="stepper-dot">⚡</div>
+            <span class="stepper-label">Processing</span>
+          </div>
+          <div class="stepper-line" id="line-2"></div>
+          <div class="stepper-step" id="step-shipped">
+            <div class="stepper-dot">🚚</div>
+            <span class="stepper-label">Shipped</span>
+          </div>
+          <div class="stepper-line" id="line-3"></div>
+          <div class="stepper-step" id="step-delivered">
+            <div class="stepper-dot">📍</div>
+            <span class="stepper-label">Delivered</span>
+          </div>
+        </div>
+
+        <!-- Items Summary List -->
+        <div class="tracking-section-label">Order Items</div>
+        <div class="tracking-items-list" id="track-result-items"></div>
+
+        <!-- Shipping Summary -->
+        <div class="tracking-section-label">Delivery Destination</div>
+        <div class="tracking-shipping-box" id="track-result-address"></div>
+
+        <!-- Total Row -->
+        <div class="tracking-total-row">
+          <span>Total Paid / Payable:</span>
+          <strong class="tracking-total-val" id="track-result-total">₹0</strong>
+        </div>
+      </div>
+
+      <div class="tracking-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="track-view-all-orders-btn">
+          <span>📋 View Full Order History</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shipping & Delivery Information Modal -->
+  <div class="modal-backdrop" id="shipping-info-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
+    <div class="modal-container info-modal-container">
+      <button class="modal-close-icon" id="shipping-modal-close-btn" aria-label="Close shipping dialog">✕</button>
+
+      <div class="info-modal-header">
+        <span class="info-header-badge badge-indigo">🚚 Logistics &amp; Delivery</span>
+        <h3 class="modal-title" id="shipping-modal-title">Shipping &amp; Delivery Information</h3>
+        <p class="modal-subtitle">Transparent fulfillment timelines, express logistics partners, and delivery standards.</p>
+      </div>
+
+      <div class="info-content-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🇮🇳</span>
+            <h4 class="info-card-title">Pan-India Delivery Availability</h4>
+          </div>
+          <p class="info-card-desc">We dispatch across all serviceable pincodes in India via vetted tier-1 courier networks. Both residential addresses and corporate work hubs are supported.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">⏱️</span>
+            <h4 class="info-card-title">Estimated Delivery Timeframe</h4>
+          </div>
+          <p class="info-card-desc"><strong>Metropolitan Hubs:</strong> 2 to 4 business days from dispatch.<br><strong>Regional &amp; Outstation Locations:</strong> 4 to 7 business days depending on local postal accessibility.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">⚡</span>
+            <h4 class="info-card-title">Same-Day Order Processing</h4>
+          </div>
+          <p class="info-card-desc">Orders confirmed before <strong>2:00 PM IST</strong> on business days undergo quality inspection, protective packaging, and carrier handover on the exact same day.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">📦</span>
+            <h4 class="info-card-title">Real-Time Delivery Tracking</h4>
+          </div>
+          <p class="info-card-desc">Every confirmed order receives a unique 24-character Order ID. Track status milestones anytime via the Order Tracking tool or your My Orders dashboard.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">💰</span>
+            <h4 class="info-card-title">Zero Delivery Fees &gt; ₹499</h4>
+          </div>
+          <p class="info-card-desc">Free express shipping applies automatically to all cart orders above ₹499. Orders below ₹499 incur a nominal fulfillment charge calculated during checkout.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🛡️</span>
+            <h4 class="info-card-title">Tamper-Proof Packaging</h4>
+          </div>
+          <p class="info-card-desc">All products are sealed in protective, tamper-evident security cartons. Please verify the exterior seal before accepting delivery from our courier representative.</p>
+        </div>
+      </div>
+
+      <div class="info-modal-footer">
+        <button type="button" class="btn btn-primary" id="shipping-modal-ok-btn">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7-Day Easy Returns Modal -->
+  <div class="modal-backdrop" id="returns-info-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="returns-modal-title">
+    <div class="modal-container info-modal-container">
+      <button class="modal-close-icon" id="returns-modal-close-btn" aria-label="Close returns dialog">✕</button>
+
+      <div class="info-modal-header">
+        <span class="info-header-badge badge-emerald">🔄 Customer Assurance</span>
+        <h3 class="modal-title" id="returns-modal-title">7-Day Easy Returns &amp; Refunds</h3>
+        <p class="modal-subtitle">Hassle-free return window, transparent eligibility guidelines, and prompt refund processing.</p>
+      </div>
+
+      <div class="info-content-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">📅</span>
+            <h4 class="info-card-title">7-Day Return Window</h4>
+          </div>
+          <p class="info-card-desc">You have 7 full calendar days from the doorstep delivery timestamp to initiate a return request if an item is damaged, defective, or not as described.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">✅</span>
+            <h4 class="info-card-title">Basic Return Eligibility</h4>
+          </div>
+          <p class="info-card-desc">Items must remain unused, unwashed, and in original condition with all barcode tags, user manuals, accessories, and protective packaging intact.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">📝</span>
+            <h4 class="info-card-title">Return Request Process</h4>
+          </div>
+          <p class="info-card-desc">1. Open your order in <strong>My Orders</strong>.<br>2. Note your 24-character Order ID.<br>3. Submit a return inquiry stating the reason. Our logistics partner schedules a scheduled doorstep pickup.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">💳</span>
+            <h4 class="info-card-title">Refund Processing Timelines</h4>
+          </div>
+          <p class="info-card-desc"><strong>Prepaid (UPI / Net Banking):</strong> Returned to original source within 3–5 business days after warehouse inspection.<br><strong>Cash on Delivery (COD):</strong> Refunded via verified UPI or bank transfer upon item handover.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">⚠️</span>
+            <h4 class="info-card-title">Important Exceptions &amp; Conditions</h4>
+          </div>
+          <p class="info-card-desc">For hygiene and safety reasons, personal grooming items, custom altered items, or products showing signs of customer misuse/wear are non-returnable.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🤝</span>
+            <h4 class="info-card-title">Free Reverse Pickup</h4>
+          </div>
+          <p class="info-card-desc">Approved return requests enjoy free doorstep courier pickup across major serviceable locations with no return shipping surcharge.</p>
+        </div>
+      </div>
+
+      <div class="info-modal-footer">
+        <button type="button" class="btn btn-primary" id="returns-modal-ok-btn">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div class="modal-backdrop" id="privacy-policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+    <div class="modal-container info-modal-container">
+      <button class="modal-close-icon" id="privacy-modal-close-btn" aria-label="Close privacy policy dialog">✕</button>
+
+      <div class="info-modal-header">
+        <span class="info-header-badge badge-indigo">🛡️ Data Privacy</span>
+        <h3 class="modal-title" id="privacy-modal-title">Privacy Policy</h3>
+        <p class="modal-subtitle">How MiniStore collects, utilizes, and safeguards your customer information.</p>
+      </div>
+
+      <div class="info-content-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">👤</span>
+            <h4 class="info-card-title">Information We Collect</h4>
+          </div>
+          <p class="info-card-desc">We collect only necessary personal data: account name, email address, delivery addresses, telephone numbers, and order histories entered during registration and checkout.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🎯</span>
+            <h4 class="info-card-title">How We Use Your Data</h4>
+          </div>
+          <p class="info-card-desc">Information is utilized solely to process orders, facilitate doorstep delivery, issue order confirmations, and provide authenticated customer support access.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🔒</span>
+            <h4 class="info-card-title">Password &amp; Session Protection</h4>
+          </div>
+          <p class="info-card-desc">Customer passwords are cryptographically hashed using salted bcrypt prior to database storage. Authenticated sessions rely on secure JSON Web Tokens (JWT).</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🤝</span>
+            <h4 class="info-card-title">Third-Party Logistics Sharing</h4>
+          </div>
+          <p class="info-card-desc">Delivery contact details are shared strictly with logistics couriers for physical parcel dispatch. We do not sell, rent, or trade your personal data to external advertisers.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">⚙️</span>
+            <h4 class="info-card-title">Customer Rights &amp; Control</h4>
+          </div>
+          <p class="info-card-desc">You may view order history, add, edit, or remove delivery addresses, and manage your stored account information directly from your user dashboard at any time.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">📬</span>
+            <h4 class="info-card-title">Inquiries &amp; Privacy Assistance</h4>
+          </div>
+          <p class="info-card-desc">For privacy-related questions or data removal requests, contact store administration through customer care or the official store admin desk.</p>
+        </div>
+      </div>
+
+      <div class="info-modal-footer">
+        <button type="button" class="btn btn-primary" id="privacy-modal-ok-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Service Modal -->
+  <div class="modal-backdrop" id="terms-of-service-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+    <div class="modal-container info-modal-container">
+      <button class="modal-close-icon" id="terms-modal-close-btn" aria-label="Close terms dialog">✕</button>
+
+      <div class="info-modal-header">
+        <span class="info-header-badge badge-amber">📜 Store Agreement</span>
+        <h3 class="modal-title" id="terms-modal-title">Terms of Service</h3>
+        <p class="modal-subtitle">Fair commercial terms governing purchases, catalog orders, and platform usage.</p>
+      </div>
+
+      <div class="info-content-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🛍️</span>
+            <h4 class="info-card-title">Catalog Listings &amp; Pricing</h4>
+          </div>
+          <p class="info-card-desc">All products are priced in Indian Rupees (₹), inclusive of applicable taxes. MiniStore reserves the right to adjust pricing or correct typographical discrepancies prior to order fulfillment.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">📦</span>
+            <h4 class="info-card-title">Order Placement &amp; Acceptance</h4>
+          </div>
+          <p class="info-card-desc">Placing an order constitutes an offer to purchase. Order confirmation notifications confirm receipt; order fulfillment is completed upon shipment dispatch from our warehouse.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">💳</span>
+            <h4 class="info-card-title">Accepted Payment Modes</h4>
+          </div>
+          <p class="info-card-desc">Payments are accepted via UPI, Cash on Delivery (COD), and Net Banking. COD orders require payment in full upon parcel presentation by the courier partner.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🔄</span>
+            <h4 class="info-card-title">Returns &amp; Cancellations</h4>
+          </div>
+          <p class="info-card-desc">Orders may be canceled prior to shipping dispatch. Delivered orders qualify for return requests within 7 calendar days in compliance with our 7-Day Returns Policy.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">👤</span>
+            <h4 class="info-card-title">Account Responsibility</h4>
+          </div>
+          <p class="info-card-desc">Users are responsible for maintaining the confidentiality of their login credentials and ensuring all shipping information supplied is accurate and up to date.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">⚖️</span>
+            <h4 class="info-card-title">Fair Use &amp; Dispute Resolution</h4>
+          </div>
+          <p class="info-card-desc">The platform is provided for lawful consumer shopping. Any commercial disputes are subject to resolution under applicable consumer protection frameworks.</p>
+        </div>
+      </div>
+
+      <div class="info-modal-footer">
+        <button type="button" class="btn btn-primary" id="terms-modal-ok-btn">I Agree</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security Information Modal -->
+  <div class="modal-backdrop" id="security-info-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="security-modal-title">
+    <div class="modal-container info-modal-container">
+      <button class="modal-close-icon" id="security-modal-close-btn" aria-label="Close security dialog">✕</button>
+
+      <div class="info-modal-header">
+        <span class="info-header-badge badge-emerald">🔐 Security Architecture</span>
+        <h3 class="modal-title" id="security-modal-title">Security Architecture &amp; Verification</h3>
+        <p class="modal-subtitle">How your transactions, customer accounts, and sessions are safely safeguarded.</p>
+      </div>
+
+      <div class="info-content-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🔑</span>
+            <h4 class="info-card-title">Cryptographic Password Hashing</h4>
+          </div>
+          <p class="info-card-desc">All customer passwords are cryptographically salted and hashed using multi-round bcrypt prior to persistence. Plaintext passwords are never recorded or stored in our database.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🛡️</span>
+            <h4 class="info-card-title">JWT Stateless Authentication</h4>
+          </div>
+          <p class="info-card-desc">Account sessions are secured using cryptographically signed JSON Web Tokens (JWT). Every protected API request validates token authenticity and expiry.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">👤</span>
+            <h4 class="info-card-title">Strict Account Isolation</h4>
+          </div>
+          <p class="info-card-desc">Robust authorization policies ensure customers can strictly view and modify only their own cart, orders, and delivery addresses, preventing cross-account access.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">💳</span>
+            <h4 class="info-card-title">Safe Transaction Workflows</h4>
+          </div>
+          <p class="info-card-desc">Transactions are processed via validated UPI, Net Banking, and Cash on Delivery workflows. MiniStore stores zero sensitive debit/credit card numbers on its servers.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">🔍</span>
+            <h4 class="info-card-title">Input Sanitization &amp; Protection</h4>
+          </div>
+          <p class="info-card-desc">Backend routes enforce strict MongoDB ObjectId validation, payload schema checks, and query protections against unauthorized injections.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <span class="info-card-icon">ℹ️</span>
+            <h4 class="info-card-title">Transparent Engineering Disclosure</h4>
+          </div>
+          <p class="info-card-desc">This overview reflects the actual technical safeguards engineered into MiniStore. We operate on honest technical merit without claiming unverified third-party certifications.</p>
+        </div>
+      </div>
+
+      <div class="info-modal-footer">
+        <button type="button" class="btn btn-primary" id="security-modal-ok-btn">Close</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="footer" id="main-footer">
@@ -1502,19 +1965,19 @@
       <div class="footer-col">
         <h4 class="footer-col-title">Shop Categories</h4>
         <ul class="footer-links">
-          <li><a href="#products-section">Electronics &amp; Audio</a></li>
-          <li><a href="#products-section">Watches &amp; Wearables</a></li>
-          <li><a href="#products-section">Footwear &amp; Apparel</a></li>
-          <li><a href="#products-section">Productivity &amp; Tech</a></li>
+          <li><a href="#products-section" class="footer-category-link" data-category="Electronics &amp; Audio">Electronics &amp; Audio</a></li>
+          <li><a href="#products-section" class="footer-category-link" data-category="Watches &amp; Wearables">Watches &amp; Wearables</a></li>
+          <li><a href="#products-section" class="footer-category-link" data-category="Footwear &amp; Apparel">Footwear &amp; Apparel</a></li>
+          <li><a href="#products-section" class="footer-category-link" data-category="Productivity &amp; Tech">Productivity &amp; Tech</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4 class="footer-col-title">Customer Care</h4>
         <ul class="footer-links">
-          <li><a href="#products-section">Order Tracking</a></li>
-          <li><a href="#products-section">Shipping &amp; Delivery</a></li>
-          <li><a href="#products-section">7-Day Easy Returns</a></li>
-          <li><a href="#products-section">Verified Customer Reviews</a></li>
+          <li><button type="button" class="footer-link-btn" id="footer-order-tracking-btn">Order Tracking</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-shipping-btn">Shipping &amp; Delivery</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-returns-btn">7-Day Easy Returns</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-reviews-btn">Verified Customer Reviews</button></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -1530,11 +1993,11 @@
     <div class="container footer-bottom-bar">
       <p class="footer-text">&copy; 2026 MiniStore. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
       <div class="footer-bottom-links">
-        <span>Privacy Policy</span>
-        <span>•</span>
-        <span>Terms of Service</span>
-        <span>•</span>
-        <span>Security Verified</span>
+        <button type="button" class="footer-bottom-btn" id="footer-privacy-btn">Privacy Policy</button>
+        <span class="footer-bottom-sep">•</span>
+        <button type="button" class="footer-bottom-btn" id="footer-terms-btn">Terms of Service</button>
+        <span class="footer-bottom-sep">•</span>
+        <button type="button" class="footer-bottom-btn" id="footer-security-btn">Security Verified</button>
       </div>
     </div>
   </footer>

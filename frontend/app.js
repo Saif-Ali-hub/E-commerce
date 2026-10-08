@@ -39,6 +39,21 @@ const retryBtn = document.getElementById('retry-btn');
 const refreshBtn = document.getElementById('refresh-btn');
 const backendStatus = document.getElementById('backend-status');
 
+// Pagination State (12 items per page)
+const ITEMS_PER_PAGE = 12;
+let currentPage = 1;
+
+// DOM Elements - Pagination
+const paginationContainer = document.getElementById('pagination-container');
+const paginationPrevBtn = document.getElementById('pagination-prev-btn');
+const paginationNextBtn = document.getElementById('pagination-next-btn');
+const paginationPages = document.getElementById('pagination-pages');
+const paginationRangeStart = document.getElementById('pagination-range-start');
+const paginationRangeEnd = document.getElementById('pagination-range-end');
+const paginationTotalItems = document.getElementById('pagination-total-items');
+const currentPageNum = document.getElementById('current-page-num');
+const totalPagesNum = document.getElementById('total-pages-num');
+
 // DOM Elements - Filter & Search
 const searchInput = document.getElementById('search-input');
 const clearSearchBtn = document.getElementById('clear-search-btn');
@@ -911,6 +926,7 @@ function showLoading() {
   emptyState.style.display = 'none';
   emptyFilterState.style.display = 'none';
   productsGrid.style.display = 'none';
+  if (paginationContainer) paginationContainer.style.display = 'none';
 }
 
 function showError(msg) {
@@ -919,6 +935,7 @@ function showError(msg) {
   emptyState.style.display = 'none';
   emptyFilterState.style.display = 'none';
   productsGrid.style.display = 'none';
+  if (paginationContainer) paginationContainer.style.display = 'none';
   errorMessage.textContent = msg || 'Could not connect to the backend API.';
 
   if (backendStatus) {
@@ -1056,12 +1073,17 @@ function createProductCard(product, index = 0, idPrefix = 'product-') {
   return card;
 }
 
-function applyFiltersAndRender() {
+function applyFiltersAndRender(resetPage = true) {
+  if (resetPage) {
+    currentPage = 1;
+  }
+
   if (allProducts.length === 0) {
     loadingState.style.display = 'none';
     errorState.style.display = 'none';
     emptyFilterState.style.display = 'none';
     productsGrid.style.display = 'none';
+    if (paginationContainer) paginationContainer.style.display = 'none';
     emptyState.style.display = 'flex';
     productCount.textContent = '0 items';
     return;
@@ -1086,6 +1108,7 @@ function applyFiltersAndRender() {
     productsGrid.style.display = 'none';
     emptyState.style.display = 'none';
     emptyFilterState.style.display = 'flex';
+    if (paginationContainer) paginationContainer.style.display = 'none';
     productCount.textContent = `0 of ${allProducts.length} items`;
     return;
   }
@@ -1094,8 +1117,17 @@ function applyFiltersAndRender() {
   emptyState.style.display = 'none';
   productsGrid.innerHTML = '';
 
-  filtered.forEach((product, index) => {
-    productsGrid.appendChild(createProductCard(product, index));
+  // Pagination calculation (12 items per page)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filtered.length);
+  const paginatedItems = filtered.slice(startIndex, endIndex);
+
+  paginatedItems.forEach((product, index) => {
+    productsGrid.appendChild(createProductCard(product, startIndex + index));
   });
 
   if (filtered.length === allProducts.length) {
@@ -1105,6 +1137,98 @@ function applyFiltersAndRender() {
   }
 
   productsGrid.style.display = 'grid';
+
+  // Render pagination controls (previous, next, page numbers, page indicator)
+  renderPaginationControls(filtered.length, totalPages, startIndex, endIndex);
+}
+
+function renderPaginationControls(totalItems, totalPages, startIndex, endIndex) {
+  if (!paginationContainer) return;
+
+  if (totalItems <= 0) {
+    paginationContainer.style.display = 'none';
+    return;
+  }
+
+  paginationContainer.style.display = 'flex';
+
+  if (paginationRangeStart) paginationRangeStart.textContent = totalItems === 0 ? 0 : (startIndex + 1);
+  if (paginationRangeEnd) paginationRangeEnd.textContent = endIndex;
+  if (paginationTotalItems) paginationTotalItems.textContent = totalItems;
+  if (currentPageNum) currentPageNum.textContent = currentPage;
+  if (totalPagesNum) totalPagesNum.textContent = totalPages;
+
+  // Previous page button state
+  if (paginationPrevBtn) {
+    const isFirstPage = currentPage <= 1;
+    paginationPrevBtn.disabled = isFirstPage;
+    paginationPrevBtn.setAttribute('aria-disabled', isFirstPage ? 'true' : 'false');
+  }
+
+  // Next page button state
+  if (paginationNextBtn) {
+    const isLastPage = currentPage >= totalPages;
+    paginationNextBtn.disabled = isLastPage;
+    paginationNextBtn.setAttribute('aria-disabled', isLastPage ? 'true' : 'false');
+  }
+
+  // Dynamic Page numbers list with interactive click handlers
+  if (paginationPages) {
+    paginationPages.innerHTML = '';
+    const pagesList = getPaginationPagesList(currentPage, totalPages);
+
+    pagesList.forEach(item => {
+      if (item === '...') {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'pagination-ellipsis';
+        ellipsis.textContent = '…';
+        ellipsis.setAttribute('aria-hidden', 'true');
+        paginationPages.appendChild(ellipsis);
+      } else {
+        const pageBtn = document.createElement('button');
+        pageBtn.type = 'button';
+        pageBtn.className = `pagination-page-btn ${item === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = item;
+        pageBtn.setAttribute('aria-label', `Page ${item}${item === currentPage ? ', current page' : ''}`);
+        if (item === currentPage) {
+          pageBtn.setAttribute('aria-current', 'page');
+        }
+        pageBtn.addEventListener('click', () => {
+          goToPage(item);
+        });
+        paginationPages.appendChild(pageBtn);
+      }
+    });
+  }
+}
+
+function getPaginationPagesList(current, total) {
+  if (total <= 7) {
+    const pages = [];
+    for (let i = 1; i <= total; i++) pages.push(i);
+    return pages;
+  }
+
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total];
+  } else if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  } else {
+    return [1, '...', current - 1, current, current + 1, '...', total];
+  }
+}
+
+function goToPage(pageNum) {
+  if (pageNum === currentPage || pageNum < 1) return;
+  currentPage = pageNum;
+  applyFiltersAndRender(false);
+
+  const productsSection = document.getElementById('products-section');
+  if (productsSection) {
+    const yOffset = -70; // offset for sticky navigation bar
+    const y = productsSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
 }
 
 async function fetchProducts() {
@@ -3268,6 +3392,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
   initHeroInteractiveFeatures();
   initHeroBackgroundSlider();
+  initFooterFunctionality();
 });
 
 // Theme Toggle Button
@@ -3315,6 +3440,24 @@ if (resetFiltersBtn) {
     categorySelect.value = 'all';
     currentCategory = 'all';
     applyFiltersAndRender();
+  });
+}
+
+// Pagination Controls - Previous and Next
+if (paginationPrevBtn) {
+  paginationPrevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  });
+}
+
+if (paginationNextBtn) {
+  paginationNextBtn.addEventListener('click', () => {
+    const totalPages = parseInt(totalPagesNum?.textContent, 10) || 1;
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
   });
 }
 
@@ -3618,6 +3761,12 @@ document.addEventListener('keydown', (e) => {
     if (cartModal && cartModal.style.display === 'flex') closeCartModal();
     if (productModal && productModal.style.display === 'flex') closeProductModal();
     if (authModal && authModal.style.display === 'flex') closeAuthModal();
+
+    // Footer & info modals
+    const activeInfoModal = document.querySelector('.modal-backdrop[id$="-modal"][style*="display: flex"]');
+    if (activeInfoModal) {
+      closeModalWithAnimation(activeInfoModal);
+    }
   }
 });
 
@@ -4914,4 +5063,453 @@ function initHeroBackgroundSlider() {
     }
   });
 }
+
+// ============================================================
+// Footer Interactive Functionality Controller
+// ============================================================
+
+function initFooterFunctionality() {
+  // Modals
+  const orderTrackingModal = document.getElementById('order-tracking-modal');
+  const shippingInfoModal = document.getElementById('shipping-info-modal');
+  const returnsInfoModal = document.getElementById('returns-info-modal');
+  const privacyPolicyModal = document.getElementById('privacy-policy-modal');
+  const termsOfServiceModal = document.getElementById('terms-of-service-modal');
+  const securityInfoModal = document.getElementById('security-info-modal');
+
+  // Order Tracking Elements
+  const trackingForm = document.getElementById('order-tracking-form');
+  const trackingInput = document.getElementById('track-order-id-input');
+  const trackingLoading = document.getElementById('track-order-loading');
+  const trackingError = document.getElementById('track-order-error');
+  const trackingUnauth = document.getElementById('track-order-unauth');
+  const trackingResult = document.getElementById('track-order-result');
+  const trackingUnauthLoginBtn = document.getElementById('track-order-unauth-login-btn');
+  const trackingViewAllBtn = document.getElementById('track-view-all-orders-btn');
+
+  function openFooterModal(modal) {
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFooterModal(modal) {
+    if (!modal) return;
+    closeModalWithAnimation(modal);
+  }
+
+  // 1. SHOP CATEGORIES (Electronics & Audio, Watches & Wearables, Footwear & Apparel, Productivity & Tech)
+  function mapFooterCategoryToExisting(label) {
+    if (!categorySelect) return 'all';
+    const available = Array.from(categorySelect.options)
+      .map(o => o.value)
+      .filter(v => v && v !== 'all');
+
+    if (!available.length) return 'all';
+
+    const normalized = (label || '').toLowerCase();
+
+    // Direct match
+    const directMatch = available.find(c => c.toLowerCase() === normalized);
+    if (directMatch) return directMatch;
+
+    // Electronics & Audio -> Electronics
+    if (normalized.includes('electronic') || normalized.includes('audio')) {
+      const match = available.find(c => /electronic|audio/i.test(c));
+      if (match) return match;
+    }
+
+    // Watches & Wearables -> Accessories or Electronics
+    if (normalized.includes('watch') || normalized.includes('wearable')) {
+      const match = available.find(c => /watch|wearable/i.test(c))
+        || available.find(c => /accessor/i.test(c))
+        || available.find(c => /electronic/i.test(c));
+      if (match) return match;
+    }
+
+    // Footwear & Apparel -> Sports or Accessories
+    if (normalized.includes('footwear') || normalized.includes('apparel') || normalized.includes('cloth') || normalized.includes('shoe')) {
+      const match = available.find(c => /footwear|apparel|cloth|fashion|shoe/i.test(c))
+        || available.find(c => /sport/i.test(c))
+        || available.find(c => /accessor/i.test(c));
+      if (match) return match;
+    }
+
+    // Productivity & Tech -> Electronics or Home
+    if (normalized.includes('productivity') || normalized.includes('tech')) {
+      const match = available.find(c => /productivity|tech|office/i.test(c))
+        || available.find(c => /electronic/i.test(c))
+        || available.find(c => /home/i.test(c));
+      if (match) return match;
+    }
+
+    return 'all';
+  }
+
+  document.querySelectorAll('.footer-category-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const rawCategory = link.getAttribute('data-category') || link.textContent.trim();
+      const mappedCategory = mapFooterCategoryToExisting(rawCategory);
+
+      if (categorySelect) {
+        categorySelect.value = mappedCategory;
+        currentCategory = mappedCategory;
+      }
+
+      // Clear any search query so the whole category is visible
+      currentSearchTerm = '';
+      if (searchInput) searchInput.value = '';
+      if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+
+      applyFiltersAndRender();
+
+      const productsSection = document.getElementById('products-section');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      showToast(`Showing catalog for: ${mappedCategory === 'all' ? 'All Products' : mappedCategory}`);
+    });
+  });
+
+  // 2. ORDER TRACKING
+  const footerOrderTrackingBtn = document.getElementById('footer-order-tracking-btn');
+  if (footerOrderTrackingBtn) {
+    footerOrderTrackingBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openFooterModal(orderTrackingModal);
+      if (trackingInput) {
+        trackingInput.value = '';
+        setTimeout(() => trackingInput.focus(), 100);
+      }
+      if (trackingError) trackingError.style.display = 'none';
+      if (trackingUnauth) trackingUnauth.style.display = 'none';
+      if (trackingResult) trackingResult.style.display = 'none';
+      if (trackingLoading) trackingLoading.style.display = 'none';
+    });
+  }
+
+  // Tracking form submission
+  if (trackingForm) {
+    trackingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const orderId = (trackingInput ? trackingInput.value : '').trim();
+
+      if (trackingError) trackingError.style.display = 'none';
+      if (trackingUnauth) trackingUnauth.style.display = 'none';
+      if (trackingResult) trackingResult.style.display = 'none';
+
+      if (!orderId) {
+        if (trackingError) {
+          trackingError.textContent = 'Please enter an Order ID to track.';
+          trackingError.style.display = 'block';
+        }
+        return;
+      }
+
+      // Check 24-character hexadecimal ObjectId format
+      if (!/^[0-9a-fA-F]{24}$/.test(orderId)) {
+        if (trackingError) {
+          trackingError.textContent = 'Invalid Order ID format. Order IDs are 24-character codes (e.g., 65f1a2b3c4d5e6f7a8b9c0d1).';
+          trackingError.style.display = 'block';
+        }
+        return;
+      }
+
+      const token = getAuthToken();
+      if (!token) {
+        if (trackingUnauth) trackingUnauth.style.display = 'block';
+        return;
+      }
+
+      if (trackingLoading) trackingLoading.style.display = 'flex';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const result = await response.json();
+        if (trackingLoading) trackingLoading.style.display = 'none';
+
+        if (!response.ok || !result.success || !result.data) {
+          if (response.status === 404) {
+            if (trackingError) {
+              trackingError.textContent = `Order #${orderId} was not found. Please verify the ID and ensure you are logged into the account that placed the order.`;
+              trackingError.style.display = 'block';
+            }
+          } else if (response.status === 401 || response.status === 403) {
+            if (trackingUnauth) trackingUnauth.style.display = 'block';
+          } else {
+            if (trackingError) {
+              trackingError.textContent = result.message || 'Unable to retrieve order tracking information.';
+              trackingError.style.display = 'block';
+            }
+          }
+          return;
+        }
+
+        renderTrackingResult(result.data);
+      } catch (err) {
+        console.error('Order tracking fetch error:', err);
+        if (trackingLoading) trackingLoading.style.display = 'none';
+        if (trackingError) {
+          trackingError.textContent = 'Network error while querying order status. Please verify your connection.';
+          trackingError.style.display = 'block';
+        }
+      }
+    });
+  }
+
+  function renderTrackingResult(order) {
+    if (!trackingResult) return;
+
+    const idEl = document.getElementById('track-result-id');
+    const dateEl = document.getElementById('track-result-date');
+    const statusEl = document.getElementById('track-result-status');
+    const paymentEl = document.getElementById('track-result-payment');
+    const paymentStatusEl = document.getElementById('track-result-payment-status');
+    const itemsEl = document.getElementById('track-result-items');
+    const addressEl = document.getElementById('track-result-address');
+    const totalEl = document.getElementById('track-result-total');
+
+    if (idEl) idEl.textContent = `Order #${order._id}`;
+
+    if (dateEl) {
+      const orderDate = new Date(order.createdAt).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      dateEl.textContent = `Placed on ${orderDate}`;
+    }
+
+    const currentStatus = (order.status || 'Pending').trim();
+    if (statusEl) {
+      statusEl.textContent = currentStatus;
+      statusEl.className = 'status-badge in-stock';
+    }
+
+    if (paymentEl) {
+      paymentEl.textContent = order.paymentMethod ? `💳 ${formatPaymentMethodName(order.paymentMethod)}` : '💳 Direct';
+    }
+
+    if (paymentStatusEl) {
+      const pStatus = (order.paymentStatus || 'Pending').trim();
+      paymentStatusEl.textContent = pStatus;
+      paymentStatusEl.className = `payment-status-badge badge-${pStatus.toLowerCase()}`;
+    }
+
+    // Visual Stepper Stages
+    const statusLower = currentStatus.toLowerCase();
+    const stepPlaced = document.getElementById('step-placed');
+    const stepProcessing = document.getElementById('step-processing');
+    const stepShipped = document.getElementById('step-shipped');
+    const stepDelivered = document.getElementById('step-delivered');
+    const line1 = document.getElementById('line-1');
+    const line2 = document.getElementById('line-2');
+    const line3 = document.getElementById('line-3');
+
+    [stepPlaced, stepProcessing, stepShipped, stepDelivered].forEach(s => {
+      if (s) s.className = 'stepper-step';
+    });
+    [line1, line2, line3].forEach(l => {
+      if (l) l.className = 'stepper-line';
+    });
+
+    if (statusLower === 'delivered') {
+      if (stepPlaced) stepPlaced.classList.add('completed');
+      if (line1) line1.classList.add('completed');
+      if (stepProcessing) stepProcessing.classList.add('completed');
+      if (line2) line2.classList.add('completed');
+      if (stepShipped) stepShipped.classList.add('completed');
+      if (line3) line3.classList.add('completed');
+      if (stepDelivered) stepDelivered.classList.add('completed', 'current');
+    } else if (statusLower === 'shipped') {
+      if (stepPlaced) stepPlaced.classList.add('completed');
+      if (line1) line1.classList.add('completed');
+      if (stepProcessing) stepProcessing.classList.add('completed');
+      if (line2) line2.classList.add('completed');
+      if (stepShipped) stepShipped.classList.add('current');
+    } else if (statusLower === 'processing') {
+      if (stepPlaced) stepPlaced.classList.add('completed');
+      if (line1) line1.classList.add('completed');
+      if (stepProcessing) stepProcessing.classList.add('current');
+    } else {
+      if (stepPlaced) stepPlaced.classList.add('current');
+    }
+
+    // Items list
+    if (itemsEl) {
+      if (Array.isArray(order.items) && order.items.length) {
+        itemsEl.innerHTML = order.items.map(it => `
+          <div class="tracking-item-row">
+            <span><strong>${escapeHtml(it.name)}</strong> × ${it.quantity}</span>
+            <span>${currencyFormatter.format(it.subtotal || it.price * it.quantity)}</span>
+          </div>
+        `).join('');
+      } else {
+        itemsEl.innerHTML = '<div class="text-muted">1 Package Shipment</div>';
+      }
+    }
+
+    // Shipping address
+    if (addressEl) {
+      if (order.shippingAddress) {
+        const addr = order.shippingAddress;
+        addressEl.innerHTML = `
+          <strong>${escapeHtml(addr.fullName || '')}</strong> · 📞 ${escapeHtml(addr.phone || '')}<br>
+          ${escapeHtml(addr.addressLine1 || '')}${addr.addressLine2 ? ', ' + escapeHtml(addr.addressLine2) : ''}<br>
+          ${escapeHtml(addr.city || '')}, ${escapeHtml(addr.state || '')} - <strong>${escapeHtml(addr.postalCode || '')}</strong>
+        `;
+      } else {
+        addressEl.innerHTML = '<span class="text-muted">Standard Courier Delivery Address</span>';
+      }
+    }
+
+    if (totalEl) {
+      totalEl.textContent = currencyFormatter.format(order.totalAmount || 0);
+    }
+
+    trackingResult.style.display = 'block';
+  }
+
+  // Tracking unauth login prompt
+  if (trackingUnauthLoginBtn) {
+    trackingUnauthLoginBtn.addEventListener('click', () => {
+      closeFooterModal(orderTrackingModal);
+      openAuthModal('login');
+    });
+  }
+
+  // Tracking shortcut to all orders
+  if (trackingViewAllBtn) {
+    trackingViewAllBtn.addEventListener('click', () => {
+      closeFooterModal(orderTrackingModal);
+      openOrdersModal();
+    });
+  }
+
+  // Tracking close button
+  const orderTrackingCloseBtn = document.getElementById('order-tracking-close-btn');
+  if (orderTrackingCloseBtn) {
+    orderTrackingCloseBtn.addEventListener('click', () => closeFooterModal(orderTrackingModal));
+  }
+
+  // 3. SHIPPING & DELIVERY
+  const footerShippingBtn = document.getElementById('footer-shipping-btn');
+  const shippingCloseBtn = document.getElementById('shipping-modal-close-btn');
+  const shippingOkBtn = document.getElementById('shipping-modal-ok-btn');
+
+  if (footerShippingBtn) {
+    footerShippingBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openFooterModal(shippingInfoModal);
+    });
+  }
+  if (shippingCloseBtn) shippingCloseBtn.addEventListener('click', () => closeFooterModal(shippingInfoModal));
+  if (shippingOkBtn) shippingOkBtn.addEventListener('click', () => closeFooterModal(shippingInfoModal));
+
+  // 4. 7-DAY EASY RETURNS
+  const footerReturnsBtn = document.getElementById('footer-returns-btn');
+  const returnsCloseBtn = document.getElementById('returns-modal-close-btn');
+  const returnsOkBtn = document.getElementById('returns-modal-ok-btn');
+
+  if (footerReturnsBtn) {
+    footerReturnsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openFooterModal(returnsInfoModal);
+    });
+  }
+  if (returnsCloseBtn) returnsCloseBtn.addEventListener('click', () => closeFooterModal(returnsInfoModal));
+  if (returnsOkBtn) returnsOkBtn.addEventListener('click', () => closeFooterModal(returnsInfoModal));
+
+  // 5. VERIFIED CUSTOMER REVIEWS
+  const footerReviewsBtn = document.getElementById('footer-reviews-btn');
+  if (footerReviewsBtn) {
+    footerReviewsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      const productsSection = document.getElementById('products-section');
+      if (productsSection) {
+        productsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      // Check for product with reviews in memory
+      const reviewedProduct = allProducts.find(p => (Array.isArray(p.reviews) && p.reviews.length > 0) || p.numReviews > 0);
+
+      if (reviewedProduct) {
+        openProductModal(reviewedProduct._id);
+        setTimeout(() => {
+          const reviewsSection = document.getElementById('modal-reviews-section');
+          if (reviewsSection) {
+            reviewsSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 320);
+        showToast(`Viewing verified customer reviews for: ${reviewedProduct.name}`);
+      } else {
+        showToast('Explore verified customer ratings and reviews on any product card below!');
+      }
+    });
+  }
+
+  // 7. PRIVACY POLICY
+  const footerPrivacyBtn = document.getElementById('footer-privacy-btn');
+  const privacyCloseBtn = document.getElementById('privacy-modal-close-btn');
+  const privacyOkBtn = document.getElementById('privacy-modal-ok-btn');
+
+  if (footerPrivacyBtn) {
+    footerPrivacyBtn.addEventListener('click', () => openFooterModal(privacyPolicyModal));
+  }
+  if (privacyCloseBtn) privacyCloseBtn.addEventListener('click', () => closeFooterModal(privacyPolicyModal));
+  if (privacyOkBtn) privacyOkBtn.addEventListener('click', () => closeFooterModal(privacyPolicyModal));
+
+  // 8. TERMS OF SERVICE
+  const footerTermsBtn = document.getElementById('footer-terms-btn');
+  const termsCloseBtn = document.getElementById('terms-modal-close-btn');
+  const termsOkBtn = document.getElementById('terms-modal-ok-btn');
+
+  if (footerTermsBtn) {
+    footerTermsBtn.addEventListener('click', () => openFooterModal(termsOfServiceModal));
+  }
+  if (termsCloseBtn) termsCloseBtn.addEventListener('click', () => closeFooterModal(termsOfServiceModal));
+  if (termsOkBtn) termsOkBtn.addEventListener('click', () => closeFooterModal(termsOfServiceModal));
+
+  // 9. SECURITY VERIFIED
+  const footerSecurityBtn = document.getElementById('footer-security-btn');
+  const securityCloseBtn = document.getElementById('security-modal-close-btn');
+  const securityOkBtn = document.getElementById('security-modal-ok-btn');
+
+  if (footerSecurityBtn) {
+    footerSecurityBtn.addEventListener('click', () => openFooterModal(securityInfoModal));
+  }
+  if (securityCloseBtn) securityCloseBtn.addEventListener('click', () => closeFooterModal(securityInfoModal));
+  if (securityOkBtn) securityOkBtn.addEventListener('click', () => closeFooterModal(securityInfoModal));
+
+  // 10. Backdrop click dismiss for all footer modals
+  const allFooterModals = [
+    orderTrackingModal,
+    shippingInfoModal,
+    returnsInfoModal,
+    privacyPolicyModal,
+    termsOfServiceModal,
+    securityInfoModal
+  ];
+
+  allFooterModals.forEach(modal => {
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeFooterModal(modal);
+        }
+      });
+    }
+  });
+}
+
 
