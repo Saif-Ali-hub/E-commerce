@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Contact = require('../models/Contact');
+const authMiddleware = require('../middleware/auth');
+const adminMiddleware = require('../middleware/admin');
 
 // ============================================================
 // 1. POST /api/contacts - Submit a contact / support inquiry
@@ -40,9 +42,9 @@ router.post('/', async (req, res) => {
 });
 
 // ============================================================
-// 2. GET /api/contacts - Retrieve all contact inquiries
+// 2. GET /api/contacts - Retrieve all contact inquiries (Admin only)
 // ============================================================
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const contacts = await Contact.find({}).sort({ createdAt: -1 });
     res.status(200).json({

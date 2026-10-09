@@ -150,37 +150,91 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // 4. Create and save the order snapshot with payment information
-    const order = new Order({
-      user: userId,
-      items: validatedItems,
-      products: validatedItems, // legacy format compatibility
-      totalAmount: calculatedTotal,
-      total: calculatedTotal, // legacy format compatibility
-      shippingAddress: shippingAddressSnapshot,
-      paymentMethod: cleanPaymentMethod,
-      paymentStatus: 'Pending',
-      paymentReference: null,
-      paymentUpdatedAt: new Date(),
-      status: 'Pending'
-    });
+    // 4. Atomically decrement stock for all ordered products with rollback capability
+    const deductedItems = [];
+    let stockDeductionError = null;
 
-    const savedOrder = await order.save();
-
-    // 5. Decrement stock for all ordered products
     for (const item of validatedItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -item.quantity }
+      // Atomic conditional decrement: ONLY succeeds if current stock >= item.quantity
+      const updatedProduct = await Product.findOneAndUpdate(
+        { _id: item.product, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { new: true }
+      );
+
+      if (!updatedProduct) {
+        // Product was either concurrently purchased, deleted, or has insufficient stock
+        stockDeductionError = `Insufficient stock for "${item.name}". Please adjust quantity or remove it from your cart.`;
+        break;
+      }
+
+      // If stock reached 0, update inStock flag to false (guard ensures stock is still 0)
+      if (updatedProduct.stock === 0) {
+        await Product.findOneAndUpdate({ _id: item.product, stock: 0 }, { inStock: false });
+      }
+
+      deductedItems.push(item);
+    }
+
+    // If any item failed atomic decrement, roll back all previously deducted items
+    if (stockDeductionError) {
+      for (const deducted of deductedItems) {
+        try {
+          await Product.findByIdAndUpdate(deducted.product, {
+            $inc: { stock: deducted.quantity },
+            inStock: true
+          });
+        } catch (rollbackErr) {
+          console.error(`Failed to restore stock for product ${deducted.product}:`, rollbackErr.message);
+        }
+      }
+      return res.status(400).json({
+        success: false,
+        message: stockDeductionError
       });
     }
 
-    // 6. Clear the user's cart
-    user.cart = [];
-    await user.save();
+    // 5. Create and save the order snapshot with payment information
+    let savedOrder = null;
+    try {
+      const order = new Order({
+        user: userId,
+        items: validatedItems,
+        products: validatedItems, // legacy format compatibility
+        totalAmount: calculatedTotal,
+        total: calculatedTotal, // legacy format compatibility
+        shippingAddress: shippingAddressSnapshot,
+        paymentMethod: cleanPaymentMethod,
+        paymentStatus: 'Pending',
+        paymentReference: null,
+        paymentUpdatedAt: new Date(),
+        status: 'Pending'
+      });
 
-    if (legacyCart) {
-      legacyCart.items = [];
-      await legacyCart.save();
+      savedOrder = await order.save();
+    } catch (orderSaveError) {
+      // If order saving fails, restore all deducted stock
+      for (const deducted of deductedItems) {
+        try {
+          await Product.findByIdAndUpdate(deducted.product, {
+            $inc: { stock: deducted.quantity },
+            inStock: true
+          });
+        } catch (rollbackErr) {
+          console.error(`Failed to restore stock after order save error for product ${deducted.product}:`, rollbackErr.message);
+        }
+      }
+      throw orderSaveError;
+    }
+
+    // 6. Clear the user's cart atomically (prevents Mongoose VersionError)
+    try {
+      await User.findByIdAndUpdate(userId, { $set: { cart: [] } });
+      if (legacyCart) {
+        await Cart.findByIdAndUpdate(legacyCart._id, { $set: { items: [] } });
+      }
+    } catch (cartClearError) {
+      console.error('Non-fatal error clearing cart after order creation:', cartClearError.message);
     }
 
     // 7. Return 201 with saved order details
