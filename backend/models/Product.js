@@ -41,20 +41,43 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Product name is required'],
       trim: true
     },
+    title: {
+      type: String,
+      trim: true
+    },
     price: {
       type: Number,
       required: [true, 'Product price is required'],
       min: [0, 'Price must be a positive number']
+    },
+    discountPrice: {
+      type: Number,
+      min: [0, 'Discount price must be a positive number'],
+      default: null
     },
     category: {
       type: String,
       required: [true, 'Product category is required'],
       trim: true
     },
+    subcategory: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    brand: {
+      type: String,
+      trim: true,
+      default: 'MiniStore'
+    },
+    sku: {
+      type: String,
+      trim: true
+    },
     description: {
       type: String,
-      required: [true, 'Product description is required'],
-      trim: true
+      trim: true,
+      default: ''
     },
     stock: {
       type: Number,
@@ -62,12 +85,41 @@ const productSchema = new mongoose.Schema(
       min: [0, 'Stock cannot be negative'],
       default: 0
     },
+    inStock: {
+      type: Boolean,
+      default: true
+    },
     image: {
       type: String,
-      required: [true, 'Product image URL is required'],
-      trim: true
+      trim: true,
+      default: ''
+    },
+    images: {
+      type: [String],
+      default: []
+    },
+    imageMetadata: {
+      gridFSId: { type: mongoose.Schema.Types.ObjectId, default: null },
+      filename: { type: String, default: null },
+      contentType: { type: String, default: null },
+      size: { type: Number, default: 0 },
+      uploadDate: { type: Date, default: null }
     },
     features: {
+      type: [String],
+      default: []
+    },
+    specifications: {
+      type: Map,
+      of: String,
+      default: () => ({})
+    },
+    // Legacy fields preserved from existing E-commerce database
+    ratings: {
+      type: Number,
+      default: 0
+    },
+    tags: {
       type: [String],
       default: []
     },
@@ -88,6 +140,25 @@ const productSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Synchronous pre-save hook for Mongoose 8/9
+productSchema.pre('save', function () {
+  if (!this.title) {
+    this.title = this.name;
+  }
+  if (!this.images || this.images.length === 0) {
+    this.images = this.image ? [this.image] : [];
+  }
+  this.inStock = typeof this.stock === 'number' && this.stock > 0;
+  if (!this.sku && this._id) {
+    const catCode = (this.category || 'GEN').slice(0, 3).toUpperCase();
+    const idSuffix = this._id.toString().slice(-6).toUpperCase();
+    this.sku = `MS-${catCode}-${idSuffix}`;
+  }
+  if (!this.averageRating && this.ratings) {
+    this.averageRating = this.ratings;
+  }
+});
 
 const Product = mongoose.model('Product', productSchema);
 

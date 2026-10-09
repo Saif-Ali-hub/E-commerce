@@ -9,6 +9,73 @@ const API_BASE_URL = 'http://localhost:5000/api';
 // Fallback image in case an external image link fails to load
 const FALLBACK_IMAGE_URL = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1%20text%20%7B%20fill%3A%2394a3b8%3Bfont-weight%3A600%3Bfont-size%3A18pt%3Bfont-family%3Asans-serif%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23e2e8f0%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22120%22%20y%3D%22155%22%3ENo%20Image%20Available%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';
 
+// Curated high-res backup image mapping in case any external or local image fails to load
+const PRODUCT_BACKUP_IMAGES = {
+  '1080p Streaming Webcam': 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80',
+  '10,000mAh Magnetic Power Bank': 'https://images.unsplash.com/photo-1609592807904-817887714138?w=800&auto=format&fit=crop&q=80',
+  'Stainless Steel Mesh Watch': 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&auto=format&fit=crop&q=80',
+  'Crossbody Sling Bag': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80',
+  '14-Inch Laptop Sleeve': 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
+  'Braided Leather Belt': 'https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=800&auto=format&fit=crop&q=80',
+  'Merino Wool Beanie': 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=800&auto=format&fit=crop&q=80',
+  'Canvas Toiletry Bag': 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80',
+  'Titanium Key Carabiner': 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=800&auto=format&fit=crop&q=80',
+  'Blue-Light Blocking Glasses': 'https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=800&auto=format&fit=crop&q=80',
+  'Waxed Canvas Duffel Bag': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&auto=format&fit=crop&q=80',
+  'Microfiber Sports Towel Set': 'https://images.unsplash.com/photo-1606902965551-dce093cda6e7?w=800&auto=format&fit=crop&q=80',
+  'Stainless Steel Shaker Bottle 750ml': 'https://images.unsplash.com/photo-1570824104453-508955ab713e?w=800&auto=format&fit=crop&q=80'
+};
+
+function formatProductImageUrl(imageUrl) {
+  if (!imageUrl || typeof imageUrl !== 'string') return FALLBACK_IMAGE_URL;
+  const trimmed = imageUrl.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  const filename = trimmed.replace(/^\/?(frontend\/)?images\//, '');
+  return `images/${filename}`;
+}
+
+function handleProductImageError(imgEl, originalUrl, productName) {
+  if (!imgEl) return;
+  const original = String(originalUrl || '').trim();
+  const name = String(productName || '').trim();
+
+  // Try 1: Curated Unsplash backup image if available
+  if (name && PRODUCT_BACKUP_IMAGES[name] && imgEl.src !== PRODUCT_BACKUP_IMAGES[name]) {
+    imgEl.src = PRODUCT_BACKUP_IMAGES[name];
+    return;
+  }
+
+  // Try 2: Backend server URL for local image
+  const serverOrigin = API_BASE_URL.replace(/\/api\/?$/, '');
+  if (original && !original.startsWith('http')) {
+    const filename = original.replace(/^\/?(frontend\/)?images\//, '');
+    const serverUrl = `${serverOrigin}/images/${filename}`;
+    if (imgEl.src !== serverUrl) {
+      imgEl.src = serverUrl;
+      return;
+    }
+  }
+
+  // Try 3: Root-relative /images/ path
+  if (original && !original.startsWith('http')) {
+    const filename = original.replace(/^\/?(frontend\/)?images\//, '');
+    const rootUrl = `/images/${filename}`;
+    if (imgEl.src !== rootUrl) {
+      imgEl.src = rootUrl;
+      return;
+    }
+  }
+
+  // Try 4: Final fallback SVG
+  imgEl.onerror = null;
+  imgEl.src = FALLBACK_IMAGE_URL;
+}
+
+window.formatProductImageUrl = formatProductImageUrl;
+window.handleProductImageError = handleProductImageError;
+
 // State Variables
 let allProducts = [];
 let currentSearchTerm = '';
@@ -1026,10 +1093,10 @@ async function toggleWishlistProduct(productId, triggerBtn = null) {
   const token = getAuthToken();
   if (!token) {
     openAuthModal('login', 'Please log in to add items to your wishlist.');
-    return;
+    return false;
   }
 
-  if (!productId) return;
+  if (!productId) return false;
   const prodIdStr = String(productId);
   const isCurrentlyWishlisted = wishlistProductIds.has(prodIdStr);
 
@@ -1041,32 +1108,49 @@ async function toggleWishlistProduct(productId, triggerBtn = null) {
   }
 
   try {
-    const url = `${API_BASE_URL}/wishlist/${productId}`;
+    const url = isCurrentlyWishlisted
+      ? `${API_BASE_URL}/wishlist/${productId}`
+      : `${API_BASE_URL}/wishlist`;
     const method = isCurrentlyWishlisted ? 'DELETE' : 'POST';
 
-    const response = await fetch(url, {
+    const requestOptions = {
       method: method,
       headers: {
         Authorization: `Bearer ${token}`
       }
-    });
+    };
 
-    const result = await response.json();
+    if (method === 'POST') {
+      requestOptions.headers['Content-Type'] = 'application/json';
+      requestOptions.body = JSON.stringify({ productId });
+    }
+
+    const response = await fetch(url, requestOptions);
+
+    let result = null;
+    try {
+      result = await response.json();
+    } catch (parseErr) {
+      result = {
+        success: false,
+        message: `Server returned error (${response.status})`
+      };
+    }
 
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       updateAuthUI();
       openAuthModal('login', 'Session expired. Please log in again.');
-      return;
+      return false;
     }
 
-    if (!response.ok || !result.success) {
-      showToast(result.message || 'Could not update wishlist.');
-      return;
+    if (!response.ok || !result || !result.success) {
+      showToast((result && result.message) || 'Could not update wishlist.');
+      return false;
     }
 
-    // Update frontend state immediately
+    // Update frontend state immediately on confirmed success
     if (isCurrentlyWishlisted) {
       wishlistProductIds.delete(prodIdStr);
       if (currentWishlist && Array.isArray(currentWishlist.products)) {
@@ -1091,9 +1175,12 @@ async function toggleWishlistProduct(productId, triggerBtn = null) {
     if (wishlistModal && wishlistModal.style.display === 'flex') {
       renderWishlistContent();
     }
+
+    return true;
   } catch (err) {
     console.error('Wishlist toggle error:', err);
     showToast('Network error updating wishlist.');
+    return false;
   }
 }
 
@@ -1163,10 +1250,10 @@ function renderWishlistContent() {
 
     itemCard.innerHTML = `
       <img
-        src="${escapeHtml(product.image)}"
+        src="${formatProductImageUrl(product.image)}"
         alt="${escapeHtml(product.name)}"
         class="wishlist-item-thumb"
-        onerror="this.onerror=null; this.src='${FALLBACK_IMAGE_URL}'"
+        onerror="handleProductImageError(this, '${escapeHtml(product.image || '')}', '${escapeHtml(product.name || '')}')"
       />
       <div class="wishlist-item-info">
         <span class="wishlist-item-category">${escapeHtml(product.category)}</span>
@@ -1332,11 +1419,11 @@ function createProductCard(product, index = 0, idPrefix = 'product-') {
         <span class="heart-icon">${isWishlisted ? '♥' : '♡'}</span>
       </button>
       <img
-        src="${escapeHtml(product.image)}"
+        src="${formatProductImageUrl(product.image)}"
         alt="${escapeHtml(product.name)}"
         class="card-image"
         loading="lazy"
-        onerror="this.onerror=null; this.src='${FALLBACK_IMAGE_URL}'"
+        onerror="handleProductImageError(this, '${escapeHtml(product.image || '')}', '${escapeHtml(product.name || '')}')"
       />
     </div>
     <div class="card-body">
@@ -1659,10 +1746,10 @@ function renderModalContent(product) {
       <!-- 1. Large Product Image -->
       <div class="modal-media-wrap">
         <img
-          src="${escapeHtml(product.image)}"
+          src="${formatProductImageUrl(product.image)}"
           alt="${escapeHtml(product.name)}"
           class="modal-image"
-          onerror="this.onerror=null; this.src='${FALLBACK_IMAGE_URL}'"
+          onerror="handleProductImageError(this, '${escapeHtml(product.image || '')}', '${escapeHtml(product.name || '')}')"
         />
       </div>
 
@@ -2613,10 +2700,10 @@ function renderCartContent() {
 
     itemCard.innerHTML = `
       <img
-        src="${escapeHtml(product.image)}"
+        src="${formatProductImageUrl(product.image)}"
         alt="${escapeHtml(product.name)}"
         class="cart-item-thumb"
-        onerror="this.onerror=null; this.src='${FALLBACK_IMAGE_URL}'"
+        onerror="handleProductImageError(this, '${escapeHtml(product.image || '')}', '${escapeHtml(product.name || '')}')"
       />
       <div class="cart-item-info">
         <span class="cart-item-category">${escapeHtml(product.category)}</span>
@@ -3747,6 +3834,10 @@ function initScrollReveal() {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updateAuthUI();
+  if (getAuthToken()) {
+    fetchWishlist();
+    fetchCart();
+  }
   fetchProducts(1);
   initScrollReveal();
   initHeroInteractiveFeatures();
@@ -4366,17 +4457,25 @@ if (loginForm) {
     e.preventDefault();
     authErrorAlert.style.display = 'none';
 
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : 'Log In';
+
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
 
     try {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Logging in...';
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok || !result.success) {
         authErrorAlert.textContent = result.message || 'Login failed';
@@ -4393,8 +4492,14 @@ if (loginForm) {
       await fetchWishlist();
       await fetchAddresses();
     } catch (err) {
-      authErrorAlert.textContent = 'Network error during login';
+      console.error('Login error:', err);
+      authErrorAlert.textContent = 'Unable to connect to backend server. Please make sure the server is running on http://localhost:5000.';
       authErrorAlert.style.display = 'block';
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   });
 }
@@ -4404,6 +4509,9 @@ if (registerForm) {
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     authErrorAlert.style.display = 'none';
+
+    const submitBtn = registerForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.textContent : 'Create Account';
 
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -4418,13 +4526,18 @@ if (registerForm) {
     }
 
     try {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok || !result.success) {
         authErrorAlert.textContent = result.message || 'Registration failed';
@@ -4438,7 +4551,7 @@ if (registerForm) {
         body: JSON.stringify({ email, password })
       });
 
-      const loginResult = await loginRes.json();
+      const loginResult = await loginRes.json().catch(() => ({}));
       if (loginRes.ok && loginResult.success) {
         localStorage.setItem('token', loginResult.token);
         localStorage.setItem('user', JSON.stringify(loginResult.user));
@@ -4446,11 +4559,21 @@ if (registerForm) {
         closeAuthModal();
         showToast(`Account created! Welcome, ${loginResult.user.name}!`);
         await fetchCart();
+        await fetchWishlist();
         await fetchAddresses();
+      } else {
+        authErrorAlert.textContent = loginResult.message || 'Account created! Please sign in with your email and password.';
+        authErrorAlert.style.display = 'block';
       }
     } catch (err) {
-      authErrorAlert.textContent = 'Network error during registration';
+      console.error('Registration error:', err);
+      authErrorAlert.textContent = 'Unable to connect to backend server. Please make sure the server is running on http://localhost:5000.';
       authErrorAlert.style.display = 'block';
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
     }
   });
 }
@@ -4595,7 +4718,7 @@ function renderAdminProductsTable(products) {
       <tr id="admin-prod-row-${prod._id}">
         <td>
           <div class="table-product-cell">
-            <img src="${escapeHtml(prod.image)}" alt="${escapeHtml(prod.name)}" class="table-thumb" onerror="this.onerror=null; this.src='${FALLBACK_IMAGE_URL}'" />
+            <img src="${formatProductImageUrl(prod.image)}" alt="${escapeHtml(prod.name)}" class="table-thumb" onerror="handleProductImageError(this, '${escapeHtml(prod.image || '')}', '${escapeHtml(prod.name || '')}')" />
             <span class="table-product-title">${escapeHtml(prod.name)}</span>
           </div>
         </td>
@@ -4943,7 +5066,7 @@ function renderAdminReviewsTable(reviews) {
       <tr id="admin-review-row-${r.reviewId}">
         <td>
           <div class="table-product-cell">
-            <img src="${escapeHtml(r.productImage)}" alt="${escapeHtml(r.productName)}" class="table-thumb" onerror="this.onerror=null; this.src='${FALLBACK_IMAGE_URL}'" />
+            <img src="${formatProductImageUrl(r.productImage)}" alt="${escapeHtml(r.productName)}" class="table-thumb" onerror="handleProductImageError(this, '${escapeHtml(r.productImage || '')}', '${escapeHtml(r.productName || '')}')" />
             <span class="table-product-title">${escapeHtml(r.productName)}</span>
           </div>
         </td>

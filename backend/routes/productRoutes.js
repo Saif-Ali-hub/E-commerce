@@ -306,15 +306,38 @@ router.get('/:id/related', async (req, res) => {
 // ============================================================
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const { name, price, category, description, stock, image } = req.body;
+    const {
+      name,
+      title,
+      price,
+      discountPrice,
+      category,
+      subcategory,
+      brand,
+      sku,
+      description,
+      stock,
+      image,
+      images,
+      features,
+      specifications
+    } = req.body;
 
     const product = new Product({
       name,
+      title: title || name,
       price,
+      discountPrice: discountPrice || null,
       category,
+      subcategory: subcategory || '',
+      brand: brand || 'MiniStore',
+      sku,
       description,
       stock,
-      image
+      image,
+      images: Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []),
+      features: Array.isArray(features) ? features : [],
+      specifications: specifications || {}
     });
 
     const savedProduct = await product.save();

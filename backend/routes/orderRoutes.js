@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Order = require('../models/Order');
+const User = require('../models/User');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const Address = require('../models/Address');
@@ -85,11 +86,28 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // 1. Find user's cart
-    const cart = await Cart.findOne({ user: userId });
+    // 1. Find user and user's cart items
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    const cartItems = (user.cart && user.cart.length > 0) ? user.cart : [];
+
+    // Fallback: check legacy Cart collection if user.cart was empty
+    let legacyCart = null;
+    if (cartItems.length === 0) {
+      legacyCart = await Cart.findOne({ user: userId });
+      if (legacyCart && Array.isArray(legacyCart.items)) {
+        cartItems.push(...legacyCart.items);
+      }
+    }
 
     // 2. Validate cart has items
-    if (!cart || !Array.isArray(cart.items) || cart.items.length === 0) {
+    if (cartItems.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Your cart is empty. Please add items to your cart before placing an order.'
@@ -100,7 +118,7 @@ router.post('/', async (req, res) => {
     const validatedItems = [];
     let calculatedTotal = 0;
 
-    for (const cartItem of cart.items) {
+    for (const cartItem of cartItems) {
       const product = await Product.findById(cartItem.product);
 
       // Verify product exists
@@ -136,7 +154,9 @@ router.post('/', async (req, res) => {
     const order = new Order({
       user: userId,
       items: validatedItems,
+      products: validatedItems, // legacy format compatibility
       totalAmount: calculatedTotal,
+      total: calculatedTotal, // legacy format compatibility
       shippingAddress: shippingAddressSnapshot,
       paymentMethod: cleanPaymentMethod,
       paymentStatus: 'Pending',
@@ -155,8 +175,13 @@ router.post('/', async (req, res) => {
     }
 
     // 6. Clear the user's cart
-    cart.items = [];
-    await cart.save();
+    user.cart = [];
+    await user.save();
+
+    if (legacyCart) {
+      legacyCart.items = [];
+      await legacyCart.save();
+    }
 
     // 7. Return 201 with saved order details
     res.status(201).json({

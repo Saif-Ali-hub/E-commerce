@@ -2,9 +2,8 @@ const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema({
   product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: [true, 'Product reference is required']
+    type: mongoose.Schema.Types.Mixed,
+    required: false
   },
   name: {
     type: String,
@@ -23,7 +22,7 @@ const orderItemSchema = new mongoose.Schema({
   },
   subtotal: {
     type: Number,
-    required: [true, 'Subtotal is required'],
+    required: false,
     min: [0, 'Subtotal cannot be negative']
   }
 });
@@ -32,17 +31,17 @@ const shippingAddressSnapshotSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: [true, 'Full name snapshot is required'],
+      required: false,
       trim: true
     },
     phone: {
       type: String,
-      required: [true, 'Phone number snapshot is required'],
+      required: false,
       trim: true
     },
     addressLine1: {
       type: String,
-      required: [true, 'Address line 1 snapshot is required'],
+      required: false,
       trim: true
     },
     addressLine2: {
@@ -52,22 +51,22 @@ const shippingAddressSnapshotSchema = new mongoose.Schema(
     },
     city: {
       type: String,
-      required: [true, 'City snapshot is required'],
+      required: false,
       trim: true
     },
     state: {
       type: String,
-      required: [true, 'State snapshot is required'],
+      required: false,
       trim: true
     },
     postalCode: {
       type: String,
-      required: [true, 'Postal code snapshot is required'],
+      required: false,
       trim: true
     },
     country: {
       type: String,
-      required: [true, 'Country snapshot is required'],
+      required: false,
       trim: true,
       default: 'India'
     },
@@ -82,22 +81,34 @@ const shippingAddressSnapshotSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+    // Legacy support: 'orderId' string (e.g., ORD001)
+    orderId: {
+      type: String,
+      trim: true
+    },
+    // User can be an ObjectId reference or legacy String name
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      type: mongoose.Schema.Types.Mixed,
       required: [true, 'User reference is required']
     },
     items: {
       type: [orderItemSchema],
-      validate: {
-        validator: (v) => Array.isArray(v) && v.length > 0,
-        message: 'Order must contain at least one item'
-      }
+      default: []
+    },
+    // Legacy field from existing E-commerce database
+    products: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: []
     },
     totalAmount: {
       type: Number,
-      required: [true, 'Total amount is required'],
+      required: false,
       min: [0, 'Total amount cannot be negative']
+    },
+    // Legacy field from existing E-commerce database
+    total: {
+      type: Number,
+      required: false
     },
     shippingAddress: {
       type: shippingAddressSnapshotSchema,
@@ -130,14 +141,31 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: 'Pending',
-      enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Completed']
+      default: 'Pending'
     }
   },
   {
     timestamps: true
   }
 );
+
+// Pre-save hook to normalize totalAmount <-> total and items <-> products
+orderSchema.pre('save', function () {
+  if (this.totalAmount === undefined && this.total !== undefined) {
+    this.totalAmount = this.total;
+  }
+  if (this.total === undefined && this.totalAmount !== undefined) {
+    this.total = this.totalAmount;
+  }
+  if ((!this.items || this.items.length === 0) && Array.isArray(this.products) && this.products.length > 0) {
+    this.items = this.products.map(p => ({
+      name: p.name,
+      price: p.price,
+      quantity: p.quantity,
+      subtotal: p.price * p.quantity
+    }));
+  }
+});
 
 const Order = mongoose.model('Order', orderSchema);
 

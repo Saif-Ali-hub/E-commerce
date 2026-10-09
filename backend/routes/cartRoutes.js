@@ -1,15 +1,36 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const Cart = require('../models/Cart');
+const User = require('../models/User');
 const Product = require('../models/Product');
 const authMiddleware = require('../middleware/auth');
 
-// All cart routes require authentication
+// All cart routes require JWT authentication
 router.use(authMiddleware);
 
-// Helper to check valid MongoDB ObjectId
+// Helper function to validate MongoDB ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+// Helper to format user cart response
+const formatCartResponse = (user) => {
+  const items = (user.cart || []).filter(item => item.product !== null && item.product !== undefined);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = items.reduce((sum, item) => {
+    const price = typeof item.product === 'object' && item.product.price ? item.product.price : 0;
+    return sum + (price * item.quantity);
+  }, 0);
+
+  return {
+    user: user._id,
+    items: items.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      subtotal: (typeof item.product === 'object' && item.product.price ? item.product.price : 0) * item.quantity
+    })),
+    totalItems,
+    totalAmount
+  };
+};
 
 // ============================================================
 // 1. GET /api/cart - Get authenticated user's cart
@@ -17,22 +38,25 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 router.get('/', async (req, res) => {
   try {
     const userId = req.user.id;
-    let cart = await Cart.findOne({ user: userId }).populate('items.product');
+    const user = await User.findById(userId).populate('cart.product');
 
-    // If user has no cart yet, return clean empty cart response
-    if (!cart) {
-      return res.status(200).json({
-        success: true,
-        data: {
-          user: userId,
-          items: []
-        }
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
       });
+    }
+
+    // Filter out any deleted product references
+    const originalLength = user.cart.length;
+    user.cart = user.cart.filter(item => item.product !== null && item.product !== undefined);
+    if (user.cart.length !== originalLength) {
+      await user.save();
     }
 
     res.status(200).json({
       success: true,
-      data: cart
+      data: formatCartResponse(user)
     });
   } catch (error) {
     res.status(500).json({
@@ -44,14 +68,13 @@ router.get('/', async (req, res) => {
 });
 
 // ============================================================
-// 2. POST /api/cart - Add a product to the user's cart
+// 2. POST /api/cart - Add a product to the authenticated user's cart
 // ============================================================
 router.post('/', async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId, quantity } = req.body;
 
-    // Validate productId format
     if (!productId || !isValidObjectId(productId)) {
       return res.status(400).json({
         success: false,
@@ -59,16 +82,9 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Validate quantity as positive integer
-    const parsedQty = Number(quantity);
-    if (!Number.isInteger(parsedQty) || parsedQty < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Quantity must be a positive integer greater than or equal to 1'
-      });
-    }
+    const addQty = Math.max(parseInt(quantity, 10) || 1, 1);
 
-    // Verify product exists in database
+    // Validate that the product exists and has stock
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -77,59 +93,48 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Verify available stock
     if (product.stock <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'Product is out of stock'
+        message: 'This product is currently out of stock.'
       });
     }
 
-    if (parsedQty > product.stock) {
-      return res.status(400).json({
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: `Requested quantity (${parsedQty}) exceeds available stock (${product.stock})`
+        message: 'User account not found'
       });
     }
 
-    // Find user's cart or create new one
-    let cart = await Cart.findOne({ user: userId });
+    // Check if product already exists in user.cart
+    const itemIndex = user.cart.findIndex(
+      item => item.product && item.product.toString() === productId.toString()
+    );
 
-    if (!cart) {
-      cart = new Cart({
-        user: userId,
-        items: [{ product: productId, quantity: parsedQty }]
-      });
-    } else {
-      // Check if product already exists in cart
-      const existingItemIndex = cart.items.findIndex(
-        (item) => item.product.toString() === productId
-      );
-
-      if (existingItemIndex > -1) {
-        const newTotalQty = cart.items[existingItemIndex].quantity + parsedQty;
-
-        // Check if combined quantity exceeds stock
-        if (newTotalQty > product.stock) {
-          return res.status(400).json({
-            success: false,
-            message: `Cannot add ${parsedQty} more. Total in cart (${newTotalQty}) would exceed available stock (${product.stock})`
-          });
-        }
-
-        cart.items[existingItemIndex].quantity = newTotalQty;
+    if (itemIndex > -1) {
+      const newQty = user.cart[itemIndex].quantity + addQty;
+      if (newQty > product.stock) {
+        user.cart[itemIndex].quantity = product.stock;
       } else {
-        cart.items.push({ product: productId, quantity: parsedQty });
+        user.cart[itemIndex].quantity = newQty;
       }
+    } else {
+      const initialQty = Math.min(addQty, product.stock);
+      user.cart.push({
+        product: product._id,
+        quantity: initialQty
+      });
     }
 
-    await cart.save();
-    await cart.populate('items.product');
+    await user.save();
+    await user.populate('cart.product');
 
     res.status(200).json({
       success: true,
       message: 'Product added to cart',
-      data: cart
+      data: formatCartResponse(user)
     });
   } catch (error) {
     res.status(500).json({
@@ -149,7 +154,6 @@ router.put('/:productId', async (req, res) => {
     const { productId } = req.params;
     const { quantity } = req.body;
 
-    // Validate productId format
     if (!isValidObjectId(productId)) {
       return res.status(400).json({
         success: false,
@@ -157,81 +161,66 @@ router.put('/:productId', async (req, res) => {
       });
     }
 
-    // Validate quantity as positive integer
-    const parsedQty = Number(quantity);
-    if (!Number.isInteger(parsedQty) || parsedQty < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Quantity must be a positive integer greater than or equal to 1'
-      });
-    }
-
-    // Verify product exists in database
-    const product = await Product.findById(productId);
-    if (!product) {
+    const user = await User.findById(userId);
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: 'User account not found'
       });
     }
 
-    // Verify quantity does not exceed stock
-    if (parsedQty > product.stock) {
-      return res.status(400).json({
-        success: false,
-        message: `Requested quantity (${parsedQty}) exceeds available stock (${product.stock})`
-      });
-    }
-
-    // Find user's cart
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found in cart'
-      });
-    }
-
-    // Find item in cart
-    const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
+    const itemIndex = user.cart.findIndex(
+      item => item.product && item.product.toString() === productId.toString()
     );
 
     if (itemIndex === -1) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found in cart'
+        message: 'Product not found in your cart'
       });
     }
 
-    // Update quantity
-    cart.items[itemIndex].quantity = parsedQty;
-    await cart.save();
-    await cart.populate('items.product');
+    const newQty = parseInt(quantity, 10);
+
+    // Quantity <= 0 means remove from cart
+    if (newQty <= 0) {
+      user.cart.splice(itemIndex, 1);
+    } else {
+      const product = await Product.findById(productId);
+      if (product && newQty > product.stock) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot set quantity beyond available stock (${product.stock}).`
+        });
+      }
+      user.cart[itemIndex].quantity = newQty;
+    }
+
+    await user.save();
+    await user.populate('cart.product');
 
     res.status(200).json({
       success: true,
-      message: 'Cart item updated successfully',
-      data: cart
+      message: 'Cart quantity updated',
+      data: formatCartResponse(user)
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Server error updating cart item',
+      message: 'Server error updating cart quantity',
       error: error.message
     });
   }
 });
 
 // ============================================================
-// 4. DELETE /api/cart/:productId - Remove item from cart
+// 4. DELETE /api/cart/:productId - Remove a single item from cart
 // ============================================================
 router.delete('/:productId', async (req, res) => {
   try {
     const userId = req.user.id;
     const { productId } = req.params;
 
-    // Validate productId format
     if (!isValidObjectId(productId)) {
       return res.status(400).json({
         success: false,
@@ -239,41 +228,67 @@ router.delete('/:productId', async (req, res) => {
       });
     }
 
-    // Find user's cart
-    const cart = await Cart.findOne({ user: userId });
-    if (!cart) {
+    const user = await User.findById(userId);
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found in cart'
+        message: 'User account not found'
       });
     }
 
-    // Find item index
-    const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
+    user.cart = user.cart.filter(
+      item => item.product && item.product.toString() !== productId.toString()
     );
 
-    if (itemIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found in cart'
-      });
-    }
-
-    // Remove item
-    cart.items.splice(itemIndex, 1);
-    await cart.save();
-    await cart.populate('items.product');
+    await user.save();
+    await user.populate('cart.product');
 
     res.status(200).json({
       success: true,
-      message: 'Product removed from cart',
-      data: cart
+      message: 'Item removed from cart',
+      data: formatCartResponse(user)
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Server error removing item from cart',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 5. DELETE /api/cart - Clear all items from the user's cart
+// ============================================================
+router.delete('/', async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    user.cart = [];
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Cart cleared successfully',
+      data: {
+        user: userId,
+        items: [],
+        totalItems: 0,
+        totalAmount: 0
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error clearing cart',
       error: error.message
     });
   }

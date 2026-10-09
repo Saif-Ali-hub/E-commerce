@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script>
-    (function() {
+    (function () {
       try {
         var savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
@@ -24,6 +25,7 @@
     })();
   </script>
 </head>
+
 <body>
   <!-- Top Utility Announcement Bar -->
   <div class="top-announcement-bar" id="top-announcement-bar">
@@ -54,18 +56,15 @@
       <div class="nav-search-wrap" id="nav-search-wrap">
         <div class="search-input-wrap">
           <span class="search-icon" aria-hidden="true">🔍</span>
-          <input
-            type="text"
-            id="search-input"
-            class="search-input"
+          <input type="text" id="search-input" class="search-input"
             placeholder="Search products by title, category, or keyword..."
-            aria-label="Search products by title, category, or keyword"
-            autocomplete="off"
-          />
-          <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search" aria-label="Clear search">✕</button>
+            aria-label="Search products by title, category, or keyword" autocomplete="off" />
+          <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search"
+            aria-label="Clear search">✕</button>
         </div>
         <!-- Autocomplete Suggestions Dropdown -->
-        <div class="search-suggestions-dropdown" id="search-suggestions-dropdown" style="display: none;" role="listbox" aria-label="Product suggestions"></div>
+        <div class="search-suggestions-dropdown" id="search-suggestions-dropdown" style="display: none;" role="listbox"
+          aria-label="Product suggestions"></div>
       </div>
 
       <div class="nav-actions">
@@ -77,7 +76,8 @@
         </button>
 
         <!-- Dark / Light Mode Toggle Button (Symbol Only, No Text) -->
-        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode" type="button">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode"
+          type="button">
           <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
           <span class="theme-toggle-label" id="theme-toggle-label" style="display: none;"></span>
         </button>
@@ -92,7 +92,8 @@
 
           <!-- Authenticated State: User Profile Trigger & Dropdown Menu -->
           <div id="nav-user-info" style="display: none;" class="nav-user-cluster">
-            <button class="nav-profile-trigger-btn" id="nav-profile-trigger-btn" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Open user profile menu">
+            <button class="nav-profile-trigger-btn" id="nav-profile-trigger-btn" type="button" aria-expanded="false"
+              aria-haspopup="true" aria-label="Open user profile menu">
               <div class="nav-profile-avatar" id="nav-profile-avatar">
                 <span class="nav-avatar-initials" id="nav-avatar-initials">U</span>
                 <img src="" alt="User avatar" class="nav-avatar-img" id="nav-avatar-img" style="display: none;" />
@@ -102,12 +103,14 @@
             </button>
 
             <!-- Dropdown Menu -->
-            <div class="profile-dropdown-menu" id="profile-dropdown-menu" role="menu" aria-label="User Account Menu" style="display: none;">
+            <div class="profile-dropdown-menu" id="profile-dropdown-menu" role="menu" aria-label="User Account Menu"
+              style="display: none;">
               <!-- Dropdown Header -->
               <div class="dropdown-user-header">
                 <div class="dropdown-avatar-circle" id="dropdown-avatar-display">
                   <span class="dropdown-avatar-initials" id="dropdown-avatar-initials">U</span>
-                  <img src="" alt="User avatar" class="dropdown-avatar-img" id="dropdown-avatar-img" style="display: none;" />
+                  <img src="" alt="User avatar" class="dropdown-avatar-img" id="dropdown-avatar-img"
+                    style="display: none;" />
                 </div>
                 <div class="dropdown-user-meta">
                   <span class="dropdown-user-name" id="dropdown-user-name">User</span>
@@ -130,7 +133,8 @@
                 </button>
 
                 <!-- 2. Wishlist Option (Transferred into profile menu) -->
-                <button class="dropdown-item wishlist-nav-btn" id="nav-wishlist-btn" role="menuitem" type="button" aria-label="View Wishlist">
+                <button class="dropdown-item wishlist-nav-btn" id="nav-wishlist-btn" role="menuitem" type="button"
+                  aria-label="View Wishlist">
                   <span class="dropdown-item-icon">❤️</span>
                   <div class="dropdown-item-text">
                     <span class="dropdown-item-title">My Wishlist</span>
@@ -140,7 +144,8 @@
                 </button>
 
                 <!-- 3. My Orders Option (Transferred into profile menu) -->
-                <button class="dropdown-item" id="nav-orders-btn" role="menuitem" type="button" aria-label="View My Orders">
+                <button class="dropdown-item" id="nav-orders-btn" role="menuitem" type="button"
+                  aria-label="View My Orders">
                   <span class="dropdown-item-icon">📦</span>
                   <div class="dropdown-item-text">
                     <span class="dropdown-item-title">My Orders</span>
@@ -149,7 +154,8 @@
                 </button>
 
                 <!-- 4. Saved Addresses Option -->
-                <button class="dropdown-item" id="nav-addresses-btn" role="menuitem" type="button" aria-label="Manage Addresses">
+                <button class="dropdown-item" id="nav-addresses-btn" role="menuitem" type="button"
+                  aria-label="Manage Addresses">
                   <span class="dropdown-item-icon">📍</span>
                   <div class="dropdown-item-text">
                     <span class="dropdown-item-title">Saved Addresses</span>
@@ -158,7 +164,8 @@
                 </button>
 
                 <!-- 5. Admin Panel (Shown for admin only) -->
-                <button class="dropdown-item" id="nav-admin-btn" role="menuitem" type="button" style="display: none;" aria-label="Admin Dashboard">
+                <button class="dropdown-item" id="nav-admin-btn" role="menuitem" type="button" style="display: none;"
+                  aria-label="Admin Dashboard">
                   <span class="dropdown-item-icon">🛡️</span>
                   <div class="dropdown-item-text">
                     <span class="dropdown-item-title">Admin Dashboard</span>
@@ -171,7 +178,8 @@
 
               <!-- Sign Out Option -->
               <div class="dropdown-footer">
-                <button class="dropdown-item dropdown-logout-item nav-logout-btn" id="nav-logout-btn" role="menuitem" type="button">
+                <button class="dropdown-item dropdown-logout-item nav-logout-btn" id="nav-logout-btn" role="menuitem"
+                  type="button">
                   <span class="dropdown-item-icon">🚪</span>
                   <span class="dropdown-item-title">Sign Out</span>
                 </button>
@@ -189,19 +197,24 @@
       <!-- Background E-Commerce Sliding Carousel -->
       <div class="hero-slider" id="hero-slider">
         <div class="hero-slide active" data-index="0">
-          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80" alt="E-commerce Fashion & Storefront" class="hero-slide-img" loading="eager" />
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80"
+            alt="E-commerce Fashion & Storefront" class="hero-slide-img" loading="eager" />
         </div>
         <div class="hero-slide" data-index="1">
-          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&auto=format&fit=crop&q=80" alt="Electronics & Audio Gear" class="hero-slide-img" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&auto=format&fit=crop&q=80"
+            alt="Electronics & Audio Gear" class="hero-slide-img" loading="lazy" />
         </div>
         <div class="hero-slide" data-index="2">
-          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1600&auto=format&fit=crop&q=80" alt="Watches & Minimalist Accessories" class="hero-slide-img" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1600&auto=format&fit=crop&q=80"
+            alt="Watches & Minimalist Accessories" class="hero-slide-img" loading="lazy" />
         </div>
         <div class="hero-slide" data-index="3">
-          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&auto=format&fit=crop&q=80" alt="Sneakers & Lifestyle Shoes" class="hero-slide-img" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&auto=format&fit=crop&q=80"
+            alt="Sneakers & Lifestyle Shoes" class="hero-slide-img" loading="lazy" />
         </div>
         <div class="hero-slide" data-index="4">
-          <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1600&auto=format&fit=crop&q=80" alt="Tech Gadgets & Workspace" class="hero-slide-img" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1600&auto=format&fit=crop&q=80"
+            alt="Tech Gadgets & Workspace" class="hero-slide-img" loading="lazy" />
         </div>
       </div>
       <div class="hero-slider-overlay"></div>
@@ -209,13 +222,15 @@
 
     <div class="container hero-container">
       <!-- Center Hero Content with Synchronized Information Slider -->
-      <div class="hero-content" id="hero-interactive-panel" tabindex="0" role="region" aria-label="Featured Categories and Store Highlights Slider">
+      <div class="hero-content" id="hero-interactive-panel" tabindex="0" role="region"
+        aria-label="Featured Categories and Store Highlights Slider">
         <div class="hero-info-track" id="hero-info-track">
           <!-- Slide 1: Curated Fashion & Everyday Essentials -->
           <div class="hero-info-slide active" data-index="0">
             <span class="hero-badge"><span class="badge-sparkle">✨</span> New Arrivals 2026</span>
             <h1 class="hero-title">Curated Essentials for Everyday Living</h1>
-            <p class="hero-subtitle">Discover premium apparel, durable canvas totes, and artisan crafted accessories curated for timeless daily style.</p>
+            <p class="hero-subtitle">Discover premium apparel, durable canvas totes, and artisan crafted accessories
+              curated for timeless daily style.</p>
             <div class="hero-slide-highlights">
               <span class="hero-highlight-pill">🏷️ Direct INR Pricing</span>
               <span class="hero-highlight-pill">🧵 100% Quality Inspected</span>
@@ -233,7 +248,8 @@
           <div class="hero-info-slide" data-index="1">
             <span class="hero-badge badge-indigo"><span class="badge-sparkle">🎧</span> Studio Electronics</span>
             <h2 class="hero-title">Immersive Acoustics &amp; Wireless Freedom</h2>
-            <p class="hero-subtitle">Studio-calibrated active noise cancellation, deep punchy bass, and 40-hour battery life for uninterrupted sound.</p>
+            <p class="hero-subtitle">Studio-calibrated active noise cancellation, deep punchy bass, and 40-hour battery
+              life for uninterrupted sound.</p>
             <div class="hero-slide-highlights">
               <span class="hero-highlight-pill">🔋 40-Hour Battery</span>
               <span class="hero-highlight-pill">⚡ Fast USB-C Charge</span>
@@ -251,7 +267,8 @@
           <div class="hero-info-slide" data-index="2">
             <span class="hero-badge badge-amber"><span class="badge-sparkle">⌚</span> Precision Timepieces</span>
             <h2 class="hero-title">Timeless Luxury Built for Every Moment</h2>
-            <p class="hero-subtitle">Smart health tracking, sapphire-coated crystal, and 5ATM water resistance crafted for understated elegance.</p>
+            <p class="hero-subtitle">Smart health tracking, sapphire-coated crystal, and 5ATM water resistance crafted
+              for understated elegance.</p>
             <div class="hero-slide-highlights">
               <span class="hero-highlight-pill">💎 Sapphire Glass</span>
               <span class="hero-highlight-pill">💧 5ATM Waterproof</span>
@@ -269,7 +286,8 @@
           <div class="hero-info-slide" data-index="3">
             <span class="hero-badge badge-emerald"><span class="badge-sparkle">👟</span> Active Performance</span>
             <h2 class="hero-title">Engineered Footwear for Daily Comfort</h2>
-            <p class="hero-subtitle">Ultralight responsive foam cushioning and breathable knit construction designed for workouts and urban commutes.</p>
+            <p class="hero-subtitle">Ultralight responsive foam cushioning and breathable knit construction designed for
+              workouts and urban commutes.</p>
             <div class="hero-slide-highlights">
               <span class="hero-highlight-pill">☁️ Cloud-Foam Soles</span>
               <span class="hero-highlight-pill">⚡ Ultralight Breathable</span>
@@ -287,7 +305,8 @@
           <div class="hero-info-slide" data-index="4">
             <span class="hero-badge badge-purple"><span class="badge-sparkle">⚡</span> Productivity Gear</span>
             <h2 class="hero-title">Elevate Your Modern Desk Setup</h2>
-            <p class="hero-subtitle">Tactile mechanical keyboards, ergonomic accessories, and smart workspace essentials to supercharge daily focus.</p>
+            <p class="hero-subtitle">Tactile mechanical keyboards, ergonomic accessories, and smart workspace essentials
+              to supercharge daily focus.</p>
             <div class="hero-slide-highlights">
               <span class="hero-highlight-pill">⌨️ Tactile Switches</span>
               <span class="hero-highlight-pill">🔌 Fast Passthrough</span>
@@ -304,13 +323,19 @@
       </div>
 
       <!-- Slide Indicator Dots -->
-      <div class="hero-slider-indicators" id="hero-slider-indicators" role="tablist" aria-label="Hero background slide controls">
+      <div class="hero-slider-indicators" id="hero-slider-indicators" role="tablist"
+        aria-label="Hero background slide controls">
         <div class="hero-slider-dots-group">
-          <button class="hero-slider-dot active" data-index="0" aria-label="Slide 1: Curated Essentials" role="tab" aria-selected="true"></button>
-          <button class="hero-slider-dot" data-index="1" aria-label="Slide 2: Studio Audio" role="tab" aria-selected="false"></button>
-          <button class="hero-slider-dot" data-index="2" aria-label="Slide 3: Watches &amp; Wearables" role="tab" aria-selected="false"></button>
-          <button class="hero-slider-dot" data-index="3" aria-label="Slide 4: Active Footwear" role="tab" aria-selected="false"></button>
-          <button class="hero-slider-dot" data-index="4" aria-label="Slide 5: Productivity Gear" role="tab" aria-selected="false"></button>
+          <button class="hero-slider-dot active" data-index="0" aria-label="Slide 1: Curated Essentials" role="tab"
+            aria-selected="true"></button>
+          <button class="hero-slider-dot" data-index="1" aria-label="Slide 2: Studio Audio" role="tab"
+            aria-selected="false"></button>
+          <button class="hero-slider-dot" data-index="2" aria-label="Slide 3: Watches &amp; Wearables" role="tab"
+            aria-selected="false"></button>
+          <button class="hero-slider-dot" data-index="3" aria-label="Slide 4: Active Footwear" role="tab"
+            aria-selected="false"></button>
+          <button class="hero-slider-dot" data-index="4" aria-label="Slide 5: Productivity Gear" role="tab"
+            aria-selected="false"></button>
         </div>
         <span class="hero-slider-counter" id="hero-slider-counter" aria-hidden="true">1 / 5</span>
       </div>
@@ -318,11 +343,13 @@
   </section>
 
   <!-- Dedicated Commercial Trust & Value Proposition Bar -->
-  <section class="trust-features-section" id="trust-features-section" aria-label="Customer Guarantees and Store Highlights">
+  <section class="trust-features-section" id="trust-features-section"
+    aria-label="Customer Guarantees and Store Highlights">
     <div class="container trust-features-container">
       <div class="hero-trust-grid" aria-label="Why Shop With Us">
         <!-- Feature 1: Free Express Delivery -->
-        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our free express delivery" data-feature="shipping">
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false"
+          aria-label="Learn about our free express delivery" data-feature="shipping">
           <div class="trust-card-icon icon-indigo">🚚</div>
           <div class="trust-card-text">
             <span class="trust-card-title">Free Express Delivery</span>
@@ -337,7 +364,8 @@
               <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
             </div>
             <h4 class="popover-title">Swift Express Shipping</h4>
-            <p class="popover-desc">Enjoy zero delivery fees on all orders above ₹499. Dispatched with tier-1 logistics partners for prompt, insured doorstep arrival in 2-4 days.</p>
+            <p class="popover-desc">Enjoy zero delivery fees on all orders above ₹499. Dispatched with tier-1 logistics
+              partners for prompt, insured doorstep arrival in 2-4 days.</p>
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ Zero Shipping &gt; ₹499</span>
               <span class="popover-badge-pill">✓ Insured &amp; Tamper-Proof</span>
@@ -346,7 +374,8 @@
         </div>
 
         <!-- Feature 2: Same-Day Dispatch -->
-        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our same-day dispatch service" data-feature="dispatch">
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false"
+          aria-label="Learn about our same-day dispatch service" data-feature="dispatch">
           <div class="trust-card-icon icon-emerald">⚡</div>
           <div class="trust-card-text">
             <span class="trust-card-title">Same-Day Dispatch</span>
@@ -361,7 +390,8 @@
               <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
             </div>
             <h4 class="popover-title">Lightning Fulfillment</h4>
-            <p class="popover-desc">Orders placed before 2:00 PM are rapidly inspected, carefully packaged, and handed over to express couriers on the exact same business day.</p>
+            <p class="popover-desc">Orders placed before 2:00 PM are rapidly inspected, carefully packaged, and handed
+              over to express couriers on the exact same business day.</p>
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ Dispatched in &lt; 4 Hours</span>
               <span class="popover-badge-pill">✓ Live Tracking Updates</span>
@@ -370,7 +400,8 @@
         </div>
 
         <!-- Feature 3: 100% Genuine Quality -->
-        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our genuine quality assurance" data-feature="quality">
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false"
+          aria-label="Learn about our genuine quality assurance" data-feature="quality">
           <div class="trust-card-icon icon-blue">🛡️</div>
           <div class="trust-card-text">
             <span class="trust-card-title">100% Genuine Quality</span>
@@ -385,7 +416,8 @@
               <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
             </div>
             <h4 class="popover-title">Authentic &amp; Certified</h4>
-            <p class="popover-desc">Every product is directly sourced from certified manufacturers and passes strict multi-point inspection to ensure unbeatable quality.</p>
+            <p class="popover-desc">Every product is directly sourced from certified manufacturers and passes strict
+              multi-point inspection to ensure unbeatable quality.</p>
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ 7-Day Easy Returns</span>
               <span class="popover-badge-pill">✓ 100% Original Brand</span>
@@ -394,7 +426,8 @@
         </div>
 
         <!-- Feature 4: Buyer Rating -->
-        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our customer satisfaction rating" data-feature="rating">
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false"
+          aria-label="Learn about our customer satisfaction rating" data-feature="rating">
           <div class="trust-card-icon icon-amber">⭐</div>
           <div class="trust-card-text">
             <span class="trust-card-title">4.9 / 5 Star Rating</span>
@@ -409,7 +442,8 @@
               <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
             </div>
             <h4 class="popover-title">Top Rated E-Commerce</h4>
-            <p class="popover-desc">We are the best rated E-commerce business with 100% satisfaction of our valuable customers. Every review is authentic from real verified buyers across the nation.</p>
+            <p class="popover-desc">We are the best rated E-commerce business with 100% satisfaction of our valuable
+              customers. Every review is authentic from real verified buyers across the nation.</p>
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ 4.9 / 5 Star Rating</span>
               <span class="popover-badge-pill">✓ 2,400+ Verified Buyers</span>
@@ -418,7 +452,8 @@
         </div>
 
         <!-- Feature 5: Transparent INR Deals -->
-        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our exclusive INR deals" data-feature="deals">
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false"
+          aria-label="Learn about our exclusive INR deals" data-feature="deals">
           <div class="trust-card-icon icon-amber">🏷️</div>
           <div class="trust-card-text">
             <span class="trust-card-title">Exclusive INR Pricing</span>
@@ -433,7 +468,8 @@
               <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
             </div>
             <h4 class="popover-title">Transparent INR Pricing</h4>
-            <p class="popover-desc">All prices are strictly listed in Indian Rupees (₹) with zero currency conversion markups or surprise checkout fees. Best value directly from verified suppliers.</p>
+            <p class="popover-desc">All prices are strictly listed in Indian Rupees (₹) with zero currency conversion
+              markups or surprise checkout fees. Best value directly from verified suppliers.</p>
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ All-Inclusive in ₹</span>
               <span class="popover-badge-pill">✓ Direct Brand Rates</span>
@@ -442,7 +478,8 @@
         </div>
 
         <!-- Feature 6: Handpicked Quality -->
-        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false" aria-label="Learn about our handpicked quality items" data-feature="curated">
+        <div class="hero-trust-card interactive-feature" tabindex="0" role="button" aria-expanded="false"
+          aria-label="Learn about our handpicked quality items" data-feature="curated">
           <div class="trust-card-icon icon-indigo">💎</div>
           <div class="trust-card-text">
             <span class="trust-card-title">Curated Quality</span>
@@ -457,7 +494,8 @@
               <button class="popover-close-btn" type="button" aria-label="Close feature details">✕</button>
             </div>
             <h4 class="popover-title">Curated With Passion</h4>
-            <p class="popover-desc">We filter out thousands of low-grade items to showcase only essentials crafted for everyday style, exceptional endurance, and long-lasting daily utility.</p>
+            <p class="popover-desc">We filter out thousands of low-grade items to showcase only essentials crafted for
+              everyday style, exceptional endurance, and long-lasting daily utility.</p>
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ Premium Craftsmanship</span>
               <span class="popover-badge-pill">✓ Multi-stage Testing</span>
@@ -561,7 +599,8 @@
     <div class="state-container error-state" id="error-state" style="display: none;">
       <div class="error-icon">⚠️</div>
       <h3 class="error-title">Unable to Load Products</h3>
-      <p class="state-text" id="error-message">Could not connect to the backend API. Please make sure the server is running.</p>
+      <p class="state-text" id="error-message">Could not connect to the backend API. Please make sure the server is
+        running.</p>
       <button class="btn btn-primary" id="retry-btn">Try Again</button>
     </div>
 
@@ -586,13 +625,16 @@
     </div>
 
     <!-- Catalog Pagination Controls (12 items per page) -->
-    <nav class="pagination-container" id="pagination-container" style="display: none;" aria-label="Product catalog navigation">
+    <nav class="pagination-container" id="pagination-container" style="display: none;"
+      aria-label="Product catalog navigation">
       <div class="pagination-summary" id="pagination-summary" aria-live="polite">
-        Showing <span id="pagination-range-start">1</span>–<span id="pagination-range-end">12</span> of <span id="pagination-total-items">0</span> products
+        Showing <span id="pagination-range-start">1</span>–<span id="pagination-range-end">12</span> of <span
+          id="pagination-total-items">0</span> products
       </div>
 
       <div class="pagination-controls">
-        <button class="pagination-nav-btn pagination-prev-btn" id="pagination-prev-btn" type="button" aria-label="Go to previous page" title="Previous page">
+        <button class="pagination-nav-btn pagination-prev-btn" id="pagination-prev-btn" type="button"
+          aria-label="Go to previous page" title="Previous page">
           <span class="pagination-arrow" aria-hidden="true">←</span>
           <span class="pagination-btn-label">Previous</span>
         </button>
@@ -601,20 +643,23 @@
           <!-- Page numbers dynamically populated by app.js -->
         </div>
 
-        <button class="pagination-nav-btn pagination-next-btn" id="pagination-next-btn" type="button" aria-label="Go to next page" title="Next page">
+        <button class="pagination-nav-btn pagination-next-btn" id="pagination-next-btn" type="button"
+          aria-label="Go to next page" title="Next page">
           <span class="pagination-btn-label">Next</span>
           <span class="pagination-arrow" aria-hidden="true">→</span>
         </button>
       </div>
 
       <div class="pagination-page-indicator" id="pagination-page-indicator" aria-live="polite">
-        Page <span id="current-page-num" class="current-page-num">1</span> of <span id="total-pages-num" class="total-pages-num">1</span>
+        Page <span id="current-page-num" class="current-page-num">1</span> of <span id="total-pages-num"
+          class="total-pages-num">1</span>
       </div>
     </nav>
   </main>
 
   <!-- Product Details Modal -->
-  <div class="modal-backdrop" id="product-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-product-title">
+  <div class="modal-backdrop" id="product-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="modal-product-title">
     <div class="modal-container product-modal-container">
       <button class="modal-close-icon" id="modal-close-btn" aria-label="Close product details">✕</button>
 
@@ -640,10 +685,11 @@
   </div>
 
   <!-- Shopping Cart Modal -->
-  <div class="modal-backdrop" id="cart-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title">
+  <div class="modal-backdrop" id="cart-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="cart-modal-title">
     <div class="modal-container cart-modal-container">
       <button class="modal-close-icon" id="cart-close-btn" aria-label="Close cart">✕</button>
-      
+
       <div class="cart-modal-header">
         <h2 class="cart-modal-title" id="cart-modal-title">Shopping Cart</h2>
         <span class="product-badge" id="cart-items-count-badge">0 items</span>
@@ -693,7 +739,8 @@
   </div>
 
   <!-- Wishlist Modal -->
-  <div class="modal-backdrop" id="wishlist-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wishlist-modal-title">
+  <div class="modal-backdrop" id="wishlist-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="wishlist-modal-title">
     <div class="modal-container wishlist-modal-container">
       <button class="modal-close-icon" id="wishlist-close-btn" aria-label="Close wishlist">✕</button>
 
@@ -737,7 +784,8 @@
   </div>
 
   <!-- Checkout & Order Confirmation Modal -->
-  <div class="modal-backdrop" id="checkout-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
+  <div class="modal-backdrop" id="checkout-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="checkout-modal-title">
     <div class="modal-container checkout-modal-container">
       <button class="modal-close-icon" id="checkout-close-btn" aria-label="Close checkout">✕</button>
 
@@ -748,7 +796,8 @@
           <span class="product-badge">Demo Checkout</span>
         </div>
 
-        <p class="checkout-intro">Review your order details below. Note: Payment processing is simulated for this demonstration.</p>
+        <p class="checkout-intro">Review your order details below. Note: Payment processing is simulated for this
+          demonstration.</p>
 
         <!-- Delivery Address Selection Section -->
         <div class="checkout-delivery-section" id="checkout-delivery-section">
@@ -781,11 +830,13 @@
 
           <div id="checkout-payment-alert" class="auth-error-alert" style="display: none;"></div>
 
-          <div class="checkout-payments-grid" id="checkout-payments-grid" role="radiogroup" aria-label="Select Payment Method">
+          <div class="checkout-payments-grid" id="checkout-payments-grid" role="radiogroup"
+            aria-label="Select Payment Method">
             <!-- UPI Option -->
             <label class="checkout-payment-card" for="payment-method-upi" id="payment-card-upi">
               <div class="checkout-payment-card-top">
-                <input type="radio" name="checkoutPaymentMethod" id="payment-method-upi" value="UPI" class="checkout-payment-radio">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-upi" value="UPI"
+                  class="checkout-payment-radio">
                 <div class="checkout-payment-card-title">
                   <span class="payment-method-icon">⚡</span>
                   <span class="payment-method-name">UPI</span>
@@ -800,7 +851,8 @@
             <!-- Cash on Delivery (COD) Option -->
             <label class="checkout-payment-card is-selected" for="payment-method-cod" id="payment-card-cod">
               <div class="checkout-payment-card-top">
-                <input type="radio" name="checkoutPaymentMethod" id="payment-method-cod" value="COD" checked class="checkout-payment-radio">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-cod" value="COD" checked
+                  class="checkout-payment-radio">
                 <div class="checkout-payment-card-title">
                   <span class="payment-method-icon">💵</span>
                   <span class="payment-method-name">Cash on Delivery</span>
@@ -815,7 +867,8 @@
             <!-- Net Banking Option -->
             <label class="checkout-payment-card" for="payment-method-netbanking" id="payment-card-netbanking">
               <div class="checkout-payment-card-top">
-                <input type="radio" name="checkoutPaymentMethod" id="payment-method-netbanking" value="NET_BANKING" class="checkout-payment-radio">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-netbanking" value="NET_BANKING"
+                  class="checkout-payment-radio">
                 <div class="checkout-payment-card-title">
                   <span class="payment-method-icon">🏦</span>
                   <span class="payment-method-name">Net Banking</span>
@@ -917,7 +970,8 @@
   </div>
 
   <!-- My Orders Modal -->
-  <div class="modal-backdrop" id="orders-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="orders-modal-title">
+  <div class="modal-backdrop" id="orders-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="orders-modal-title">
     <div class="modal-container orders-modal-container">
       <button class="modal-close-icon" id="orders-close-btn" aria-label="Close orders dialog">✕</button>
 
@@ -956,7 +1010,8 @@
   </div>
 
   <!-- Manage Addresses Modal -->
-  <div class="modal-backdrop" id="address-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="address-modal-title">
+  <div class="modal-backdrop" id="address-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="address-modal-title">
     <div class="modal-container address-modal-container">
       <button class="modal-close-icon" id="address-close-btn" aria-label="Close addresses dialog">✕</button>
 
@@ -999,42 +1054,50 @@
           <div class="form-grid">
             <div class="form-group">
               <label for="address-full-name" class="form-label">Full Name *</label>
-              <input type="text" id="address-full-name" required placeholder="e.g. Saif Ali" class="form-input" autocomplete="name" />
+              <input type="text" id="address-full-name" required placeholder="e.g. Saif Ali" class="form-input"
+                autocomplete="name" />
             </div>
 
             <div class="form-group">
               <label for="address-phone" class="form-label">Phone Number * (10 Digits)</label>
-              <input type="tel" id="address-phone" required placeholder="e.g. 9876543210" class="form-input" autocomplete="tel" />
+              <input type="tel" id="address-phone" required placeholder="e.g. 9876543210" class="form-input"
+                autocomplete="tel" />
             </div>
 
             <div class="form-group form-full-width">
               <label for="address-line1" class="form-label">Flat / House No. / Street Address *</label>
-              <input type="text" id="address-line1" required placeholder="e.g. Flat 402, Sunshine Heights, MG Road" class="form-input" autocomplete="address-line1" />
+              <input type="text" id="address-line1" required placeholder="e.g. Flat 402, Sunshine Heights, MG Road"
+                class="form-input" autocomplete="address-line1" />
             </div>
 
             <div class="form-group form-full-width">
               <label for="address-line2" class="form-label">Area / Sector / Landmark (Optional)</label>
-              <input type="text" id="address-line2" placeholder="e.g. Near City Mall" class="form-input" autocomplete="address-line2" />
+              <input type="text" id="address-line2" placeholder="e.g. Near City Mall" class="form-input"
+                autocomplete="address-line2" />
             </div>
 
             <div class="form-group">
               <label for="address-city" class="form-label">City *</label>
-              <input type="text" id="address-city" required placeholder="e.g. Ahmedabad" class="form-input" autocomplete="address-level2" />
+              <input type="text" id="address-city" required placeholder="e.g. Ahmedabad" class="form-input"
+                autocomplete="address-level2" />
             </div>
 
             <div class="form-group">
               <label for="address-state" class="form-label">State *</label>
-              <input type="text" id="address-state" required placeholder="e.g. Gujarat" class="form-input" autocomplete="address-level1" />
+              <input type="text" id="address-state" required placeholder="e.g. Gujarat" class="form-input"
+                autocomplete="address-level1" />
             </div>
 
             <div class="form-group">
               <label for="address-postal-code" class="form-label">PIN Code * (6 Digits)</label>
-              <input type="text" id="address-postal-code" required placeholder="e.g. 380001" maxlength="6" class="form-input" autocomplete="postal-code" />
+              <input type="text" id="address-postal-code" required placeholder="e.g. 380001" maxlength="6"
+                class="form-input" autocomplete="postal-code" />
             </div>
 
             <div class="form-group">
               <label for="address-country" class="form-label">Country *</label>
-              <input type="text" id="address-country" required value="India" class="form-input" autocomplete="country-name" />
+              <input type="text" id="address-country" required value="India" class="form-input"
+                autocomplete="country-name" />
             </div>
 
             <div class="form-group">
@@ -1077,7 +1140,8 @@
   </div>
 
   <!-- Admin Dashboard Modal -->
-  <div class="modal-backdrop" id="admin-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="admin-modal-title">
+  <div class="modal-backdrop" id="admin-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="admin-modal-title">
     <div class="modal-container admin-modal-container">
       <button class="modal-close-icon" id="admin-close-btn" aria-label="Close admin dashboard">✕</button>
 
@@ -1169,15 +1233,18 @@
             <div class="form-grid">
               <div class="form-group">
                 <label for="admin-prod-name" class="form-label">Product Name *</label>
-                <input type="text" id="admin-prod-name" required class="form-input" placeholder="e.g. Ergonomic Keyboard" />
+                <input type="text" id="admin-prod-name" required class="form-input"
+                  placeholder="e.g. Ergonomic Keyboard" />
               </div>
               <div class="form-group">
                 <label for="admin-prod-category" class="form-label">Category *</label>
-                <input type="text" id="admin-prod-category" required class="form-input" placeholder="e.g. Electronics" />
+                <input type="text" id="admin-prod-category" required class="form-input"
+                  placeholder="e.g. Electronics" />
               </div>
               <div class="form-group">
                 <label for="admin-prod-price" class="form-label">Price (₹) *</label>
-                <input type="number" id="admin-prod-price" step="0.01" min="0" required class="form-input" placeholder="e.g. 79.99" />
+                <input type="number" id="admin-prod-price" step="0.01" min="0" required class="form-input"
+                  placeholder="e.g. 79.99" />
               </div>
               <div class="form-group">
                 <label for="admin-prod-stock" class="form-label">Stock Quantity *</label>
@@ -1185,11 +1252,13 @@
               </div>
               <div class="form-group form-full-width">
                 <label for="admin-prod-image" class="form-label">Image URL *</label>
-                <input type="url" id="admin-prod-image" required class="form-input" placeholder="https://example.com/image.jpg" />
+                <input type="url" id="admin-prod-image" required class="form-input"
+                  placeholder="https://example.com/image.jpg" />
               </div>
               <div class="form-group form-full-width">
                 <label for="admin-prod-desc" class="form-label">Description *</label>
-                <textarea id="admin-prod-desc" required class="form-input" rows="3" placeholder="Detailed product description..."></textarea>
+                <textarea id="admin-prod-desc" required class="form-input" rows="3"
+                  placeholder="Detailed product description..."></textarea>
               </div>
             </div>
             <div class="form-actions">
@@ -1283,7 +1352,8 @@
         <div class="analytics-toolbar">
           <div class="analytics-toolbar-info">
             <h3 class="admin-subtitle">Store Performance Analytics</h3>
-            <p class="admin-subdesc">Real-time revenue, sales trends, settlement metrics, and customer insights calculated dynamically from MongoDB.</p>
+            <p class="admin-subdesc">Real-time revenue, sales trends, settlement metrics, and customer insights
+              calculated dynamically from MongoDB.</p>
           </div>
           <div class="analytics-toolbar-controls">
             <div class="analytics-range-selector" role="group" aria-label="Select Date Range">
@@ -1292,7 +1362,8 @@
               <button type="button" class="analytics-range-btn" data-range="90d" id="range-btn-90d">90 Days</button>
               <button type="button" class="analytics-range-btn" data-range="all" id="range-btn-all">All Time</button>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm" id="refresh-analytics-btn" title="Refresh analytics data">↻ Refresh</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="refresh-analytics-btn"
+              title="Refresh analytics data">↻ Refresh</button>
           </div>
         </div>
 
@@ -1305,7 +1376,8 @@
         <!-- Analytics Error Alert -->
         <div class="auth-error-alert" id="analytics-error" style="display: none;">
           <span id="analytics-error-text">Failed to load analytics.</span>
-          <button type="button" class="btn btn-secondary btn-sm" id="retry-analytics-btn" style="margin-left: 10px;">Retry</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="retry-analytics-btn"
+            style="margin-left: 10px;">Retry</button>
         </div>
 
         <!-- Analytics Main Content Container -->
@@ -1404,7 +1476,8 @@
               </div>
               <div class="metric-value" id="metric-products-reviews">0 / 0</div>
               <div class="metric-footer">
-                <span class="metric-subtext"><span id="metric-products-count">0</span> Products · <span id="metric-reviews-count">0</span> Reviews</span>
+                <span class="metric-subtext"><span id="metric-products-count">0</span> Products · <span
+                    id="metric-reviews-count">0</span> Reviews</span>
               </div>
             </div>
           </div>
@@ -1475,7 +1548,8 @@
                 <!-- Injected dynamically -->
               </div>
               <div class="payment-settlement-note">
-                ℹ️ <em>Online payments (UPI &amp; Net Banking) remain Pending until a real payment gateway callback verifies the transaction.</em>
+                ℹ️ <em>Online payments (UPI &amp; Net Banking) remain Pending until a real payment gateway callback
+                  verifies the transaction.</em>
               </div>
             </div>
           </div>
@@ -1536,7 +1610,8 @@
   </div>
 
   <!-- Authentication Modal (Log In / Register) -->
-  <div class="modal-backdrop" id="auth-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+  <div class="modal-backdrop" id="auth-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="auth-modal-title">
     <div class="modal-container auth-modal-container">
       <button class="modal-close-icon" id="auth-close-btn" aria-label="Close auth dialog">✕</button>
 
@@ -1551,11 +1626,13 @@
       <form id="login-form" class="auth-form">
         <div class="form-group">
           <label for="login-email" class="form-label">Email Address</label>
-          <input type="email" id="login-email" required placeholder="you@example.com" class="form-input" autocomplete="email" />
+          <input type="email" id="login-email" required placeholder="you@example.com" class="form-input"
+            autocomplete="email" />
         </div>
         <div class="form-group">
           <label for="login-password" class="form-label">Password</label>
-          <input type="password" id="login-password" required placeholder="••••••••" class="form-input" autocomplete="current-password" />
+          <input type="password" id="login-password" required placeholder="••••••••" class="form-input"
+            autocomplete="current-password" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">Log In</button>
       </form>
@@ -1568,11 +1645,13 @@
         </div>
         <div class="form-group">
           <label for="reg-email" class="form-label">Email Address</label>
-          <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input" autocomplete="email" />
+          <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input"
+            autocomplete="email" />
         </div>
         <div class="form-group">
           <label for="reg-password" class="form-label">Password (min 8 chars, letters &amp; numbers)</label>
-          <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input" autocomplete="new-password" />
+          <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input"
+            autocomplete="new-password" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">Create Account</button>
       </form>
@@ -1580,7 +1659,8 @@
   </div>
 
   <!-- User Profile Modal (View & Edit Details, Avatar/Photo) -->
-  <div class="modal-backdrop" id="profile-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+  <div class="modal-backdrop" id="profile-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="profile-modal-title">
     <div class="modal-container profile-modal-container">
       <button class="modal-close-icon" id="profile-close-btn" aria-label="Close profile modal">✕</button>
 
@@ -1602,9 +1682,11 @@
           <div class="profile-avatar-wrap">
             <div class="profile-avatar-circle" id="profile-avatar-display">
               <span class="profile-avatar-initials" id="profile-modal-initials">U</span>
-              <img src="" alt="Profile avatar" class="profile-avatar-img" id="profile-modal-img" style="display: none;" />
+              <img src="" alt="Profile avatar" class="profile-avatar-img" id="profile-modal-img"
+                style="display: none;" />
             </div>
-            <label for="profile-avatar-file" class="profile-avatar-upload-badge" title="Upload photo from your device" aria-label="Upload photo from device">
+            <label for="profile-avatar-file" class="profile-avatar-upload-badge" title="Upload photo from your device"
+              aria-label="Upload photo from device">
               📷
               <input type="file" id="profile-avatar-file" accept="image/*" style="display: none;" />
             </label>
@@ -1626,9 +1708,11 @@
 
             <!-- Image URL Alternative -->
             <div class="avatar-url-row">
-              <input type="url" id="profile-avatar-url-input" class="form-input form-input-sm" placeholder="Or enter image URL (https://...)" />
+              <input type="url" id="profile-avatar-url-input" class="form-input form-input-sm"
+                placeholder="Or enter image URL (https://...)" />
               <button type="button" class="btn btn-secondary btn-sm" id="profile-avatar-url-apply-btn">Apply</button>
-              <button type="button" class="btn btn-secondary btn-sm" id="profile-avatar-remove-btn" title="Reset to initials">Reset</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="profile-avatar-remove-btn"
+                title="Reset to initials">Reset</button>
             </div>
           </div>
         </div>
@@ -1638,12 +1722,15 @@
           <div class="form-grid profile-form-grid">
             <div class="form-group">
               <label for="profile-name-input" class="form-label">Full Name <span class="required">*</span></label>
-              <input type="text" id="profile-name-input" class="form-input" required placeholder="Enter your full name" />
+              <input type="text" id="profile-name-input" class="form-input" required
+                placeholder="Enter your full name" />
             </div>
 
             <div class="form-group">
-              <label for="profile-email-input" class="form-label">Email Address <span class="badge-verified">✓ Verified</span></label>
-              <input type="email" id="profile-email-input" class="form-input form-input-readonly" readonly title="Primary account email cannot be changed" />
+              <label for="profile-email-input" class="form-label">Email Address <span class="badge-verified">✓
+                  Verified</span></label>
+              <input type="email" id="profile-email-input" class="form-input form-input-readonly" readonly
+                title="Primary account email cannot be changed" />
             </div>
 
             <div class="form-group">
@@ -1700,26 +1787,30 @@
   <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
 
   <!-- Order Tracking Modal -->
-  <div class="modal-backdrop" id="order-tracking-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="order-tracking-title">
+  <div class="modal-backdrop" id="order-tracking-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="order-tracking-title">
     <div class="modal-container tracking-modal-container">
       <button class="modal-close-icon" id="order-tracking-close-btn" aria-label="Close order tracking dialog">✕</button>
 
       <div class="info-modal-header">
         <span class="info-header-badge badge-indigo">📦 Real-Time Tracking</span>
         <h3 class="modal-title" id="order-tracking-title">Track Your Order</h3>
-        <p class="modal-subtitle">Enter your 24-character Order ID to view current fulfillment status and shipment details.</p>
+        <p class="modal-subtitle">Enter your 24-character Order ID to view current fulfillment status and shipment
+          details.</p>
       </div>
 
       <!-- Tracking Input Form -->
       <form id="order-tracking-form" class="tracking-input-form">
         <div class="tracking-input-group">
-          <input type="text" id="track-order-id-input" class="form-input tracking-input" placeholder="Enter Order ID (e.g., 65f1a2b3c4d5e6f7a8b9c0d1)" maxlength="24" required autocomplete="off" />
+          <input type="text" id="track-order-id-input" class="form-input tracking-input"
+            placeholder="Enter Order ID (e.g., 65f1a2b3c4d5e6f7a8b9c0d1)" maxlength="24" required autocomplete="off" />
           <button type="submit" id="track-order-submit-btn" class="btn btn-primary tracking-submit-btn">
             <span>Track Order</span>
             <span>→</span>
           </button>
         </div>
-        <p class="tracking-form-hint">Tip: Your Order ID is shown upon placing an order and listed in your order history.</p>
+        <p class="tracking-form-hint">Tip: Your Order ID is shown upon placing an order and listed in your order
+          history.</p>
       </form>
 
       <!-- Loading State -->
@@ -1735,8 +1826,10 @@
       <div id="track-order-unauth" class="tracking-unauth-box" style="display: none;">
         <div class="unauth-icon">🔒</div>
         <h4>Authentication Required</h4>
-        <p>Orders are private and protected. Please sign in to the account that placed the order to view its verified details.</p>
-        <button type="button" class="btn btn-primary btn-sm" id="track-order-unauth-login-btn">Log In to View Order</button>
+        <p>Orders are private and protected. Please sign in to the account that placed the order to view its verified
+          details.</p>
+        <button type="button" class="btn btn-primary btn-sm" id="track-order-unauth-login-btn">Log In to View
+          Order</button>
       </div>
 
       <!-- Result Card -->
@@ -1800,14 +1893,16 @@
   </div>
 
   <!-- Shipping & Delivery Information Modal -->
-  <div class="modal-backdrop" id="shipping-info-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
+  <div class="modal-backdrop" id="shipping-info-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="shipping-modal-title">
     <div class="modal-container info-modal-container">
       <button class="modal-close-icon" id="shipping-modal-close-btn" aria-label="Close shipping dialog">✕</button>
 
       <div class="info-modal-header">
         <span class="info-header-badge badge-indigo">🚚 Logistics &amp; Delivery</span>
         <h3 class="modal-title" id="shipping-modal-title">Shipping &amp; Delivery Information</h3>
-        <p class="modal-subtitle">Transparent fulfillment timelines, express logistics partners, and delivery standards.</p>
+        <p class="modal-subtitle">Transparent fulfillment timelines, express logistics partners, and delivery standards.
+        </p>
       </div>
 
       <div class="info-content-grid">
@@ -1816,7 +1911,8 @@
             <span class="info-card-icon">🇮🇳</span>
             <h4 class="info-card-title">Pan-India Delivery Availability</h4>
           </div>
-          <p class="info-card-desc">We dispatch across all serviceable pincodes in India via vetted tier-1 courier networks. Both residential addresses and corporate work hubs are supported.</p>
+          <p class="info-card-desc">We dispatch across all serviceable pincodes in India via vetted tier-1 courier
+            networks. Both residential addresses and corporate work hubs are supported.</p>
         </div>
 
         <div class="info-card">
@@ -1824,7 +1920,9 @@
             <span class="info-card-icon">⏱️</span>
             <h4 class="info-card-title">Estimated Delivery Timeframe</h4>
           </div>
-          <p class="info-card-desc"><strong>Metropolitan Hubs:</strong> 2 to 4 business days from dispatch.<br><strong>Regional &amp; Outstation Locations:</strong> 4 to 7 business days depending on local postal accessibility.</p>
+          <p class="info-card-desc"><strong>Metropolitan Hubs:</strong> 2 to 4 business days from
+            dispatch.<br><strong>Regional &amp; Outstation Locations:</strong> 4 to 7 business days depending on local
+            postal accessibility.</p>
         </div>
 
         <div class="info-card">
@@ -1832,7 +1930,8 @@
             <span class="info-card-icon">⚡</span>
             <h4 class="info-card-title">Same-Day Order Processing</h4>
           </div>
-          <p class="info-card-desc">Orders confirmed before <strong>2:00 PM IST</strong> on business days undergo quality inspection, protective packaging, and carrier handover on the exact same day.</p>
+          <p class="info-card-desc">Orders confirmed before <strong>2:00 PM IST</strong> on business days undergo
+            quality inspection, protective packaging, and carrier handover on the exact same day.</p>
         </div>
 
         <div class="info-card">
@@ -1840,7 +1939,8 @@
             <span class="info-card-icon">📦</span>
             <h4 class="info-card-title">Real-Time Delivery Tracking</h4>
           </div>
-          <p class="info-card-desc">Every confirmed order receives a unique 24-character Order ID. Track status milestones anytime via the Order Tracking tool or your My Orders dashboard.</p>
+          <p class="info-card-desc">Every confirmed order receives a unique 24-character Order ID. Track status
+            milestones anytime via the Order Tracking tool or your My Orders dashboard.</p>
         </div>
 
         <div class="info-card">
@@ -1848,7 +1948,8 @@
             <span class="info-card-icon">💰</span>
             <h4 class="info-card-title">Zero Delivery Fees &gt; ₹499</h4>
           </div>
-          <p class="info-card-desc">Free express shipping applies automatically to all cart orders above ₹499. Orders below ₹499 incur a nominal fulfillment charge calculated during checkout.</p>
+          <p class="info-card-desc">Free express shipping applies automatically to all cart orders above ₹499. Orders
+            below ₹499 incur a nominal fulfillment charge calculated during checkout.</p>
         </div>
 
         <div class="info-card">
@@ -1856,7 +1957,8 @@
             <span class="info-card-icon">🛡️</span>
             <h4 class="info-card-title">Tamper-Proof Packaging</h4>
           </div>
-          <p class="info-card-desc">All products are sealed in protective, tamper-evident security cartons. Please verify the exterior seal before accepting delivery from our courier representative.</p>
+          <p class="info-card-desc">All products are sealed in protective, tamper-evident security cartons. Please
+            verify the exterior seal before accepting delivery from our courier representative.</p>
         </div>
       </div>
 
@@ -1867,14 +1969,16 @@
   </div>
 
   <!-- 7-Day Easy Returns Modal -->
-  <div class="modal-backdrop" id="returns-info-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="returns-modal-title">
+  <div class="modal-backdrop" id="returns-info-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="returns-modal-title">
     <div class="modal-container info-modal-container">
       <button class="modal-close-icon" id="returns-modal-close-btn" aria-label="Close returns dialog">✕</button>
 
       <div class="info-modal-header">
         <span class="info-header-badge badge-emerald">🔄 Customer Assurance</span>
         <h3 class="modal-title" id="returns-modal-title">7-Day Easy Returns &amp; Refunds</h3>
-        <p class="modal-subtitle">Hassle-free return window, transparent eligibility guidelines, and prompt refund processing.</p>
+        <p class="modal-subtitle">Hassle-free return window, transparent eligibility guidelines, and prompt refund
+          processing.</p>
       </div>
 
       <div class="info-content-grid">
@@ -1883,7 +1987,8 @@
             <span class="info-card-icon">📅</span>
             <h4 class="info-card-title">7-Day Return Window</h4>
           </div>
-          <p class="info-card-desc">You have 7 full calendar days from the doorstep delivery timestamp to initiate a return request if an item is damaged, defective, or not as described.</p>
+          <p class="info-card-desc">You have 7 full calendar days from the doorstep delivery timestamp to initiate a
+            return request if an item is damaged, defective, or not as described.</p>
         </div>
 
         <div class="info-card">
@@ -1891,7 +1996,8 @@
             <span class="info-card-icon">✅</span>
             <h4 class="info-card-title">Basic Return Eligibility</h4>
           </div>
-          <p class="info-card-desc">Items must remain unused, unwashed, and in original condition with all barcode tags, user manuals, accessories, and protective packaging intact.</p>
+          <p class="info-card-desc">Items must remain unused, unwashed, and in original condition with all barcode tags,
+            user manuals, accessories, and protective packaging intact.</p>
         </div>
 
         <div class="info-card">
@@ -1899,7 +2005,9 @@
             <span class="info-card-icon">📝</span>
             <h4 class="info-card-title">Return Request Process</h4>
           </div>
-          <p class="info-card-desc">1. Open your order in <strong>My Orders</strong>.<br>2. Note your 24-character Order ID.<br>3. Submit a return inquiry stating the reason. Our logistics partner schedules a scheduled doorstep pickup.</p>
+          <p class="info-card-desc">1. Open your order in <strong>My Orders</strong>.<br>2. Note your 24-character Order
+            ID.<br>3. Submit a return inquiry stating the reason. Our logistics partner schedules a scheduled doorstep
+            pickup.</p>
         </div>
 
         <div class="info-card">
@@ -1907,7 +2015,9 @@
             <span class="info-card-icon">💳</span>
             <h4 class="info-card-title">Refund Processing Timelines</h4>
           </div>
-          <p class="info-card-desc"><strong>Prepaid (UPI / Net Banking):</strong> Returned to original source within 3–5 business days after warehouse inspection.<br><strong>Cash on Delivery (COD):</strong> Refunded via verified UPI or bank transfer upon item handover.</p>
+          <p class="info-card-desc"><strong>Prepaid (UPI / Net Banking):</strong> Returned to original source within 3–5
+            business days after warehouse inspection.<br><strong>Cash on Delivery (COD):</strong> Refunded via verified
+            UPI or bank transfer upon item handover.</p>
         </div>
 
         <div class="info-card">
@@ -1915,7 +2025,8 @@
             <span class="info-card-icon">⚠️</span>
             <h4 class="info-card-title">Important Exceptions &amp; Conditions</h4>
           </div>
-          <p class="info-card-desc">For hygiene and safety reasons, personal grooming items, custom altered items, or products showing signs of customer misuse/wear are non-returnable.</p>
+          <p class="info-card-desc">For hygiene and safety reasons, personal grooming items, custom altered items, or
+            products showing signs of customer misuse/wear are non-returnable.</p>
         </div>
 
         <div class="info-card">
@@ -1923,7 +2034,8 @@
             <span class="info-card-icon">🤝</span>
             <h4 class="info-card-title">Free Reverse Pickup</h4>
           </div>
-          <p class="info-card-desc">Approved return requests enjoy free doorstep courier pickup across major serviceable locations with no return shipping surcharge.</p>
+          <p class="info-card-desc">Approved return requests enjoy free doorstep courier pickup across major serviceable
+            locations with no return shipping surcharge.</p>
         </div>
       </div>
 
@@ -1934,7 +2046,8 @@
   </div>
 
   <!-- Privacy Policy Modal -->
-  <div class="modal-backdrop" id="privacy-policy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+  <div class="modal-backdrop" id="privacy-policy-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="privacy-modal-title">
     <div class="modal-container info-modal-container">
       <button class="modal-close-icon" id="privacy-modal-close-btn" aria-label="Close privacy policy dialog">✕</button>
 
@@ -1950,7 +2063,8 @@
             <span class="info-card-icon">👤</span>
             <h4 class="info-card-title">Information We Collect</h4>
           </div>
-          <p class="info-card-desc">We collect only necessary personal data: account name, email address, delivery addresses, telephone numbers, and order histories entered during registration and checkout.</p>
+          <p class="info-card-desc">We collect only necessary personal data: account name, email address, delivery
+            addresses, telephone numbers, and order histories entered during registration and checkout.</p>
         </div>
 
         <div class="info-card">
@@ -1958,7 +2072,8 @@
             <span class="info-card-icon">🎯</span>
             <h4 class="info-card-title">How We Use Your Data</h4>
           </div>
-          <p class="info-card-desc">Information is utilized solely to process orders, facilitate doorstep delivery, issue order confirmations, and provide authenticated customer support access.</p>
+          <p class="info-card-desc">Information is utilized solely to process orders, facilitate doorstep delivery,
+            issue order confirmations, and provide authenticated customer support access.</p>
         </div>
 
         <div class="info-card">
@@ -1966,7 +2081,8 @@
             <span class="info-card-icon">🔒</span>
             <h4 class="info-card-title">Password &amp; Session Protection</h4>
           </div>
-          <p class="info-card-desc">Customer passwords are cryptographically hashed using salted bcrypt prior to database storage. Authenticated sessions rely on secure JSON Web Tokens (JWT).</p>
+          <p class="info-card-desc">Customer passwords are cryptographically hashed using salted bcrypt prior to
+            database storage. Authenticated sessions rely on secure JSON Web Tokens (JWT).</p>
         </div>
 
         <div class="info-card">
@@ -1974,7 +2090,8 @@
             <span class="info-card-icon">🤝</span>
             <h4 class="info-card-title">Third-Party Logistics Sharing</h4>
           </div>
-          <p class="info-card-desc">Delivery contact details are shared strictly with logistics couriers for physical parcel dispatch. We do not sell, rent, or trade your personal data to external advertisers.</p>
+          <p class="info-card-desc">Delivery contact details are shared strictly with logistics couriers for physical
+            parcel dispatch. We do not sell, rent, or trade your personal data to external advertisers.</p>
         </div>
 
         <div class="info-card">
@@ -1982,7 +2099,8 @@
             <span class="info-card-icon">⚙️</span>
             <h4 class="info-card-title">Customer Rights &amp; Control</h4>
           </div>
-          <p class="info-card-desc">You may view order history, add, edit, or remove delivery addresses, and manage your stored account information directly from your user dashboard at any time.</p>
+          <p class="info-card-desc">You may view order history, add, edit, or remove delivery addresses, and manage your
+            stored account information directly from your user dashboard at any time.</p>
         </div>
 
         <div class="info-card">
@@ -1990,7 +2108,8 @@
             <span class="info-card-icon">📬</span>
             <h4 class="info-card-title">Inquiries &amp; Privacy Assistance</h4>
           </div>
-          <p class="info-card-desc">For privacy-related questions or data removal requests, contact store administration through customer care or the official store admin desk.</p>
+          <p class="info-card-desc">For privacy-related questions or data removal requests, contact store administration
+            through customer care or the official store admin desk.</p>
         </div>
       </div>
 
@@ -2001,7 +2120,8 @@
   </div>
 
   <!-- Terms of Service Modal -->
-  <div class="modal-backdrop" id="terms-of-service-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+  <div class="modal-backdrop" id="terms-of-service-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="terms-modal-title">
     <div class="modal-container info-modal-container">
       <button class="modal-close-icon" id="terms-modal-close-btn" aria-label="Close terms dialog">✕</button>
 
@@ -2017,7 +2137,9 @@
             <span class="info-card-icon">🛍️</span>
             <h4 class="info-card-title">Catalog Listings &amp; Pricing</h4>
           </div>
-          <p class="info-card-desc">All products are priced in Indian Rupees (₹), inclusive of applicable taxes. MiniStore reserves the right to adjust pricing or correct typographical discrepancies prior to order fulfillment.</p>
+          <p class="info-card-desc">All products are priced in Indian Rupees (₹), inclusive of applicable taxes.
+            MiniStore reserves the right to adjust pricing or correct typographical discrepancies prior to order
+            fulfillment.</p>
         </div>
 
         <div class="info-card">
@@ -2025,7 +2147,8 @@
             <span class="info-card-icon">📦</span>
             <h4 class="info-card-title">Order Placement &amp; Acceptance</h4>
           </div>
-          <p class="info-card-desc">Placing an order constitutes an offer to purchase. Order confirmation notifications confirm receipt; order fulfillment is completed upon shipment dispatch from our warehouse.</p>
+          <p class="info-card-desc">Placing an order constitutes an offer to purchase. Order confirmation notifications
+            confirm receipt; order fulfillment is completed upon shipment dispatch from our warehouse.</p>
         </div>
 
         <div class="info-card">
@@ -2033,7 +2156,8 @@
             <span class="info-card-icon">💳</span>
             <h4 class="info-card-title">Accepted Payment Modes</h4>
           </div>
-          <p class="info-card-desc">Payments are accepted via UPI, Cash on Delivery (COD), and Net Banking. COD orders require payment in full upon parcel presentation by the courier partner.</p>
+          <p class="info-card-desc">Payments are accepted via UPI, Cash on Delivery (COD), and Net Banking. COD orders
+            require payment in full upon parcel presentation by the courier partner.</p>
         </div>
 
         <div class="info-card">
@@ -2041,7 +2165,8 @@
             <span class="info-card-icon">🔄</span>
             <h4 class="info-card-title">Returns &amp; Cancellations</h4>
           </div>
-          <p class="info-card-desc">Orders may be canceled prior to shipping dispatch. Delivered orders qualify for return requests within 7 calendar days in compliance with our 7-Day Returns Policy.</p>
+          <p class="info-card-desc">Orders may be canceled prior to shipping dispatch. Delivered orders qualify for
+            return requests within 7 calendar days in compliance with our 7-Day Returns Policy.</p>
         </div>
 
         <div class="info-card">
@@ -2049,7 +2174,8 @@
             <span class="info-card-icon">👤</span>
             <h4 class="info-card-title">Account Responsibility</h4>
           </div>
-          <p class="info-card-desc">Users are responsible for maintaining the confidentiality of their login credentials and ensuring all shipping information supplied is accurate and up to date.</p>
+          <p class="info-card-desc">Users are responsible for maintaining the confidentiality of their login credentials
+            and ensuring all shipping information supplied is accurate and up to date.</p>
         </div>
 
         <div class="info-card">
@@ -2057,7 +2183,8 @@
             <span class="info-card-icon">⚖️</span>
             <h4 class="info-card-title">Fair Use &amp; Dispute Resolution</h4>
           </div>
-          <p class="info-card-desc">The platform is provided for lawful consumer shopping. Any commercial disputes are subject to resolution under applicable consumer protection frameworks.</p>
+          <p class="info-card-desc">The platform is provided for lawful consumer shopping. Any commercial disputes are
+            subject to resolution under applicable consumer protection frameworks.</p>
         </div>
       </div>
 
@@ -2068,7 +2195,8 @@
   </div>
 
   <!-- Security Information Modal -->
-  <div class="modal-backdrop" id="security-info-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="security-modal-title">
+  <div class="modal-backdrop" id="security-info-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="security-modal-title">
     <div class="modal-container info-modal-container">
       <button class="modal-close-icon" id="security-modal-close-btn" aria-label="Close security dialog">✕</button>
 
@@ -2084,7 +2212,8 @@
             <span class="info-card-icon">🔑</span>
             <h4 class="info-card-title">Cryptographic Password Hashing</h4>
           </div>
-          <p class="info-card-desc">All customer passwords are cryptographically salted and hashed using multi-round bcrypt prior to persistence. Plaintext passwords are never recorded or stored in our database.</p>
+          <p class="info-card-desc">All customer passwords are cryptographically salted and hashed using multi-round
+            bcrypt prior to persistence. Plaintext passwords are never recorded or stored in our database.</p>
         </div>
 
         <div class="info-card">
@@ -2092,7 +2221,8 @@
             <span class="info-card-icon">🛡️</span>
             <h4 class="info-card-title">JWT Stateless Authentication</h4>
           </div>
-          <p class="info-card-desc">Account sessions are secured using cryptographically signed JSON Web Tokens (JWT). Every protected API request validates token authenticity and expiry.</p>
+          <p class="info-card-desc">Account sessions are secured using cryptographically signed JSON Web Tokens (JWT).
+            Every protected API request validates token authenticity and expiry.</p>
         </div>
 
         <div class="info-card">
@@ -2100,7 +2230,8 @@
             <span class="info-card-icon">👤</span>
             <h4 class="info-card-title">Strict Account Isolation</h4>
           </div>
-          <p class="info-card-desc">Robust authorization policies ensure customers can strictly view and modify only their own cart, orders, and delivery addresses, preventing cross-account access.</p>
+          <p class="info-card-desc">Robust authorization policies ensure customers can strictly view and modify only
+            their own cart, orders, and delivery addresses, preventing cross-account access.</p>
         </div>
 
         <div class="info-card">
@@ -2108,7 +2239,8 @@
             <span class="info-card-icon">💳</span>
             <h4 class="info-card-title">Safe Transaction Workflows</h4>
           </div>
-          <p class="info-card-desc">Transactions are processed via validated UPI, Net Banking, and Cash on Delivery workflows. MiniStore stores zero sensitive debit/credit card numbers on its servers.</p>
+          <p class="info-card-desc">Transactions are processed via validated UPI, Net Banking, and Cash on Delivery
+            workflows. MiniStore stores zero sensitive debit/credit card numbers on its servers.</p>
         </div>
 
         <div class="info-card">
@@ -2116,7 +2248,8 @@
             <span class="info-card-icon">🔍</span>
             <h4 class="info-card-title">Input Sanitization &amp; Protection</h4>
           </div>
-          <p class="info-card-desc">Backend routes enforce strict MongoDB ObjectId validation, payload schema checks, and query protections against unauthorized injections.</p>
+          <p class="info-card-desc">Backend routes enforce strict MongoDB ObjectId validation, payload schema checks,
+            and query protections against unauthorized injections.</p>
         </div>
 
         <div class="info-card">
@@ -2124,7 +2257,8 @@
             <span class="info-card-icon">ℹ️</span>
             <h4 class="info-card-title">Transparent Engineering Disclosure</h4>
           </div>
-          <p class="info-card-desc">This overview reflects the actual technical safeguards engineered into MiniStore. We operate on honest technical merit without claiming unverified third-party certifications.</p>
+          <p class="info-card-desc">This overview reflects the actual technical safeguards engineered into MiniStore. We
+            operate on honest technical merit without claiming unverified third-party certifications.</p>
         </div>
       </div>
 
@@ -2142,7 +2276,8 @@
           <span class="brand-icon">⚡</span>
           <span class="brand-text">MiniStore</span>
         </a>
-        <p class="footer-tagline">Curated essentials engineered for daily durability, modern aesthetics, and verified performance.</p>
+        <p class="footer-tagline">Curated essentials engineered for daily durability, modern aesthetics, and verified
+          performance.</p>
         <div class="footer-trust-chips">
           <span class="footer-chip">🛡️ 100% Genuine</span>
           <span class="footer-chip">🚚 Pan-India Shipping</span>
@@ -2152,19 +2287,25 @@
       <div class="footer-col">
         <h4 class="footer-col-title">Shop Categories</h4>
         <ul class="footer-links">
-          <li><a href="#products-section" class="footer-category-link" data-category="Electronics &amp; Audio">Electronics &amp; Audio</a></li>
-          <li><a href="#products-section" class="footer-category-link" data-category="Watches &amp; Wearables">Watches &amp; Wearables</a></li>
-          <li><a href="#products-section" class="footer-category-link" data-category="Footwear &amp; Apparel">Footwear &amp; Apparel</a></li>
-          <li><a href="#products-section" class="footer-category-link" data-category="Productivity &amp; Tech">Productivity &amp; Tech</a></li>
+          <li><a href="#products-section" class="footer-category-link"
+              data-category="Electronics &amp; Audio">Electronics &amp; Audio</a></li>
+          <li><a href="#products-section" class="footer-category-link" data-category="Watches &amp; Wearables">Watches
+              &amp; Wearables</a></li>
+          <li><a href="#products-section" class="footer-category-link" data-category="Footwear &amp; Apparel">Footwear
+              &amp; Apparel</a></li>
+          <li><a href="#products-section" class="footer-category-link"
+              data-category="Productivity &amp; Tech">Productivity &amp; Tech</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4 class="footer-col-title">Customer Care</h4>
         <ul class="footer-links">
           <li><button type="button" class="footer-link-btn" id="footer-order-tracking-btn">Order Tracking</button></li>
-          <li><button type="button" class="footer-link-btn" id="footer-shipping-btn">Shipping &amp; Delivery</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-shipping-btn">Shipping &amp; Delivery</button>
+          </li>
           <li><button type="button" class="footer-link-btn" id="footer-returns-btn">7-Day Easy Returns</button></li>
-          <li><button type="button" class="footer-link-btn" id="footer-reviews-btn">Verified Customer Reviews</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-reviews-btn">Verified Customer Reviews</button>
+          </li>
         </ul>
       </div>
       <div class="footer-col">
@@ -2174,7 +2315,8 @@
           <span class="payment-badge-tag">💵 Cash on Delivery</span>
           <span class="payment-badge-tag">🏦 Net Banking</span>
         </div>
-        <p class="footer-payment-note">All transactions processed with multi-tier encryption and zero hidden conversion fees.</p>
+        <p class="footer-payment-note">All transactions processed with multi-tier encryption and zero hidden conversion
+          fees.</p>
       </div>
     </div>
     <div class="container footer-bottom-bar">
@@ -2191,4 +2333,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>

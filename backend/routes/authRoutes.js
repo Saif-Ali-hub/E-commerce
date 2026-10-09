@@ -50,7 +50,11 @@ router.post('/register', async (req, res) => {
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      role: 'customer'
+      role: 'customer',
+      status: 'active',
+      phone: req.body.phone ? String(req.body.phone).trim() : '',
+      cart: [],
+      wishlist: []
     });
 
     const savedUser = await newUser.save();
@@ -174,6 +178,41 @@ router.get('/me', authMiddleware, async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role || 'customer',
+        status: user.status || 'active',
+        phone: user.phone || '',
+        avatar: user.avatar || '',
+        createdAt: user.createdAt
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving user profile',
+      error: error.message
+    });
+  }
+});
+
+// Alias: GET /api/auth/profile
+router.get('/profile', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role || 'customer',
+        status: user.status || 'active',
         phone: user.phone || '',
         avatar: user.avatar || '',
         createdAt: user.createdAt
