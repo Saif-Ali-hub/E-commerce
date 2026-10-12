@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse category products | MiniStore. Direct INR pricing, verified quality, and fast Pan-India shipping.">
+  <title>Category | MiniStore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- Top Utility Announcement Bar -->
+  <div class="top-announcement-bar" id="top-announcement-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <span class="announcement-pill">🚚 FREE DELIVERY</span>
+        <span class="announcement-text">Pan-India express shipping on all orders over ₹499</span>
+      </div>
+      <div class="top-bar-right">
+        <span class="top-bar-feature">✓ 100% Certified Authentic</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">✓ 7-Day Easy Returns</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">✓ Direct INR Pricing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar" id="main-header">
+    <div class="container navbar-inner">
+      <a href="index.html" class="brand" id="brand-logo" aria-label="MiniStore Home">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">MiniStore</span>
+      </a>
+
+      <!-- Central Search Bar -->
+      <div class="nav-search-wrap" id="nav-search-wrap">
+        <div class="search-input-wrap">
+          <button type="button" class="search-icon-btn" id="search-submit-btn" title="Search" aria-label="Search products">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+          </button>
+          <input type="text" id="search-input" class="search-input"
+            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-suggestions-dropdown" aria-haspopup="listbox"
+            placeholder="Search products by title, category, or keyword..."
+            aria-label="Search products by title, category, or keyword" autocomplete="off" />
+          <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search"
+            aria-label="Clear search">✕</button>
+        </div>
+        <!-- Autocomplete Suggestions Dropdown -->
+        <div class="search-suggestions-dropdown" id="search-suggestions-dropdown" style="display: none;" role="listbox"
+          aria-label="Product suggestions"></div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Shopping Cart Button -->
+        <button class="btn btn-primary btn-sm cart-nav-btn" id="nav-cart-btn" aria-label="Shopping Cart">
+          <span class="nav-btn-icon">🛒</span>
+          <span class="nav-btn-label">Cart</span>
+          <span class="nav-badge-pill" id="cart-nav-badge">0</span>
+        </button>
+
+        <!-- Dark / Light Mode Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode"
+          type="button">
+          <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
+        </button>
+
+        <!-- User Profile Dropdown Cluster -->
+        <div class="profile-nav-wrapper" id="profile-nav-wrapper">
+          <!-- Unauthenticated State: Log In Button -->
+          <button class="btn btn-secondary btn-sm nav-login-btn" id="nav-login-btn" aria-label="Log in or register">
+            <span class="nav-btn-icon">👤</span>
+            <span class="nav-btn-label">Log In</span>
+          </button>
+
+          <!-- Authenticated State: User Profile Trigger & Dropdown Menu -->
+          <div id="nav-user-info" style="display: none;" class="nav-user-cluster">
+            <button class="nav-profile-trigger-btn" id="nav-profile-trigger-btn" type="button" aria-expanded="false"
+              aria-haspopup="true" aria-label="Open user profile menu">
+              <div class="nav-profile-avatar" id="nav-profile-avatar">
+                <span class="nav-avatar-initials" id="nav-avatar-initials">U</span>
+                <img src="" alt="User avatar" class="nav-avatar-img" id="nav-avatar-img" style="display: none;" />
+              </div>
+              <span class="user-greeting" id="nav-user-name">User</span>
+              <span class="nav-profile-chevron" aria-hidden="true">▾</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="profile-dropdown-menu" id="profile-dropdown-menu" role="menu" aria-label="User Account Menu"
+              style="display: none;">
+              <!-- Dropdown Header -->
+              <div class="dropdown-user-header">
+                <div class="dropdown-avatar-circle" id="dropdown-avatar-display">
+                  <span class="dropdown-avatar-initials" id="dropdown-avatar-initials">U</span>
+                  <img src="" alt="User avatar" class="dropdown-avatar-img" id="dropdown-avatar-img"
+                    style="display: none;" />
+                </div>
+                <div class="dropdown-user-meta">
+                  <span class="dropdown-user-name" id="dropdown-user-name">User</span>
+                  <span class="dropdown-user-email" id="dropdown-user-email">user@example.com</span>
+                  <span class="dropdown-role-badge" id="dropdown-user-role">Customer</span>
+                </div>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Menu Items List -->
+              <div class="dropdown-items-list">
+                <!-- 1. Profile Option -->
+                <button class="dropdown-item" id="dropdown-profile-btn" role="menuitem" type="button">
+                  <span class="dropdown-item-icon">👤</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Profile</span>
+                    <span class="dropdown-item-desc">View &amp; edit details</span>
+                  </div>
+                </button>
+
+                <!-- 2. Wishlist Option -->
+                <button class="dropdown-item wishlist-nav-btn" id="nav-wishlist-btn" role="menuitem" type="button"
+                  aria-label="View Wishlist">
+                  <span class="dropdown-item-icon">❤️</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Wishlist</span>
+                    <span class="dropdown-item-desc">Saved favorite products</span>
+                  </div>
+                  <span class="nav-badge-pill" id="wishlist-nav-badge">0</span>
+                </button>
+
+                <!-- 3. Return to Home -->
+                <a href="index.html" class="dropdown-item" role="menuitem">
+                  <span class="dropdown-item-icon">🏪</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">All Categories</span>
+                    <span class="dropdown-item-desc">Browse store homepage</span>
+                  </div>
+                </a>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Logout Button -->
+              <div class="dropdown-footer">
+                <button class="btn btn-secondary btn-sm btn-logout" id="nav-logout-btn" role="menuitem" type="button">
+                  <span class="logout-icon">🚪</span>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Category Page Header Banner -->
+  <section class="category-page-banner" id="category-page-banner">
+    <div class="container">
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumb-container" aria-label="Breadcrumb" style="margin-bottom: 16px;">
+        <ul class="breadcrumb-list">
+          <li><a href="index.html" class="breadcrumb-link">Home</a></li>
+          <li class="breadcrumb-sep" aria-hidden="true">/</li>
+          <li><a href="index.html#category-sections-wrapper" class="breadcrumb-link">Categories</a></li>
+          <li class="breadcrumb-sep" aria-hidden="true">/</li>
+          <li class="breadcrumb-current" id="category-breadcrumb-current" aria-current="page">Loading...</li>
+        </ul>
+        <a href="index.html" class="btn-back-link">
+          <span>←</span> <span>Back to Home</span>
+        </a>
+      </nav>
+
+      <!-- Category Title & Info Row -->
+      <div class="category-page-header-row">
+        <div class="category-page-title-box">
+          <div class="category-page-icon-badge" id="category-page-icon-badge">📦</div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <h1 class="category-page-title" id="category-page-title">Category Products</h1>
+              <span class="category-product-count" id="category-product-count">Loading items...</span>
+            </div>
+            <p class="category-page-subtitle" id="category-page-subtitle">
+              Explore authentic products from this category with best prices and fast delivery.
+            </p>
+          </div>
+        </div>
+        <div class="category-page-quick-links" id="category-quick-links">
+          <!-- Dynamically filled with other category links -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main class="container" style="padding-top: 24px; padding-bottom: 60px;">
+    <!-- Controls Bar: Search within Category, Sorting & View Toggle -->
+    <div class="category-controls-bar">
+      <!-- In-Category Search -->
+      <div class="category-search-box">
+        <span class="category-search-icon" aria-hidden="true">🔍</span>
+        <input type="text" id="category-filter-search" class="category-search-input"
+          placeholder="Filter within this category..." aria-label="Filter within this category" />
+        <button id="category-clear-filter-btn" class="clear-search-btn" style="display: none;" title="Clear filter"
+          aria-label="Clear category filter">✕</button>
+      </div>
+
+      <!-- Category Filter & Sort Options -->
+      <div class="category-sort-wrap">
+        <label for="category-sort-select" class="sort-label">Sort By:</label>
+        <select id="category-sort-select" class="sort-select" aria-label="Sort products">
+          <option value="featured">Featured / Default</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Highest Rated</option>
+          <option value="newest">Newest Arrivals</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Active Filter Summary & Result Count -->
+    <div class="category-filter-summary" id="category-filter-summary" style="display: none;">
+      <span class="filter-summary-text" id="category-filter-summary-text">Showing filtered results</span>
+      <button type="button" class="btn btn-secondary btn-sm" id="category-reset-filter-btn">Clear Filter</button>
+    </div>
+
+    <!-- State 1: Loading Skeleton -->
+    <div id="category-loading-state" class="products-grid" aria-busy="true">
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+    </div>
+
+    <!-- State 2: Error State -->
+    <div id="category-error-state" class="product-not-found-card" style="display: none;">
+      <div class="product-not-found-icon">⚠️</div>
+      <h2 class="product-not-found-title" id="category-error-title">Unable to Load Products</h2>
+      <p class="product-not-found-desc" id="category-error-message">
+        We could not load the products for this category. Please check your network or try again.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-primary" id="category-retry-btn">
+          <span>↻ Retry</span>
+        </button>
+        <a href="index.html" class="btn btn-secondary">
+          <span>← Back to Home</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- State 3: Empty State -->
+    <div id="category-empty-state" class="product-not-found-card" style="display: none;">
+      <div class="product-not-found-icon">🛍️</div>
+      <h2 class="product-not-found-title" id="category-empty-title">No Products Found</h2>
+      <p class="product-not-found-desc" id="category-empty-message">
+        There are currently no products matching your criteria in this category.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-primary" id="category-empty-reset-btn" style="display: none;">
+          <span>Clear Filter</span>
+        </button>
+        <a href="index.html" class="btn btn-secondary">
+          <span>Explore All Categories</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- State 4: Products Grid (Shows ALL products belonging to the category) -->
+    <div class="products-grid" id="category-products-grid" style="display: none;">
+      <!-- Populated dynamically via category.js -->
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-container" id="category-pagination-container" style="display: none;">
+      <button class="pagination-btn" id="category-prev-page-btn" aria-label="Previous Page">
+        <span>← Previous</span>
+      </button>
+      <div class="pagination-pages" id="category-pagination-pages"></div>
+      <button class="pagination-btn" id="category-next-page-btn" aria-label="Next Page">
+        <span>Next →</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- Modals: Cart, Wishlist, Auth, Profile -->
+
+  <!-- Shopping Cart Modal -->
+  <div class="modal-backdrop" id="cart-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="cart-modal-title">
+    <div class="modal-container cart-modal-container">
+      <button class="modal-close-icon" id="cart-close-btn" aria-label="Close cart">✕</button>
+
+      <div class="cart-modal-header">
+        <h2 class="cart-modal-title" id="cart-modal-title">Shopping Cart</h2>
+        <span class="product-badge" id="cart-items-count-badge">0 items</span>
+      </div>
+
+      <!-- Cart Loading State -->
+      <div class="modal-state" id="cart-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your cart...</p>
+      </div>
+
+      <!-- Cart Unauthenticated State -->
+      <div class="modal-state" id="cart-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your shopping cart.</p>
+        <button class="btn btn-primary" id="cart-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <!-- Cart Empty State -->
+      <div class="modal-state" id="cart-empty-state" style="display: none;">
+        <div class="empty-icon">🛒</div>
+        <h3 class="empty-title">Your Cart is Empty</h3>
+        <p class="state-text">Browse our catalog and add items to your cart.</p>
+        <a href="index.html" class="btn btn-secondary" id="cart-browse-btn">Browse Catalog</a>
+      </div>
+
+      <!-- Cart Content -->
+      <div class="cart-content" id="cart-content" style="display: none;">
+        <div class="cart-items-list" id="cart-items-list"></div>
+        <div class="cart-summary">
+          <div class="cart-summary-row">
+            <span class="summary-label">Estimated Total:</span>
+            <span class="summary-total" id="cart-total-amount">₹0.00</span>
+          </div>
+          <p class="summary-note">Prices and item totals are calculated dynamically from current catalog prices.</p>
+          <div class="cart-summary-actions">
+            <a href="checkout.html" class="btn btn-primary" id="cart-checkout-btn">Proceed to Checkout →</a>
+            <button class="btn btn-secondary" id="cart-continue-btn">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div class="modal-backdrop" id="wishlist-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="wishlist-modal-title">
+    <div class="modal-container wishlist-modal-container">
+      <button class="modal-close-icon" id="wishlist-close-btn" aria-label="Close wishlist">✕</button>
+
+      <div class="wishlist-modal-header">
+        <h2 class="wishlist-modal-title" id="wishlist-modal-title">My Wishlist ❤️</h2>
+        <span class="product-badge" id="wishlist-items-count-badge">0 items</span>
+      </div>
+
+      <div class="modal-state" id="wishlist-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your wishlist...</p>
+      </div>
+
+      <div class="modal-state" id="wishlist-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your saved wishlist items.</p>
+        <button class="btn btn-primary" id="wishlist-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <div class="modal-state" id="wishlist-empty-state" style="display: none;">
+        <div class="empty-icon">❤️</div>
+        <h3 class="empty-title">Your wishlist is empty</h3>
+        <p class="state-text">Explore our collection and add your favorite items to your wishlist!</p>
+        <button class="btn btn-secondary" id="wishlist-continue-btn">Explore Products</button>
+      </div>
+
+      <div class="wishlist-content" id="wishlist-content" style="display: none;">
+        <div class="wishlist-items-list" id="wishlist-items-list"></div>
+        <div class="wishlist-footer-actions">
+          <button class="btn btn-secondary" id="wishlist-browse-more-btn">Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Modal (Log In / Register) -->
+  <div class="modal-backdrop" id="auth-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="auth-modal-title">
+    <div class="modal-container auth-modal-container">
+      <button class="modal-close-icon" id="auth-close-btn" aria-label="Close auth dialog">✕</button>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-login-btn">Log In</button>
+        <button type="button" class="auth-tab" id="tab-register-btn">Register</button>
+      </div>
+
+      <div id="auth-error-alert" class="auth-error-alert" style="display: none;"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email Address</label>
+          <input type="email" id="login-email" required placeholder="you@example.com" class="form-input"
+            autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="form-input"
+            autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="reg-name" class="form-label">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="John Doe" class="form-input" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="reg-email" class="form-label">Email Address</label>
+          <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input"
+            autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="reg-password" class="form-label">Password (min 8 chars, letters &amp; numbers)</label>
+          <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input"
+            autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div class="modal-backdrop" id="profile-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="profile-modal-title">
+    <div class="modal-container profile-modal-container">
+      <button class="modal-close-icon" id="profile-close-btn" aria-label="Close profile modal">✕</button>
+
+      <div class="profile-modal-header">
+        <div>
+          <span class="info-header-badge badge-indigo">👤 Account Settings</span>
+          <h2 class="profile-modal-title" id="profile-modal-title">My Profile</h2>
+        </div>
+        <span class="user-role-badge" id="profile-role-badge">Customer</span>
+      </div>
+
+      <div class="auth-error-alert" id="profile-alert-error" style="display: none;" role="alert"></div>
+      <div class="alert-box alert-success" id="profile-alert-success" style="display: none;" role="alert"></div>
+
+      <div class="profile-modal-body">
+        <form class="profile-form" id="profile-form">
+          <div class="form-grid profile-form-grid">
+            <div class="form-group">
+              <label for="profile-name-input" class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" id="profile-name-input" class="form-input" required
+                placeholder="Enter your full name" />
+            </div>
+
+            <div class="form-group">
+              <label for="profile-email-input" class="form-label">Email Address</label>
+              <input type="email" id="profile-email-input" class="form-input form-input-readonly" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="profile-phone-input" class="form-label">Phone Number</label>
+              <input type="tel" id="profile-phone-input" class="form-input" placeholder="+91 98765 43210" />
+            </div>
+          </div>
+
+          <div class="profile-modal-actions">
+            <button type="submit" class="btn btn-primary" id="profile-save-btn">
+              <span id="profile-save-btn-text">Save Changes</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="profile-close-action-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer" id="main-footer">
+    <div class="container footer-main-grid">
+      <div class="footer-col brand-col">
+        <div class="footer-brand">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">MiniStore</span>
+        </div>
+        <p class="footer-desc">Your verified destination for quality consumer essentials. Authentic goods, direct INR
+          pricing, and express Pan-India fulfillment.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link-btn">All Categories</a></li>
+          <li><a href="index.html#products-section" class="footer-link-btn">Special Offers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Accepted Payments</h4>
+        <div class="footer-payment-badges">
+          <span class="payment-badge-tag">⚡ UPI Instant</span>
+          <span class="payment-badge-tag">💵 Cash on Delivery</span>
+          <span class="payment-badge-tag">🏦 Net Banking</span>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom-bar">
+      <p class="footer-text">&copy; 2026 MiniStore. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
+    </div>
+  </footer>
+
+  <script src="category.js"></script>
+</body>
+
+</html>

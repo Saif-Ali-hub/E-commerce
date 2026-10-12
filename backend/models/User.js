@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['customer', 'admin'],
+      enum: ['customer', 'seller', 'admin'],
       default: 'customer'
     },
     status: {
@@ -58,6 +58,41 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: ''
+    },
+    // Seller details for merchant accounts
+    sellerDetails: {
+      businessName: {
+        type: String,
+        trim: true,
+        default: ''
+      },
+      businessAddress: {
+        type: String,
+        trim: true,
+        default: ''
+      },
+      contactNumber: {
+        type: String,
+        trim: true,
+        default: ''
+      },
+      pan: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        default: ''
+      },
+      gstin: {
+        type: String,
+        trim: true,
+        uppercase: true,
+        default: ''
+      },
+      verificationStatus: {
+        type: String,
+        enum: ['pending', 'verified', 'rejected'],
+        default: 'pending'
+      }
     },
     addresses: [
       {
@@ -83,11 +118,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Defense-in-depth: Never return password hash in public JSON conversions
+// Defense-in-depth: Never return password hash in public JSON conversions and mask sensitive PAN
 userSchema.set('toJSON', {
   transform: function (doc, ret) {
     delete ret.password;
     delete ret.__v;
+    if (ret.sellerDetails && ret.sellerDetails.pan) {
+      const p = ret.sellerDetails.pan;
+      ret.sellerDetails.pan = p.length === 10 ? `${p.slice(0, 5)}****${p.slice(9)}` : `${p.slice(0, 2)}****`;
+    }
     return ret;
   }
 });

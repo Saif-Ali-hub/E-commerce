@@ -5,14 +5,32 @@ const router = express.Router();
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 
+// Helper to format and mask seller details in API responses
+function formatSellerDetails(seller) {
+  if (!seller || !seller.businessName) return undefined;
+  const rawPan = (seller.pan || '').toString().trim().toUpperCase();
+  const maskedPan = rawPan.length === 10
+    ? `${rawPan.slice(0, 5)}****${rawPan.slice(9)}`
+    : (rawPan ? `${rawPan.slice(0, 2)}****` : '');
+
+  return {
+    businessName: seller.businessName || '',
+    businessAddress: seller.businessAddress || '',
+    contactNumber: seller.contactNumber || '',
+    gstin: seller.gstin || 'Not Applicable',
+    pan: maskedPan,
+    verificationStatus: seller.verificationStatus || 'pending'
+  };
+}
+
 // ============================================================
 // 1. POST /api/auth/register - Register a new user
 // ============================================================
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, isSeller, role, phone, businessName, businessAddress, pan, gstin } = req.body;
 
-    // Validate presence of required fields
+    // Validate presence of base required fields
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -41,28 +59,104 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Determine requested role (only allow 'customer' or 'seller' - never allow 'admin')
+    const requestedRole = (isSeller === true || isSeller === 'true' || role === 'seller') ? 'seller' : 'customer';
+
+    // Validate seller-specific fields if registering as seller
+    let sellerDetails = undefined;
+    const contactPhone = (phone ? String(phone).trim() : '') || (req.body.contactNumber ? String(req.body.contactNumber).trim() : '');
+
+    if (requestedRole === 'seller') {
+      if (!businessName || !String(businessName).trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Business name is required for seller registration.'
+        });
+      }
+
+      if (!businessAddress || !String(businessAddress).trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Business address is required for seller registration.'
+        });
+      }
+
+      if (!contactPhone) {
+        return res.status(400).json({
+          success: false,
+          message: 'Contact number is required for seller registration.'
+        });
+      }
+
+      const phoneClean = contactPhone.replace(/[\s\-\+]/g, '');
+      if (phoneClean.length < 10 || phoneClean.length > 15 || !/^\d+$/.test(phoneClean)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please provide a valid 10-digit mobile / contact number.'
+        });
+      }
+
+      if (!pan || !String(pan).trim()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Business PAN is required for seller registration.'
+        });
+      }
+
+      const normalizedPan = String(pan).trim().toUpperCase();
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!panRegex.test(normalizedPan)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid Business PAN format. PAN must be 10 characters (e.g. ABCDE1234F).'
+        });
+      }
+
+      let normalizedGstin = '';
+      if (gstin && String(gstin).trim() && !/^(na|n\/a|not applicable|none|exempt)$/i.test(String(gstin).trim())) {
+        normalizedGstin = String(gstin).trim().toUpperCase();
+        const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        if (!gstinRegex.test(normalizedGstin)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid GSTIN format. Must be 15 characters (e.g. 22AAAAA0000A1Z5) or left blank if exempt.'
+          });
+        }
+      }
+
+      sellerDetails = {
+        businessName: String(businessName).trim(),
+        businessAddress: String(businessAddress).trim(),
+        contactNumber: contactPhone,
+        pan: normalizedPan,
+        gstin: normalizedGstin || '',
+        verificationStatus: 'pending'
+      };
+    }
+
     // Hash password with bcryptjs
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Create and save new user (force role: 'customer' to prevent privilege escalation)
+    // Create and save new user (force requestedRole to either customer or seller)
     const newUser = new User({
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      role: 'customer',
+      role: requestedRole,
       status: 'active',
-      phone: req.body.phone ? String(req.body.phone).trim() : '',
+      phone: contactPhone,
+      sellerDetails: requestedRole === 'seller' ? sellerDetails : undefined,
       cart: [],
       wishlist: []
     });
 
     const savedUser = await newUser.save();
 
-    // Respond without password
+    // Respond without password and with masked PAN
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: requestedRole === 'seller' ? 'Seller registered successfully (Pending Verification)' : 'User registered successfully',
       data: {
         id: savedUser._id,
         name: savedUser.name,
@@ -70,6 +164,7 @@ router.post('/register', async (req, res) => {
         role: savedUser.role || 'customer',
         phone: savedUser.phone || '',
         avatar: savedUser.avatar || '',
+        sellerDetails: savedUser.role === 'seller' ? formatSellerDetails(savedUser.sellerDetails) : undefined,
         createdAt: savedUser.createdAt
       }
     });
@@ -126,9 +221,10 @@ router.post('/login', async (req, res) => {
     }
 
     // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET || 'supersecretjwtkey_miniecommerce_2026_secure';
     const token = jwt.sign(
       { id: user._id },
-      process.env.JWT_SECRET,
+      jwtSecret,
       { expiresIn: '1d' }
     );
 
@@ -144,6 +240,7 @@ router.post('/login', async (req, res) => {
         role: user.role || 'customer',
         phone: user.phone || '',
         avatar: user.avatar || '',
+        sellerDetails: user.role === 'seller' ? formatSellerDetails(user.sellerDetails) : undefined,
         createdAt: user.createdAt
       }
     });
@@ -181,6 +278,7 @@ router.get('/me', authMiddleware, async (req, res) => {
         status: user.status || 'active',
         phone: user.phone || '',
         avatar: user.avatar || '',
+        sellerDetails: user.role === 'seller' ? formatSellerDetails(user.sellerDetails) : undefined,
         createdAt: user.createdAt
       }
     });
@@ -215,6 +313,7 @@ router.get('/profile', authMiddleware, async (req, res) => {
         status: user.status || 'active',
         phone: user.phone || '',
         avatar: user.avatar || '',
+        sellerDetails: user.role === 'seller' ? formatSellerDetails(user.sellerDetails) : undefined,
         createdAt: user.createdAt
       }
     });
@@ -266,6 +365,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
         role: updatedUser.role || 'customer',
         phone: updatedUser.phone || '',
         avatar: updatedUser.avatar || '',
+        sellerDetails: updatedUser.role === 'seller' ? formatSellerDetails(updatedUser.sellerDetails) : undefined,
         createdAt: updatedUser.createdAt
       }
     });

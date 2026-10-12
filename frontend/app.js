@@ -131,6 +131,12 @@ const categorySelect = document.getElementById('category-select');
 const resetFiltersBtn = document.getElementById('reset-filters-btn');
 const navSearchWrap = document.getElementById('nav-search-wrap');
 const searchSuggestionsDropdown = document.getElementById('search-suggestions-dropdown');
+const searchSubmitBtn = document.getElementById('search-submit-btn');
+
+// DOM Elements - Flipkart-Style Category Showcases
+const categorySectionsWrapper = document.getElementById('category-sections-wrapper');
+const categorySectionsContainer = document.getElementById('category-sections-container');
+const categoryShowcaseLoading = document.getElementById('category-showcase-loading');
 
 // DOM Elements - Product Details Modal
 const productModal = document.getElementById('product-modal');
@@ -263,6 +269,16 @@ const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const authErrorAlert = document.getElementById('auth-error-alert');
 
+// DOM Elements - Seller Registration
+const regIsSeller = document.getElementById('reg-is-seller');
+const sellerFieldsWrap = document.getElementById('seller-fields-wrap');
+const regSellerPhone = document.getElementById('reg-seller-phone');
+const regBusinessName = document.getElementById('reg-business-name');
+const regBusinessAddress = document.getElementById('reg-business-address');
+const regBusinessPan = document.getElementById('reg-business-pan');
+const regBusinessGstin = document.getElementById('reg-business-gstin');
+const regSubmitBtn = document.getElementById('reg-submit-btn');
+
 // DOM Elements - Admin Dashboard
 const navAdminBtn = document.getElementById('nav-admin-btn');
 const adminModal = document.getElementById('admin-modal');
@@ -368,6 +384,13 @@ const profileEmailInput = document.getElementById('profile-email-input');
 const profilePhoneInput = document.getElementById('profile-phone-input');
 const profileCreatedInput = document.getElementById('profile-created-input');
 const profileRoleBadge = document.getElementById('profile-role-badge');
+const profileSellerCard = document.getElementById('profile-seller-card');
+const profileSellerBusinessName = document.getElementById('profile-seller-business-name');
+const profileSellerContact = document.getElementById('profile-seller-contact');
+const profileSellerAddress = document.getElementById('profile-seller-address');
+const profileSellerPan = document.getElementById('profile-seller-pan');
+const profileSellerGstin = document.getElementById('profile-seller-gstin');
+const sellerVerificationStatusBadge = document.getElementById('seller-verification-status-badge');
 const profileAlertError = document.getElementById('profile-alert-error');
 const profileAlertSuccess = document.getElementById('profile-alert-success');
 const profileSaveBtn = document.getElementById('profile-save-btn');
@@ -771,8 +794,44 @@ function openProfileModal() {
   if (profilePhoneInput) profilePhoneInput.value = user.phone || '';
 
   if (profileRoleBadge) {
-    profileRoleBadge.textContent = user.role === 'admin' ? 'Administrator' : 'Customer';
-    profileRoleBadge.className = 'user-role-badge ' + (user.role === 'admin' ? 'role-admin' : 'role-customer');
+    if (user.role === 'admin') {
+      profileRoleBadge.textContent = 'Administrator';
+      profileRoleBadge.className = 'user-role-badge role-admin';
+    } else if (user.role === 'seller') {
+      profileRoleBadge.textContent = 'Seller Account';
+      profileRoleBadge.className = 'user-role-badge role-seller';
+    } else {
+      profileRoleBadge.textContent = 'Customer';
+      profileRoleBadge.className = 'user-role-badge role-customer';
+    }
+  }
+
+  // Populate or hide Seller Business Details Card
+  if (profileSellerCard) {
+    if (user.role === 'seller') {
+      profileSellerCard.style.display = 'block';
+      const sd = user.sellerDetails || {};
+      if (profileSellerBusinessName) profileSellerBusinessName.textContent = sd.businessName || '—';
+      if (profileSellerContact) profileSellerContact.textContent = sd.contactNumber || user.phone || '—';
+      if (profileSellerAddress) profileSellerAddress.textContent = sd.businessAddress || '—';
+      if (profileSellerPan) profileSellerPan.textContent = sd.pan || '••••••••••';
+      if (profileSellerGstin) profileSellerGstin.textContent = sd.gstin || 'Not Applicable / Exempt';
+      if (sellerVerificationStatusBadge) {
+        const status = (sd.verificationStatus || 'pending').toLowerCase();
+        if (status === 'verified') {
+          sellerVerificationStatusBadge.textContent = '✅ Verified Merchant';
+          sellerVerificationStatusBadge.className = 'badge-verification badge-verified';
+        } else if (status === 'rejected') {
+          sellerVerificationStatusBadge.textContent = '❌ Verification Rejected';
+          sellerVerificationStatusBadge.className = 'badge-verification badge-rejected';
+        } else {
+          sellerVerificationStatusBadge.textContent = '⏳ Pending Verification';
+          sellerVerificationStatusBadge.className = 'badge-verification badge-pending';
+        }
+      }
+    } else {
+      profileSellerCard.style.display = 'none';
+    }
   }
 
   if (profileCreatedInput) {
@@ -917,7 +976,13 @@ function updateAuthUI() {
     if (dropdownUserName) dropdownUserName.textContent = user.name || 'User';
     if (dropdownUserEmail) dropdownUserEmail.textContent = user.email || '';
     if (dropdownUserRole) {
-      dropdownUserRole.textContent = user.role === 'admin' ? 'Administrator' : 'Customer';
+      if (user.role === 'admin') {
+        dropdownUserRole.textContent = 'Administrator';
+      } else if (user.role === 'seller') {
+        dropdownUserRole.textContent = 'Seller Account';
+      } else {
+        dropdownUserRole.textContent = 'Customer';
+      }
     }
 
     if (navAddressesBtn) navAddressesBtn.style.display = 'inline-flex';
@@ -991,12 +1056,27 @@ function openAuthModal(initialTab = 'login', customNotice = '') {
   }
 }
 
+function toggleSellerRegistration(isSeller) {
+  if (regIsSeller) regIsSeller.checked = !!isSeller;
+  if (sellerFieldsWrap) {
+    sellerFieldsWrap.style.display = isSeller ? 'block' : 'none';
+  }
+  if (regSubmitBtn) {
+    regSubmitBtn.textContent = isSeller ? 'Register as Seller' : 'Create Account';
+  }
+  if (regSellerPhone) regSellerPhone.required = !!isSeller;
+  if (regBusinessName) regBusinessName.required = !!isSeller;
+  if (regBusinessAddress) regBusinessAddress.required = !!isSeller;
+  if (regBusinessPan) regBusinessPan.required = !!isSeller;
+}
+
 function closeAuthModal() {
   closeModalWithAnimation(authModal, () => {
     authErrorAlert.style.display = 'none';
     authErrorAlert.textContent = '';
     loginForm.reset();
     registerForm.reset();
+    toggleSellerRegistration(false);
   });
 }
 
@@ -1331,22 +1411,22 @@ function renderWishlistContent() {
 // ============================================================
 
 function showLoading() {
-  loadingState.style.display = 'flex';
-  errorState.style.display = 'none';
-  emptyState.style.display = 'none';
-  emptyFilterState.style.display = 'none';
-  productsGrid.style.display = 'none';
+  if (loadingState) loadingState.style.display = 'flex';
+  if (errorState) errorState.style.display = 'none';
+  if (emptyState) emptyState.style.display = 'none';
+  if (emptyFilterState) emptyFilterState.style.display = 'none';
+  if (productsGrid) productsGrid.style.display = 'none';
   if (paginationContainer) paginationContainer.style.display = 'none';
 }
 
 function showError(msg) {
-  loadingState.style.display = 'none';
-  errorState.style.display = 'flex';
-  emptyState.style.display = 'none';
-  emptyFilterState.style.display = 'none';
-  productsGrid.style.display = 'none';
+  if (loadingState) loadingState.style.display = 'none';
+  if (errorState) errorState.style.display = 'flex';
+  if (emptyState) emptyState.style.display = 'none';
+  if (emptyFilterState) emptyFilterState.style.display = 'none';
+  if (productsGrid) productsGrid.style.display = 'none';
   if (paginationContainer) paginationContainer.style.display = 'none';
-  errorMessage.textContent = msg || 'Could not connect to the backend API.';
+  if (errorMessage) errorMessage.textContent = msg || 'Could not connect to the backend API.';
 
   if (backendStatus) {
     backendStatus.innerHTML = `
@@ -1356,11 +1436,230 @@ function showError(msg) {
   }
 }
 
-function populateCategories(categorySource) {
-  if (categorySelect && categorySelect.options.length > 1) {
-    return; // Already populated
+// ============================================================
+// Flipkart-Style Dynamic Category Navigation & Metadata
+// ============================================================
+const CATEGORY_META = {
+  all: {
+    icon: '🛍️',
+    label: 'All Products',
+    tint: 'rgba(37, 99, 235, 0.08)',
+    border: 'rgba(37, 99, 235, 0.25)',
+    color: '#2563eb'
+  },
+  accessories: {
+    icon: '🎒',
+    label: 'Accessories',
+    tint: 'rgba(147, 51, 234, 0.08)',
+    border: 'rgba(147, 51, 234, 0.25)',
+    color: '#9333ea'
+  },
+  computers: {
+    icon: '💻',
+    label: 'Computers',
+    tint: 'rgba(2, 132, 199, 0.08)',
+    border: 'rgba(2, 132, 199, 0.25)',
+    color: '#0284c7'
+  },
+  electronics: {
+    icon: '🎧',
+    label: 'Electronics',
+    tint: 'rgba(79, 70, 229, 0.08)',
+    border: 'rgba(79, 70, 229, 0.25)',
+    color: '#4f46e5'
+  },
+  home: {
+    icon: '🏠',
+    label: 'Home & Living',
+    tint: 'rgba(217, 119, 6, 0.08)',
+    border: 'rgba(217, 119, 6, 0.25)',
+    color: '#d97706'
+  },
+  kitchen: {
+    icon: '🍳',
+    label: 'Kitchen & Dining',
+    tint: 'rgba(225, 29, 72, 0.08)',
+    border: 'rgba(225, 29, 72, 0.25)',
+    color: '#e11d48'
+  },
+  sports: {
+    icon: '⚽',
+    label: 'Sports & Fitness',
+    tint: 'rgba(5, 150, 105, 0.08)',
+    border: 'rgba(5, 150, 105, 0.25)',
+    color: '#059669'
+  },
+  fashion: {
+    icon: '👕',
+    label: 'Fashion',
+    tint: 'rgba(236, 72, 153, 0.08)',
+    border: 'rgba(236, 72, 153, 0.25)',
+    color: '#ec4899'
+  },
+  footwear: {
+    icon: '👟',
+    label: 'Footwear',
+    tint: 'rgba(249, 115, 22, 0.08)',
+    border: 'rgba(249, 115, 22, 0.25)',
+    color: '#f97316'
+  },
+  beauty: {
+    icon: '💄',
+    label: 'Beauty',
+    tint: 'rgba(244, 63, 94, 0.08)',
+    border: 'rgba(244, 63, 94, 0.25)',
+    color: '#f43f5e'
+  },
+  books: {
+    icon: '📚',
+    label: 'Books',
+    tint: 'rgba(13, 148, 136, 0.08)',
+    border: 'rgba(13, 148, 136, 0.25)',
+    color: '#0d9488'
+  },
+  toys: {
+    icon: '🧸',
+    label: 'Toys & Baby',
+    tint: 'rgba(234, 179, 8, 0.08)',
+    border: 'rgba(234, 179, 8, 0.25)',
+    color: '#eab308'
+  },
+  grocery: {
+    icon: '🛒',
+    label: 'Grocery',
+    tint: 'rgba(34, 197, 94, 0.08)',
+    border: 'rgba(34, 197, 94, 0.25)',
+    color: '#22c55e'
+  }
+};
+
+function getCategoryMeta(categoryName) {
+  if (!categoryName) return { icon: '🏷️', tint: 'rgba(100, 116, 139, 0.08)', border: 'rgba(100, 116, 139, 0.25)' };
+  const key = String(categoryName).trim().toLowerCase();
+  return CATEGORY_META[key] || {
+    icon: '🏷️',
+    tint: 'rgba(100, 116, 139, 0.08)',
+    border: 'rgba(100, 116, 139, 0.25)'
+  };
+}
+
+async function initCategorySections() {
+  if (!categorySectionsContainer) return;
+
+  try {
+    const [prodRes, catRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/products?all=true`),
+      fetch(`${API_BASE_URL}/products/categories`)
+    ]);
+
+    if (!prodRes.ok) throw new Error(`HTTP error ${prodRes.status}`);
+
+    const prodData = await prodRes.json();
+    const catData = catRes.ok ? await catRes.json() : null;
+
+    const allProds = prodData.success && Array.isArray(prodData.data) ? prodData.data : [];
+    const categories = (catData && catData.success && Array.isArray(catData.data) && catData.data.length > 0)
+      ? catData.data
+      : (prodData.categories || []);
+
+    allProducts = allProds;
+    if (categories.length > 0) {
+      populateCategories(categories);
+    }
+
+    renderCategorySections(allProds, categories);
+  } catch (err) {
+    console.error('Error loading category showcases:', err);
+    if (categoryShowcaseLoading) {
+      categoryShowcaseLoading.style.display = 'none';
+    }
+  }
+}
+
+function renderCategorySections(products, categoriesList) {
+  if (!categorySectionsContainer) return;
+
+  if (categoryShowcaseLoading) {
+    categoryShowcaseLoading.style.display = 'none';
   }
 
+  const rawCategories = Array.isArray(categoriesList) ? categoriesList : [];
+  const distinctCategories = Array.from(
+    new Set(rawCategories.map(c => (typeof c === 'string' ? c : c?.category)?.trim()).filter(Boolean))
+  ).sort();
+
+  if (distinctCategories.length === 0) {
+    if (categorySectionsWrapper) categorySectionsWrapper.style.display = 'none';
+    return;
+  }
+
+  if (categorySectionsWrapper) categorySectionsWrapper.style.display = 'block';
+
+  // Group products by category
+  const categoryGroups = new Map();
+  distinctCategories.forEach(cat => {
+    categoryGroups.set(cat.toLowerCase(), {
+      name: cat,
+      products: []
+    });
+  });
+
+  (Array.isArray(products) ? products : []).forEach(prod => {
+    if (!prod || !prod.category) return;
+    const key = prod.category.trim().toLowerCase();
+    if (categoryGroups.has(key)) {
+      categoryGroups.get(key).products.push(prod);
+    }
+  });
+
+  categorySectionsContainer.innerHTML = '';
+
+  distinctCategories.forEach(catName => {
+    const group = categoryGroups.get(catName.toLowerCase());
+    const catProducts = group ? group.products : [];
+
+    // Show up to 4 products (exactly 4 if at least 4 available; fewer if fewer available)
+    const displayProducts = catProducts.slice(0, 4);
+    if (displayProducts.length === 0) return;
+
+    const meta = getCategoryMeta(catName);
+    const categoryPageUrl = `category.html?name=${encodeURIComponent(catName)}`;
+
+    const sectionEl = document.createElement('section');
+    sectionEl.className = 'category-showcase-section reveal-on-scroll is-visible';
+    sectionEl.setAttribute('data-category', catName);
+    sectionEl.setAttribute('aria-label', `${catName} category showcase`);
+
+    sectionEl.innerHTML = `
+      <div class="category-showcase-header">
+        <div class="category-showcase-title-wrap">
+          <div class="category-showcase-icon-box" style="--cat-tint: ${meta.tint}; --cat-border: ${meta.border};">
+            <span aria-hidden="true">${meta.icon}</span>
+          </div>
+          <div class="category-showcase-text-wrap">
+            <h2 class="category-showcase-title">${escapeHtml(catName)}</h2>
+            <span class="category-showcase-subtitle">${catProducts.length} ${catProducts.length === 1 ? 'item' : 'items'} available in store</span>
+          </div>
+        </div>
+        <a href="${categoryPageUrl}" class="category-showcase-view-all" aria-label="View all ${escapeHtml(catName)} products">
+          <span class="view-all-text">View All</span>
+          <span class="view-all-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="category-showcase-grid"></div>
+    `;
+
+    const grid = sectionEl.querySelector('.category-showcase-grid');
+    displayProducts.forEach((prod, index) => {
+      const card = createProductCard(prod, index, `showcase-${catName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-`);
+      grid.appendChild(card);
+    });
+
+    categorySectionsContainer.appendChild(sectionEl);
+  });
+}
+
+function populateCategories(categorySource) {
   let categories = [];
   if (Array.isArray(categorySource) && categorySource.length > 0) {
     if (typeof categorySource[0] === 'string') {
@@ -1372,21 +1671,27 @@ function populateCategories(categorySource) {
     }
   }
 
-  const previousSelection = categorySelect.value;
-  categorySelect.innerHTML = '<option value="all">All Categories</option>';
+  if (categorySelect && categorySelect.options.length > 1) {
+    return; // Dropdown already populated
+  }
 
-  categories.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat;
-    categorySelect.appendChild(option);
-  });
+  const previousSelection = categorySelect ? categorySelect.value : 'all';
+  if (categorySelect) {
+    categorySelect.innerHTML = '<option value="all">All Categories</option>';
 
-  if (categories.includes(previousSelection)) {
-    categorySelect.value = previousSelection;
-    currentCategory = previousSelection;
-  } else {
-    categorySelect.value = currentCategory || 'all';
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    });
+
+    if (categories.includes(previousSelection)) {
+      categorySelect.value = previousSelection;
+      currentCategory = previousSelection;
+    } else {
+      categorySelect.value = currentCategory || 'all';
+    }
   }
 }
 
@@ -1581,15 +1886,18 @@ async function goToPage(pageNum) {
   currentPage = pageNum;
   await fetchProducts(currentPage);
 
-  const productsSection = document.getElementById('products-section');
-  if (productsSection) {
+  const targetSection = document.getElementById('category-sections-wrapper') || document.getElementById('products-section');
+  if (targetSection) {
     const yOffset = -70; // offset for sticky navigation bar
-    const y = productsSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    const y = targetSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
     window.scrollTo({ top: y, behavior: 'smooth' });
   }
 }
 
 async function fetchProducts(page = 1) {
+  if (!productsGrid) {
+    return;
+  }
   currentPage = page;
   showLoading();
 
@@ -1696,38 +2004,9 @@ async function fetchProducts(page = 1) {
 // State for current open product in modal
 let currentModalProductId = null;
 
-async function openProductDetails(productId) {
-  currentModalProductId = productId;
-  productModal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-
-  // Smoothly scroll modal container to top when opening a product or navigating from related products
-  const modalContainer = productModal.querySelector('.modal-container');
-  if (modalContainer) {
-    modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  modalLoading.style.display = 'flex';
-  modalError.style.display = 'none';
-  modalContent.style.display = 'none';
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/${productId}`);
-    const result = await response.json();
-
-    if (!response.ok || !result.success || !result.data) {
-      const errorText = result.message || `Product not found (Status ${response.status})`;
-      throw new Error(errorText);
-    }
-
-    renderModalContent(result.data);
-  } catch (error) {
-    console.error('Error fetching product details:', error);
-    modalLoading.style.display = 'none';
-    modalContent.style.display = 'none';
-    modalErrorMessage.textContent = error.message || 'Unable to retrieve product details.';
-    modalError.style.display = 'flex';
-  }
+function openProductDetails(productId) {
+  if (!productId) return;
+  window.location.href = `product-details.html?id=${encodeURIComponent(productId)}`;
 }
 
 function renderModalContent(product) {
@@ -3838,7 +4117,25 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchWishlist();
     fetchCart();
   }
-  fetchProducts(1);
+
+  // Parse URL query parameters if arriving from product-details or external links
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('search')) {
+    const sTerm = urlParams.get('search');
+    if (searchInput) searchInput.value = sTerm;
+    currentSearchTerm = sTerm;
+    if (clearSearchBtn) clearSearchBtn.style.display = 'block';
+  }
+  if (urlParams.has('category')) {
+    const cTerm = urlParams.get('category');
+    currentCategory = cTerm;
+    if (categorySelect) categorySelect.value = cTerm;
+  }
+
+  if (productsGrid) {
+    fetchProducts(1);
+  }
+  initCategorySections();
   initScrollReveal();
   initHeroInteractiveFeatures();
   initHeroBackgroundSlider();
@@ -3861,6 +4158,17 @@ let suggestionDebounceTimer = null;
 let activeSuggestionIndex = -1;
 let currentSuggestionsList = [];
 let latestSuggestionRequestId = 0;
+let suggestionAbortController = null;
+
+// Global fallback handler for product suggestion images
+window.handleSuggestionImageError = function (img) {
+  if (!img) return;
+  img.style.display = 'none';
+  const parent = img.parentElement;
+  if (parent) {
+    parent.innerHTML = '<span class="suggestion-thumb-fallback" aria-hidden="true">📦</span>';
+  }
+};
 
 function closeSuggestionsDropdown() {
   if (!searchSuggestionsDropdown) return;
@@ -3868,41 +4176,79 @@ function closeSuggestionsDropdown() {
   searchSuggestionsDropdown.innerHTML = '';
   currentSuggestionsList = [];
   activeSuggestionIndex = -1;
+  if (searchInput) {
+    searchInput.setAttribute('aria-expanded', 'false');
+    searchInput.removeAttribute('aria-activedescendant');
+  }
 }
 
 function highlightMatch(text, query) {
   if (!text) return '';
   if (!query || !query.trim()) return escapeHtml(text);
-  const escapedQuery = query.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
   const safeText = escapeHtml(text);
-  return safeText.replace(new RegExp(`(${escapedQuery})`, 'gi'), '<span class="suggestion-highlight">$1</span>');
+  const tokens = query.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return safeText;
+  const escapedTokens = tokens.map((t) => t.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&'));
+  const regex = new RegExp(`(${escapedTokens.join('|')})`, 'gi');
+  return safeText.replace(regex, '<span class="suggestion-highlight">$1</span>');
 }
 
-function renderSuggestionsDropdown(suggestions, query) {
+function renderSuggestionsDropdown(suggestions, query, totalMatches = 0, hasMore = false) {
   if (!searchSuggestionsDropdown) return;
 
   if (!suggestions || suggestions.length === 0) {
-    closeSuggestionsDropdown();
+    // Empty state: render clear "No matching products found"
+    const emptyHtml = `
+      <div class="suggestions-status-message suggestions-empty" role="status">
+        <span class="suggestions-empty-icon" aria-hidden="true">🔍</span>
+        <span class="suggestions-empty-title">No matching products found</span>
+        <span class="suggestions-empty-sub">Try checking your spelling or using different keywords</span>
+      </div>
+    `;
+    searchSuggestionsDropdown.innerHTML = emptyHtml;
+    searchSuggestionsDropdown.style.display = 'block';
+    if (searchInput) {
+      searchInput.setAttribute('aria-expanded', 'true');
+      searchInput.removeAttribute('aria-activedescendant');
+    }
+    currentSuggestionsList = [];
+    activeSuggestionIndex = -1;
     return;
   }
 
   currentSuggestionsList = suggestions;
   activeSuggestionIndex = -1;
 
-  let html = '<ul class="suggestions-list" role="listbox">';
+  let html = '<ul class="suggestions-list" role="listbox" id="suggestions-list-box">';
   suggestions.forEach((item, index) => {
     const highlightedName = highlightMatch(item.name, query);
     const categoryLabel = item.category ? escapeHtml(item.category) : '';
     const priceLabel = item.price ? `₹${item.price.toLocaleString('en-IN')}` : '';
+    const imgUrl = formatProductImageUrl(item.image);
+    const isOutOfStock = typeof item.stock === 'number' && item.stock <= 0;
+    const stockTag = isOutOfStock
+      ? '<span class="suggestion-stock-tag out-of-stock">Out of stock</span>'
+      : (item.stock && item.stock <= 5 ? `<span class="suggestion-stock-tag">Only ${item.stock} left</span>` : '');
 
     html += `
-      <li class="suggestion-item" role="option" id="suggestion-item-${index}" data-index="${index}" data-name="${escapeHtml(item.name)}">
-        <div class="suggestion-left">
-          <span class="suggestion-icon" aria-hidden="true">🔍</span>
-          <span class="suggestion-name">${highlightedName}</span>
+      <li class="suggestion-item" role="option" id="suggestion-item-${index}" data-index="${index}" data-id="${item.id || item._id}" data-name="${escapeHtml(item.name)}" aria-selected="false">
+        <div class="suggestion-thumb-wrap">
+          <img
+            src="${imgUrl}"
+            alt="${escapeHtml(item.name)}"
+            class="suggestion-thumb"
+            loading="lazy"
+            onerror="handleSuggestionImageError(this)"
+          />
         </div>
-        <div class="suggestion-right">
-          ${categoryLabel ? `<span class="suggestion-category">${categoryLabel}</span>` : ''}
+        <div class="suggestion-info">
+          <div class="suggestion-name">${highlightedName}</div>
+          <div class="suggestion-meta">
+            ${categoryLabel ? `<span class="suggestion-category">${categoryLabel}</span>` : ''}
+            ${stockTag}
+          </div>
+        </div>
+        <div class="suggestion-price-col">
           ${priceLabel ? `<span class="suggestion-price">${priceLabel}</span>` : ''}
         </div>
       </li>
@@ -3910,10 +4256,14 @@ function renderSuggestionsDropdown(suggestions, query) {
   });
   html += '</ul>';
 
+  const displayTotal = totalMatches || suggestions.length;
   html += `
     <div class="suggestions-footer">
-      <span>${suggestions.length} ${suggestions.length === 1 ? 'match' : 'matches'} found</span>
-      <div class="suggestions-footer-keys">
+      <div class="suggestions-footer-info">
+        <span>${displayTotal} matching ${displayTotal === 1 ? 'product' : 'products'}</span>
+        ${hasMore ? `<button type="button" class="suggestions-view-all-btn" id="suggestions-view-all-btn" title="View all matching products">View all results ➔</button>` : ''}
+      </div>
+      <div class="suggestions-footer-keys" aria-hidden="true">
         <span class="suggestions-key-badge">↑↓</span> navigate
         <span class="suggestions-key-badge">↵</span> select
         <span class="suggestions-key-badge">esc</span> dismiss
@@ -3923,14 +4273,20 @@ function renderSuggestionsDropdown(suggestions, query) {
 
   searchSuggestionsDropdown.innerHTML = html;
   searchSuggestionsDropdown.style.display = 'block';
+  if (searchInput) {
+    searchInput.setAttribute('aria-expanded', 'true');
+  }
 
   // Attach hover and click listeners to suggestion items
   const items = searchSuggestionsDropdown.querySelectorAll('.suggestion-item');
   items.forEach((item) => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
-      const selectedName = item.dataset.name;
-      selectSuggestion(selectedName);
+      const productId = item.dataset.id;
+      if (productId) {
+        closeSuggestionsDropdown();
+        openProductDetails(productId);
+      }
     });
 
     item.addEventListener('mouseenter', () => {
@@ -3939,6 +4295,16 @@ function renderSuggestionsDropdown(suggestions, query) {
       updateHighlightedSuggestion();
     });
   });
+
+  // Attach listener to "View all results" button if present
+  const viewAllBtn = searchSuggestionsDropdown.querySelector('#suggestions-view-all-btn');
+  if (viewAllBtn) {
+    viewAllBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeSuggestionsDropdown();
+      submitSearchQuery(query);
+    });
+  }
 }
 
 function updateHighlightedSuggestion() {
@@ -3950,35 +4316,54 @@ function updateHighlightedSuggestion() {
     item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
     if (isSelected) {
       item.scrollIntoView({ block: 'nearest' });
+      if (searchInput) {
+        searchInput.setAttribute('aria-activedescendant', `suggestion-item-${idx}`);
+      }
     }
   });
+
+  if (activeSuggestionIndex === -1 && searchInput) {
+    searchInput.removeAttribute('aria-activedescendant');
+  }
 }
 
-function selectSuggestion(fullName) {
-  if (!fullName) return;
-  if (searchInput) {
-    searchInput.value = fullName;
-    searchInput.focus();
-  }
-  currentSearchTerm = fullName;
-  if (clearSearchBtn) {
-    clearSearchBtn.style.display = 'block';
-  }
+function submitSearchQuery(query) {
+  const normalized = (query !== undefined ? query : (searchInput ? searchInput.value : '')).trim();
   closeSuggestionsDropdown();
   clearTimeout(searchDebounceTimeout);
+  clearTimeout(suggestionDebounceTimer);
+  if (suggestionAbortController) {
+    suggestionAbortController.abort();
+  }
+
+  if (searchInput) {
+    searchInput.value = normalized;
+  }
+  currentSearchTerm = normalized;
+  if (clearSearchBtn) {
+    clearSearchBtn.style.display = normalized ? 'block' : 'none';
+  }
   applyFiltersAndRender(true);
 }
 
 async function fetchSuggestions(query) {
-  if (!query || query.trim().length < 2) {
+  const trimmed = (query || '').trim();
+  if (!trimmed || trimmed.length < 1) {
     closeSuggestionsDropdown();
     return;
   }
 
+  // Abort previous in-flight request if still running
+  if (suggestionAbortController) {
+    suggestionAbortController.abort();
+  }
+  suggestionAbortController = new AbortController();
   const currentRequestId = ++latestSuggestionRequestId;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/products/suggestions?q=${encodeURIComponent(query.trim())}`);
+    const response = await fetch(`${API_BASE_URL}/products/suggestions?q=${encodeURIComponent(trimmed)}&limit=12`, {
+      signal: suggestionAbortController.signal
+    });
 
     // Discard response if a newer request was dispatched
     if (currentRequestId !== latestSuggestionRequestId) {
@@ -3993,17 +4378,21 @@ async function fetchSuggestions(query) {
     const result = await response.json();
 
     // Verify search input still matches query before rendering
-    if (!searchInput || searchInput.value.trim().length < 2) {
+    if (!searchInput || searchInput.value.trim().length < 1) {
       closeSuggestionsDropdown();
       return;
     }
 
-    if (result.success && Array.isArray(result.data) && result.data.length > 0) {
-      renderSuggestionsDropdown(result.data, query);
+    if (result.success && Array.isArray(result.data)) {
+      renderSuggestionsDropdown(result.data, trimmed, result.totalMatches, result.hasMore);
     } else {
       closeSuggestionsDropdown();
     }
   } catch (error) {
+    if (error.name === 'AbortError') {
+      // Intentionally aborted due to newer keystroke; do not clear UI or error out
+      return;
+    }
     console.debug('Autocomplete fetch error:', error);
     if (currentRequestId === latestSuggestionRequestId) {
       closeSuggestionsDropdown();
@@ -4011,27 +4400,27 @@ async function fetchSuggestions(query) {
   }
 }
 
-// Search
+// Search input handling
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     currentSearchTerm = e.target.value;
     const query = currentSearchTerm.trim();
     clearSearchBtn.style.display = currentSearchTerm ? 'block' : 'none';
 
-    // 1. Debounced catalog search
+    // 1. Debounced catalog search (300ms)
     clearTimeout(searchDebounceTimeout);
     searchDebounceTimeout = setTimeout(() => {
       applyFiltersAndRender(true);
-    }, 250);
+    }, 300);
 
-    // 2. Debounced autocomplete suggestions (minimum 2 characters)
+    // 2. Debounced autocomplete suggestions (from 1st character, 220ms)
     clearTimeout(suggestionDebounceTimer);
-    if (query.length < 2) {
+    if (query.length < 1) {
       closeSuggestionsDropdown();
     } else {
       suggestionDebounceTimer = setTimeout(() => {
         fetchSuggestions(query);
-      }, 250);
+      }, 220);
     }
   });
 
@@ -4057,17 +4446,19 @@ if (searchInput) {
         return;
       }
     } else if (e.key === 'Enter') {
+      e.preventDefault();
       if (isDropdownVisible && activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestionsList.length) {
-        e.preventDefault();
+        // User highlighted a suggestion -> open product details
         const selected = currentSuggestionsList[activeSuggestionIndex];
-        selectSuggestion(selected.name);
+        const selectedId = selected.id || selected._id;
+        closeSuggestionsDropdown();
+        if (selectedId) {
+          openProductDetails(selectedId);
+        }
         return;
       }
-      // Otherwise trigger normal Enter key search
-      e.preventDefault();
-      closeSuggestionsDropdown();
-      clearTimeout(searchDebounceTimeout);
-      applyFiltersAndRender(true);
+      // No suggestion highlighted -> perform catalog search
+      submitSearchQuery(searchInput.value);
       return;
     } else if (e.key === 'Escape') {
       if (isDropdownVisible) {
@@ -4075,14 +4466,29 @@ if (searchInput) {
         closeSuggestionsDropdown();
         return;
       }
+    } else if (e.key === 'Tab') {
+      // Natural Tab key navigation: close suggestions dropdown
+      closeSuggestionsDropdown();
     }
   });
 }
 
+// Search button click handling
+if (searchSubmitBtn) {
+  searchSubmitBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    submitSearchQuery(searchInput ? searchInput.value : '');
+  });
+}
+
+// Clear search button handling
 if (clearSearchBtn) {
   clearSearchBtn.addEventListener('click', () => {
     clearTimeout(searchDebounceTimeout);
     clearTimeout(suggestionDebounceTimer);
+    if (suggestionAbortController) {
+      suggestionAbortController.abort();
+    }
     closeSuggestionsDropdown();
     searchInput.value = '';
     currentSearchTerm = '';
@@ -4445,6 +4851,12 @@ if (tabRegisterBtn) {
   });
 }
 
+if (regIsSeller) {
+  regIsSeller.addEventListener('change', (e) => {
+    toggleSellerRegistration(e.target.checked);
+  });
+}
+
 if (authModal) {
   authModal.addEventListener('click', (e) => {
     if (e.target === authModal) closeAuthModal();
@@ -4510,8 +4922,10 @@ if (registerForm) {
     e.preventDefault();
     authErrorAlert.style.display = 'none';
 
-    const submitBtn = registerForm.querySelector('button[type="submit"]');
-    const originalBtnText = submitBtn ? submitBtn.textContent : 'Create Account';
+    const submitBtn = regSubmitBtn || registerForm.querySelector('button[type="submit"]');
+    const isSeller = regIsSeller ? regIsSeller.checked : false;
+    const defaultBtnText = isSeller ? 'Register as Seller' : 'Create Account';
+    const originalBtnText = submitBtn ? submitBtn.textContent : defaultBtnText;
 
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -4525,16 +4939,85 @@ if (registerForm) {
       return;
     }
 
+    let sellerPayload = {};
+    if (isSeller) {
+      const phone = regSellerPhone ? regSellerPhone.value.trim() : '';
+      const businessName = regBusinessName ? regBusinessName.value.trim() : '';
+      const businessAddress = regBusinessAddress ? regBusinessAddress.value.trim() : '';
+      const pan = regBusinessPan ? regBusinessPan.value.trim().toUpperCase() : '';
+      const gstin = regBusinessGstin ? regBusinessGstin.value.trim().toUpperCase() : '';
+
+      if (!phone) {
+        authErrorAlert.textContent = 'Contact / Mobile Number is required for seller registration.';
+        authErrorAlert.style.display = 'block';
+        if (regSellerPhone) regSellerPhone.focus();
+        return;
+      }
+      const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+      if (cleanPhone.length < 10 || cleanPhone.length > 15 || !/^\d+$/.test(cleanPhone)) {
+        authErrorAlert.textContent = 'Please enter a valid mobile / contact number (at least 10 digits).';
+        authErrorAlert.style.display = 'block';
+        if (regSellerPhone) regSellerPhone.focus();
+        return;
+      }
+
+      if (!businessName) {
+        authErrorAlert.textContent = 'Business / Shop Name is required for seller registration.';
+        authErrorAlert.style.display = 'block';
+        if (regBusinessName) regBusinessName.focus();
+        return;
+      }
+
+      if (!businessAddress) {
+        authErrorAlert.textContent = 'Registered Business Address is required for seller registration.';
+        authErrorAlert.style.display = 'block';
+        if (regBusinessAddress) regBusinessAddress.focus();
+        return;
+      }
+
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!panRegex.test(pan)) {
+        authErrorAlert.textContent = 'Valid 10-character Business PAN (e.g. ABCDE1234F) is required.';
+        authErrorAlert.style.display = 'block';
+        if (regBusinessPan) regBusinessPan.focus();
+        return;
+      }
+
+      if (gstin && !['NA', 'N/A', 'EXEMPT', 'NOT APPLICABLE'].includes(gstin)) {
+        const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        if (!gstinRegex.test(gstin)) {
+          authErrorAlert.textContent = 'Please enter a valid 15-character GSTIN or leave blank if exempt.';
+          authErrorAlert.style.display = 'block';
+          if (regBusinessGstin) regBusinessGstin.focus();
+          return;
+        }
+      }
+
+      sellerPayload = {
+        isSeller: true,
+        phone,
+        businessName,
+        businessAddress,
+        pan,
+        gstin: gstin || 'Not Applicable'
+      };
+    }
+
     try {
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Creating account...';
+        submitBtn.textContent = isSeller ? 'Registering seller...' : 'Creating account...';
       }
 
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          ...sellerPayload
+        })
       });
 
       const result = await response.json().catch(() => ({}));
@@ -4545,6 +5028,7 @@ if (registerForm) {
         return;
       }
 
+      // Automatically log in after successful registration
       const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -4557,7 +5041,11 @@ if (registerForm) {
         localStorage.setItem('user', JSON.stringify(loginResult.user));
         updateAuthUI();
         closeAuthModal();
-        showToast(`Account created! Welcome, ${loginResult.user.name}!`);
+        if (loginResult.user && loginResult.user.role === 'seller') {
+          showToast(`Seller account registered! Welcome, ${loginResult.user.name}!`);
+        } else {
+          showToast(`Account created! Welcome, ${loginResult.user.name}!`);
+        }
         await fetchCart();
         await fetchWishlist();
         await fetchAddresses();
@@ -5857,13 +6345,21 @@ function initHeroBackgroundSlider() {
       if (categorySelect) {
         categorySelect.value = category;
         currentCategory = category;
-        applyFiltersAndRender();
       }
-      const productsSection = document.getElementById('products-section');
-      if (productsSection) {
-        productsSection.scrollIntoView({ behavior: 'smooth' });
+      if (category && category !== 'all') {
+        const showcaseSection = document.querySelector(`.category-showcase-section[data-category="${category}"]`);
+        if (showcaseSection) {
+          showcaseSection.scrollIntoView({ behavior: 'smooth' });
+          showToast(`Viewing ${category} showcase`);
+          return;
+        }
+        window.location.href = `category.html?name=${encodeURIComponent(category)}`;
+      } else {
+        const catWrapper = document.getElementById('category-sections-wrapper');
+        if (catWrapper) {
+          catWrapper.scrollIntoView({ behavior: 'smooth' });
+        }
       }
-      showToast(`Filtered catalog to: ${category === 'all' ? 'All Products' : category}`);
     });
   });
 
@@ -5988,19 +6484,20 @@ function initFooterFunctionality() {
         currentCategory = mappedCategory;
       }
 
-      // Clear any search query so the whole category is visible
-      currentSearchTerm = '';
-      if (searchInput) searchInput.value = '';
-      if (clearSearchBtn) clearSearchBtn.style.display = 'none';
-
-      applyFiltersAndRender();
-
-      const productsSection = document.getElementById('products-section');
-      if (productsSection) {
-        productsSection.scrollIntoView({ behavior: 'smooth' });
+      if (mappedCategory && mappedCategory !== 'all') {
+        const showcaseSection = document.querySelector(`.category-showcase-section[data-category="${mappedCategory}"]`);
+        if (showcaseSection) {
+          showcaseSection.scrollIntoView({ behavior: 'smooth' });
+          showToast(`Viewing ${mappedCategory} showcase`);
+          return;
+        }
+        window.location.href = `category.html?name=${encodeURIComponent(mappedCategory)}`;
+      } else {
+        const catWrapper = document.getElementById('category-sections-wrapper');
+        if (catWrapper) {
+          catWrapper.scrollIntoView({ behavior: 'smooth' });
+        }
       }
-
-      showToast(`Showing catalog for: ${mappedCategory === 'all' ? 'All Products' : mappedCategory}`);
     });
   });
 
@@ -6266,9 +6763,9 @@ function initFooterFunctionality() {
     footerReviewsBtn.addEventListener('click', (e) => {
       e.preventDefault();
 
-      const productsSection = document.getElementById('products-section');
-      if (productsSection) {
-        productsSection.scrollIntoView({ behavior: 'smooth' });
+      const targetWrapper = document.getElementById('category-sections-wrapper');
+      if (targetWrapper) {
+        targetWrapper.scrollIntoView({ behavior: 'smooth' });
       }
 
       // Check for product with reviews in memory

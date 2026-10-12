@@ -55,8 +55,12 @@
       <!-- Central Commercial Search Bar -->
       <div class="nav-search-wrap" id="nav-search-wrap">
         <div class="search-input-wrap">
-          <span class="search-icon" aria-hidden="true">🔍</span>
-          <input type="text" id="search-input" class="search-input"
+          <button type="button" class="search-icon-btn" id="search-submit-btn" title="Search"
+            aria-label="Search products">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+          </button>
+          <input type="text" id="search-input" class="search-input" role="combobox" aria-autocomplete="list"
+            aria-expanded="false" aria-controls="search-suggestions-dropdown" aria-haspopup="listbox"
             placeholder="Search products by title, category, or keyword..."
             aria-label="Search products by title, category, or keyword" autocomplete="off" />
           <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search"
@@ -506,155 +510,26 @@
     </div>
   </section>
 
-  <!-- Products Section -->
-  <main class="container main-content" id="products-section">
-    <!-- Header with count and refresh -->
-    <div class="section-header">
-      <div class="section-title-wrap">
-        <h2 class="section-title">All Products</h2>
-        <span class="product-badge" id="product-count">0 items</span>
-      </div>
-      <div class="section-actions-wrap">
-        <button class="btn btn-secondary" id="refresh-btn" title="Refresh catalog">
-          ↻ Refresh
-        </button>
-      </div>
-    </div>
-
-    <!-- Category Filter Controls -->
-    <div class="filter-controls reveal-on-scroll" id="filter-controls">
-      <div class="category-select-wrap">
-        <span class="filter-label-icon" aria-hidden="true">📁</span>
-        <label for="category-select" class="filter-label">Category:</label>
-        <select id="category-select" class="category-select" aria-label="Filter products by category">
-          <option value="all">All Categories</option>
-          <!-- Dynamically populated from API products data -->
-        </select>
-      </div>
-    </div>
-
-    <!-- Loading State with Skeleton Shimmer -->
-    <div class="loading-state-container" id="loading-state">
-      <div class="loading-header-banner">
-        <div class="spinner"></div>
-        <p class="state-text">Fetching products from catalog...</p>
-      </div>
-      <div class="skeleton-grid" aria-hidden="true">
-        <div class="skeleton-card">
-          <div class="skeleton-media shimmer"></div>
-          <div class="skeleton-body">
-            <div class="skeleton-badge shimmer"></div>
-            <div class="skeleton-line shimmer title"></div>
-            <div class="skeleton-line shimmer desc"></div>
-            <div class="skeleton-line shimmer desc-short"></div>
-            <div class="skeleton-footer">
-              <div class="skeleton-line shimmer price"></div>
-              <div class="skeleton-btn shimmer"></div>
-            </div>
+  <!-- Curated Category-wise Product Sections (Flipkart-Style Showcases) -->
+  <main class="category-sections-wrapper" id="category-sections-wrapper" aria-label="Curated Categories Showcases">
+    <div class="container" id="category-sections-container">
+      <!-- Loading Skeleton for Category Sections -->
+      <div class="category-showcase-loading" id="category-showcase-loading" aria-hidden="true">
+        <div class="showcase-skeleton-card">
+          <div class="showcase-skeleton-header">
+            <div class="showcase-skeleton-title shimmer"></div>
+            <div class="showcase-skeleton-btn shimmer"></div>
           </div>
-        </div>
-        <div class="skeleton-card">
-          <div class="skeleton-media shimmer"></div>
-          <div class="skeleton-body">
-            <div class="skeleton-badge shimmer"></div>
-            <div class="skeleton-line shimmer title"></div>
-            <div class="skeleton-line shimmer desc"></div>
-            <div class="skeleton-line shimmer desc-short"></div>
-            <div class="skeleton-footer">
-              <div class="skeleton-line shimmer price"></div>
-              <div class="skeleton-btn shimmer"></div>
-            </div>
-          </div>
-        </div>
-        <div class="skeleton-card">
-          <div class="skeleton-media shimmer"></div>
-          <div class="skeleton-body">
-            <div class="skeleton-badge shimmer"></div>
-            <div class="skeleton-line shimmer title"></div>
-            <div class="skeleton-line shimmer desc"></div>
-            <div class="skeleton-line shimmer desc-short"></div>
-            <div class="skeleton-footer">
-              <div class="skeleton-line shimmer price"></div>
-              <div class="skeleton-btn shimmer"></div>
-            </div>
-          </div>
-        </div>
-        <div class="skeleton-card">
-          <div class="skeleton-media shimmer"></div>
-          <div class="skeleton-body">
-            <div class="skeleton-badge shimmer"></div>
-            <div class="skeleton-line shimmer title"></div>
-            <div class="skeleton-line shimmer desc"></div>
-            <div class="skeleton-line shimmer desc-short"></div>
-            <div class="skeleton-footer">
-              <div class="skeleton-line shimmer price"></div>
-              <div class="skeleton-btn shimmer"></div>
-            </div>
+          <div class="showcase-skeleton-grid">
+            <div class="skeleton-card"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div></div></div>
           </div>
         </div>
       </div>
+      <!-- Category sections rendered dynamically via JavaScript -->
     </div>
-
-    <!-- Error State -->
-    <div class="state-container error-state" id="error-state" style="display: none;">
-      <div class="error-icon">⚠️</div>
-      <h3 class="error-title">Unable to Load Products</h3>
-      <p class="state-text" id="error-message">Could not connect to the backend API. Please make sure the server is
-        running.</p>
-      <button class="btn btn-primary" id="retry-btn">Try Again</button>
-    </div>
-
-    <!-- Empty Catalog State (0 products in database) -->
-    <div class="state-container empty-state" id="empty-state" style="display: none;">
-      <div class="empty-icon">📦</div>
-      <h3 class="empty-title">Catalog is Empty</h3>
-      <p class="state-text">No products are currently available in the store.</p>
-    </div>
-
-    <!-- Empty Search/Filter State -->
-    <div class="state-container empty-filter-state" id="empty-filter-state" style="display: none;">
-      <div class="empty-icon">🔎</div>
-      <h3 class="empty-title">No Matching Products</h3>
-      <p class="state-text" id="empty-filter-text">No products matched your search or category filter.</p>
-      <button class="btn btn-secondary" id="reset-filters-btn">Clear All Filters</button>
-    </div>
-
-    <!-- Products Grid -->
-    <div class="products-grid" id="products-grid" style="display: none;">
-      <!-- Product cards injected dynamically by app.js -->
-    </div>
-
-    <!-- Catalog Pagination Controls (12 items per page) -->
-    <nav class="pagination-container" id="pagination-container" style="display: none;"
-      aria-label="Product catalog navigation">
-      <div class="pagination-summary" id="pagination-summary" aria-live="polite">
-        Showing <span id="pagination-range-start">1</span>–<span id="pagination-range-end">12</span> of <span
-          id="pagination-total-items">0</span> products
-      </div>
-
-      <div class="pagination-controls">
-        <button class="pagination-nav-btn pagination-prev-btn" id="pagination-prev-btn" type="button"
-          aria-label="Go to previous page" title="Previous page">
-          <span class="pagination-arrow" aria-hidden="true">←</span>
-          <span class="pagination-btn-label">Previous</span>
-        </button>
-
-        <div class="pagination-pages" id="pagination-pages" role="group" aria-label="Page navigation">
-          <!-- Page numbers dynamically populated by app.js -->
-        </div>
-
-        <button class="pagination-nav-btn pagination-next-btn" id="pagination-next-btn" type="button"
-          aria-label="Go to next page" title="Next page">
-          <span class="pagination-btn-label">Next</span>
-          <span class="pagination-arrow" aria-hidden="true">→</span>
-        </button>
-      </div>
-
-      <div class="pagination-page-indicator" id="pagination-page-indicator" aria-live="polite">
-        Page <span id="current-page-num" class="current-page-num">1</span> of <span id="total-pages-num"
-          class="total-pages-num">1</span>
-      </div>
-    </nav>
   </main>
 
   <!-- Product Details Modal -->
@@ -1639,21 +1514,75 @@
 
       <!-- Register Form -->
       <form id="register-form" class="auth-form" style="display: none;">
+        <!-- Seller Account Toggle -->
+        <div class="seller-toggle-card">
+          <label class="seller-toggle-switch" for="reg-is-seller">
+            <input type="checkbox" id="reg-is-seller" class="seller-toggle-input" />
+            <span class="seller-toggle-slider"></span>
+          </label>
+          <div class="seller-toggle-text-wrap">
+            <label for="reg-is-seller" class="seller-toggle-title">Are you a seller?</label>
+            <span class="seller-toggle-subtitle">Register a merchant account to sell products</span>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label for="reg-name" class="form-label">Full Name</label>
+          <label for="reg-name" class="form-label" id="reg-name-label">Full Name <span class="required">*</span></label>
           <input type="text" id="reg-name" required placeholder="John Doe" class="form-input" autocomplete="name" />
         </div>
         <div class="form-group">
-          <label for="reg-email" class="form-label">Email Address</label>
+          <label for="reg-email" class="form-label">Email Address <span class="required">*</span></label>
           <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input"
             autocomplete="email" />
         </div>
         <div class="form-group">
-          <label for="reg-password" class="form-label">Password (min 8 chars, letters &amp; numbers)</label>
+          <label for="reg-password" class="form-label">Password <span class="form-hint">(min 8 chars, letters &amp; numbers)</span> <span class="required">*</span></label>
           <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input"
             autocomplete="new-password" />
         </div>
-        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+
+        <!-- Dedicated Seller Registration Fields (Toggled when 'Are you a seller?' is checked) -->
+        <div id="seller-fields-wrap" class="seller-fields-wrap" style="display: none;">
+          <div class="seller-section-divider">
+            <span class="seller-section-badge">🏢 Business Information</span>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-seller-phone" class="form-label">Contact / Mobile Number <span class="required">*</span></label>
+            <input type="tel" id="reg-seller-phone" placeholder="+91 98765 43210" class="form-input" autocomplete="tel" />
+          </div>
+
+          <div class="form-group">
+            <label for="reg-business-name" class="form-label">Business / Shop Name <span class="required">*</span></label>
+            <input type="text" id="reg-business-name" placeholder="e.g. Apex Retail Store" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label for="reg-business-address" class="form-label">Registered Business Address <span class="required">*</span></label>
+            <textarea id="reg-business-address" rows="2" placeholder="Full commercial / operational address" class="form-input form-textarea"></textarea>
+          </div>
+
+          <div class="form-grid seller-tax-grid">
+            <div class="form-group">
+              <label for="reg-business-pan" class="form-label">Business PAN <span class="required">*</span></label>
+              <input type="text" id="reg-business-pan" maxlength="10" placeholder="e.g. ABCDE1234F" class="form-input text-uppercase" />
+              <span class="form-input-subtext">10-character alphanumeric PAN</span>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-business-gstin" class="form-label">GSTIN <span class="form-hint-optional">(Optional if exempt)</span></label>
+              <input type="text" id="reg-business-gstin" maxlength="15" placeholder="e.g. 22AAAAA0000A1Z5" class="form-input text-uppercase" />
+              <span class="form-input-subtext">Leave blank if exempt / not applicable</span>
+            </div>
+          </div>
+
+          <div class="seller-notice-banner">
+            <span class="seller-notice-icon">ℹ️</span>
+            <span class="seller-notice-text">Seller accounts are registered under <strong>Pending Verification</strong>. Business PAN will be securely stored and masked.</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="reg-submit-btn">Create Account</button>
       </form>
     </div>
   </div>
@@ -1751,6 +1680,54 @@
             <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Cancel</button>
           </div>
         </form>
+
+        <!-- Dedicated Seller Business Details Card (Visible only for Seller accounts) -->
+        <div class="profile-seller-card" id="profile-seller-card" style="display: none;">
+          <div class="profile-seller-header">
+            <div class="profile-seller-title-wrap">
+              <span class="profile-seller-icon">🏢</span>
+              <div>
+                <h4 class="profile-seller-title">Business Information</h4>
+                <p class="profile-seller-subtitle">Registered merchant profile details</p>
+              </div>
+            </div>
+            <span class="badge-verification badge-pending" id="seller-verification-status-badge">
+              ⏳ Pending Verification
+            </span>
+          </div>
+
+          <div class="seller-info-grid">
+            <div class="seller-info-item">
+              <span class="seller-info-label">Business Name</span>
+              <span class="seller-info-value" id="profile-seller-business-name">—</span>
+            </div>
+
+            <div class="seller-info-item">
+              <span class="seller-info-label">Business Contact</span>
+              <span class="seller-info-value" id="profile-seller-contact">—</span>
+            </div>
+
+            <div class="seller-info-item seller-info-full">
+              <span class="seller-info-label">Registered Business Address</span>
+              <span class="seller-info-value" id="profile-seller-address">—</span>
+            </div>
+
+            <div class="seller-info-item">
+              <span class="seller-info-label">Business PAN</span>
+              <span class="seller-info-value font-mono" id="profile-seller-pan">—</span>
+            </div>
+
+            <div class="seller-info-item">
+              <span class="seller-info-label">GSTIN</span>
+              <span class="seller-info-value font-mono" id="profile-seller-gstin">—</span>
+            </div>
+          </div>
+
+          <div class="seller-privilege-notice">
+            <span class="seller-privilege-icon">🔒</span>
+            <span class="seller-privilege-text">Product management and merchant privileges will be unlocked once business verification is complete.</span>
+          </div>
+        </div>
 
         <!-- 3. Quick Account Shortcuts Hub -->
         <div class="profile-quick-hub">
@@ -2287,13 +2264,13 @@
       <div class="footer-col">
         <h4 class="footer-col-title">Shop Categories</h4>
         <ul class="footer-links">
-          <li><a href="#products-section" class="footer-category-link"
+          <li><a href="#category-sections-wrapper" class="footer-category-link"
               data-category="Electronics &amp; Audio">Electronics &amp; Audio</a></li>
-          <li><a href="#products-section" class="footer-category-link" data-category="Watches &amp; Wearables">Watches
+          <li><a href="#category-sections-wrapper" class="footer-category-link" data-category="Watches &amp; Wearables">Watches
               &amp; Wearables</a></li>
-          <li><a href="#products-section" class="footer-category-link" data-category="Footwear &amp; Apparel">Footwear
+          <li><a href="#category-sections-wrapper" class="footer-category-link" data-category="Footwear &amp; Apparel">Footwear
               &amp; Apparel</a></li>
-          <li><a href="#products-section" class="footer-category-link"
+          <li><a href="#category-sections-wrapper" class="footer-category-link"
               data-category="Productivity &amp; Tech">Productivity &amp; Tech</a></li>
         </ul>
       </div>

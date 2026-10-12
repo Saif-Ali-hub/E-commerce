@@ -37,16 +37,34 @@ router.get('/', async (req, res) => {
 
     // Search filter
     if (search && search.trim() !== '') {
-      const escapedSearch = search.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-      const searchRegex = new RegExp(escapedSearch, 'i');
-      const searchConditions = [
-        { name: searchRegex },
-        { description: searchRegex }
-      ];
-      if (!filter.category) {
-        searchConditions.push({ category: searchRegex });
+      const normalizedSearch = search.trim().replace(/\s+/g, ' ');
+      const tokens = normalizedSearch.split(/\s+/).filter(Boolean);
+      const escapedTokens = tokens.map((t) => t.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&'));
+
+      if (escapedTokens.length > 1) {
+        // Multi-word search: all words must be found across name/description/category
+        filter.$and = escapedTokens.map((token) => {
+          const regex = new RegExp(token, 'i');
+          const conditions = [
+            { name: regex },
+            { description: regex }
+          ];
+          if (!filter.category) {
+            conditions.push({ category: regex });
+          }
+          return { $or: conditions };
+        });
+      } else if (escapedTokens.length === 1) {
+        const searchRegex = new RegExp(escapedTokens[0], 'i');
+        const searchConditions = [
+          { name: searchRegex },
+          { description: searchRegex }
+        ];
+        if (!filter.category) {
+          searchConditions.push({ category: searchRegex });
+        }
+        filter.$or = searchConditions;
       }
-      filter.$or = searchConditions;
     }
 
     // Determine pagination: enabled if page/limit/category/search specified and all !== 'true'
@@ -125,43 +143,87 @@ router.get('/categories', async (req, res) => {
 // ============================================================
 router.get('/suggestions', async (req, res) => {
   try {
-    const query = (req.query.q || req.query.search || '').trim();
+    const rawQuery = (req.query.q || req.query.search || '');
+    // Normalize query: trim and collapse multiple consecutive whitespace characters
+    const query = rawQuery.trim().replace(/\s+/g, ' ');
 
-    // Do nothing / return empty array for 0 or 1 character
-    if (!query || query.length < 2) {
+    // Return empty array for empty or whitespace-only queries
+    if (!query || query.length < 1) {
       return res.status(200).json({
         success: true,
         count: 0,
+        totalMatches: 0,
+        hasMore: false,
         data: []
       });
     }
 
-    // Escape regex special characters safely
-    const escapedQuery = query.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-    const nameRegex = new RegExp(escapedQuery, 'i');
+    // Configurable limit: default 12, clamped between 1 and 25
+    const limitParam = parseInt(req.query.limit, 10);
+    const limit = (!isNaN(limitParam) && limitParam > 0) ? Math.min(limitParam, 25) : 12;
 
-    // Query MongoDB dynamically on product name, return minimal fields, limit to 10
-    const matchingProducts = await Product.find({ name: nameRegex })
-      .select('name category price image')
-      .limit(10)
+    // Split into tokens for multi-word search
+    const tokens = query.split(/\s+/).filter(Boolean);
+    const escapedTokens = tokens.map((t) => t.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&'));
+
+    // Construct filter: if multiple tokens, all must match within the product name
+    const filter = escapedTokens.length > 1
+      ? { $and: escapedTokens.map((t) => ({ name: new RegExp(t, 'i') })) }
+      : { name: new RegExp(escapedTokens[0], 'i') };
+
+    // Count total matching products to inform frontend if more results exist
+    const totalMatches = await Product.countDocuments(filter);
+
+    // Fetch products matching the filter (up to 3x limit for accurate in-memory relevance sorting)
+    const fetchLimit = Math.min(totalMatches, limit * 3);
+    const candidateProducts = await Product.find(filter)
+      .select('name category price image stock')
+      .limit(fetchLimit)
       .lean();
+
+    // Smart relevance sorting:
+    // 1. Product name starts with full query
+    // 2. Product name contains full contiguous query
+    // 3. Alphabetical / natural order
+    const queryLower = query.toLowerCase();
+    candidateProducts.sort((a, b) => {
+      const aName = (a.name || '').toLowerCase();
+      const bName = (b.name || '').toLowerCase();
+      const aStarts = aName.startsWith(queryLower);
+      const bStarts = bName.startsWith(queryLower);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      const aContiguous = aName.includes(queryLower);
+      const bContiguous = bName.includes(queryLower);
+      if (aContiguous && !bContiguous) return -1;
+      if (!aContiguous && bContiguous) return 1;
+
+      return aName.localeCompare(bName);
+    });
+
+    const matchingProducts = candidateProducts.slice(0, limit);
 
     res.status(200).json({
       success: true,
       count: matchingProducts.length,
+      totalMatches: totalMatches,
+      limit: limit,
+      hasMore: totalMatches > matchingProducts.length,
       data: matchingProducts.map((p) => ({
-        id: p._id,
+        id: p._id.toString(),
+        _id: p._id.toString(),
         name: p.name,
         category: p.category,
         price: p.price,
-        image: p.image
+        image: p.image,
+        stock: p.stock
       }))
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve product suggestions',
-      error: error.message
+      message: 'Failed to retrieve product suggestions'
     });
   }
 });

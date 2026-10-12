@@ -17,8 +17,8 @@ const connectDB = async () => {
     console.log(`Connection State : ${conn.connection.readyState === 1 ? 'Ready (Connected)' : 'Degraded'}`);
     console.log(`========================================`);
 
-    if (dbName !== 'E-commerce') {
-      console.warn(`[WARNING] Expected database "E-commerce" but connected to "${dbName}".`);
+    if (dbName.toLowerCase() !== 'e-commerce') {
+      console.warn(`[WARNING] Expected database "e-commerce" but connected to "${dbName}".`);
     }
 
     // Initialize GridFS bucket for persistent image storage

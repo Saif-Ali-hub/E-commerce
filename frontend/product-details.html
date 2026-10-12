@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Product Details | MiniStore. Premium quality, best pricing, and express delivery.">
+  <title>Product Details | MiniStore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- Top Utility Announcement Bar -->
+  <div class="top-announcement-bar" id="top-announcement-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <span class="announcement-pill">🚚 FREE DELIVERY</span>
+        <span class="announcement-text">Pan-India express shipping on all orders over ₹499</span>
+      </div>
+      <div class="top-bar-right">
+        <span class="top-bar-feature">✓ 100% Certified Authentic</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">✓ 7-Day Easy Returns</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">✓ Direct INR Pricing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar" id="main-header">
+    <div class="container navbar-inner">
+      <a href="index.html" class="brand" id="brand-logo" aria-label="MiniStore Home">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">MiniStore</span>
+      </a>
+
+      <!-- Central Search Bar -->
+      <div class="nav-search-wrap" id="nav-search-wrap">
+        <div class="search-input-wrap">
+          <button type="button" class="search-icon-btn" id="search-submit-btn" title="Search" aria-label="Search products">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+          </button>
+          <input type="text" id="search-input" class="search-input"
+            role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="search-suggestions-dropdown" aria-haspopup="listbox"
+            placeholder="Search products by title, category, or keyword..."
+            aria-label="Search products by title, category, or keyword" autocomplete="off" />
+          <button id="clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search"
+            aria-label="Clear search">✕</button>
+        </div>
+        <!-- Autocomplete Suggestions Dropdown -->
+        <div class="search-suggestions-dropdown" id="search-suggestions-dropdown" style="display: none;" role="listbox"
+          aria-label="Product suggestions"></div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Shopping Cart Button -->
+        <button class="btn btn-primary btn-sm cart-nav-btn" id="nav-cart-btn" aria-label="Shopping Cart">
+          <span class="nav-btn-icon">🛒</span>
+          <span class="nav-btn-label">Cart</span>
+          <span class="nav-badge-pill" id="cart-nav-badge">0</span>
+        </button>
+
+        <!-- Dark / Light Mode Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode"
+          type="button">
+          <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
+        </button>
+
+        <!-- User Profile Dropdown Cluster -->
+        <div class="profile-nav-wrapper" id="profile-nav-wrapper">
+          <!-- Unauthenticated State: Log In Button -->
+          <button class="btn btn-secondary btn-sm nav-login-btn" id="nav-login-btn" aria-label="Log in or register">
+            <span class="nav-btn-icon">👤</span>
+            <span class="nav-btn-label">Log In</span>
+          </button>
+
+          <!-- Authenticated State: User Profile Trigger & Dropdown Menu -->
+          <div id="nav-user-info" style="display: none;" class="nav-user-cluster">
+            <button class="nav-profile-trigger-btn" id="nav-profile-trigger-btn" type="button" aria-expanded="false"
+              aria-haspopup="true" aria-label="Open user profile menu">
+              <div class="nav-profile-avatar" id="nav-profile-avatar">
+                <span class="nav-avatar-initials" id="nav-avatar-initials">U</span>
+                <img src="" alt="User avatar" class="nav-avatar-img" id="nav-avatar-img" style="display: none;" />
+              </div>
+              <span class="user-greeting" id="nav-user-name">User</span>
+              <span class="nav-profile-chevron" aria-hidden="true">▾</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="profile-dropdown-menu" id="profile-dropdown-menu" role="menu" aria-label="User Account Menu"
+              style="display: none;">
+              <!-- Dropdown Header -->
+              <div class="dropdown-user-header">
+                <div class="dropdown-avatar-circle" id="dropdown-avatar-display">
+                  <span class="dropdown-avatar-initials" id="dropdown-avatar-initials">U</span>
+                  <img src="" alt="User avatar" class="dropdown-avatar-img" id="dropdown-avatar-img"
+                    style="display: none;" />
+                </div>
+                <div class="dropdown-user-meta">
+                  <span class="dropdown-user-name" id="dropdown-user-name">User</span>
+                  <span class="dropdown-user-email" id="dropdown-user-email">user@example.com</span>
+                  <span class="dropdown-role-badge" id="dropdown-user-role">Customer</span>
+                </div>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Menu Items List -->
+              <div class="dropdown-items-list">
+                <!-- 1. Profile Option -->
+                <button class="dropdown-item" id="dropdown-profile-btn" role="menuitem" type="button">
+                  <span class="dropdown-item-icon">👤</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Profile</span>
+                    <span class="dropdown-item-desc">View &amp; edit details, change photo</span>
+                  </div>
+                </button>
+
+                <!-- 2. Wishlist Option -->
+                <button class="dropdown-item wishlist-nav-btn" id="nav-wishlist-btn" role="menuitem" type="button"
+                  aria-label="View Wishlist">
+                  <span class="dropdown-item-icon">❤️</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Wishlist</span>
+                    <span class="dropdown-item-desc">Saved favorite products</span>
+                  </div>
+                  <span class="nav-badge-pill" id="wishlist-nav-badge">0</span>
+                </button>
+
+                <!-- 3. My Orders Option -->
+                <button class="dropdown-item" id="nav-orders-btn" role="menuitem" type="button"
+                  aria-label="View My Orders">
+                  <span class="dropdown-item-icon">📦</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Orders</span>
+                    <span class="dropdown-item-desc">Order tracking, history &amp; receipts</span>
+                  </div>
+                </button>
+
+                <!-- 4. Manage Addresses Option -->
+                <button class="dropdown-item" id="nav-addresses-btn" role="menuitem" type="button"
+                  aria-label="Manage Delivery Addresses">
+                  <span class="dropdown-item-icon">📍</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Addresses</span>
+                    <span class="dropdown-item-desc">Manage saved shipping locations</span>
+                  </div>
+                </button>
+              </div>
+
+              <div class="dropdown-divider"></div>
+
+              <!-- Logout Button -->
+              <div class="dropdown-footer">
+                <button class="btn btn-secondary btn-sm btn-logout" id="nav-logout-btn" role="menuitem" type="button">
+                  <span class="logout-icon">🚪</span>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Product Details Container -->
+  <main class="container product-page-wrapper">
+    <!-- Breadcrumbs Navigation -->
+    <nav class="breadcrumb-container" aria-label="Breadcrumb">
+      <ul class="breadcrumb-list">
+        <li><a href="index.html" class="breadcrumb-link">Home</a></li>
+        <li class="breadcrumb-sep" aria-hidden="true">/</li>
+        <li><a href="index.html" class="breadcrumb-link" id="bc-category">Catalog</a></li>
+        <li class="breadcrumb-sep" aria-hidden="true">/</li>
+        <li class="breadcrumb-current" id="bc-title" aria-current="page">Loading product...</li>
+      </ul>
+      <a href="index.html" class="btn-back-link">
+        <span>←</span> <span>Back to Products</span>
+      </a>
+    </nav>
+
+    <!-- State 1: Loading Skeleton -->
+    <div id="pd-loading-state" class="product-page-grid" aria-busy="true">
+      <div class="skeleton-media shimmer" style="aspect-ratio: 1/1; border-radius: var(--radius-lg); height: 420px;"></div>
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div class="skeleton-badge shimmer" style="width: 120px; height: 26px;"></div>
+        <div class="skeleton-line shimmer title" style="width: 85%; height: 38px;"></div>
+        <div class="skeleton-line shimmer desc" style="width: 45%; height: 24px;"></div>
+        <div class="skeleton-line shimmer price" style="width: 35%; height: 42px;"></div>
+        <div class="skeleton-line shimmer desc" style="width: 100%; height: 80px;"></div>
+        <div class="skeleton-btn shimmer" style="width: 200px; height: 48px;"></div>
+      </div>
+    </div>
+
+    <!-- State 2: Error / Product Not Found -->
+    <div id="pd-error-state" class="product-not-found-card" style="display: none;">
+      <div class="product-not-found-icon" id="pd-error-icon">🔍</div>
+      <h2 class="product-not-found-title" id="pd-error-title">Product Not Found</h2>
+      <p class="product-not-found-desc" id="pd-error-message">
+        The product you are looking for may have been removed, or an invalid Product ID was provided.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <a href="index.html" class="btn btn-primary">
+          <span>🛍️ Browse All Products</span>
+        </a>
+        <button type="button" class="btn btn-secondary" id="pd-error-retry-btn">
+          <span>↻ Try Again</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- State 3: Loaded Product Details -->
+    <article id="pd-content-section" style="display: none;">
+      <div class="product-page-grid">
+        <!-- Left: Product Image Gallery -->
+        <div class="product-gallery-column">
+          <div class="product-gallery-main">
+            <img id="pd-main-img" src="" alt="Product image" />
+          </div>
+          <div class="gallery-thumb-strip" id="pd-thumb-strip" style="display: none;">
+            <!-- Thumbnails injected if multiple images exist -->
+          </div>
+        </div>
+
+        <!-- Right: Product Information & Controls -->
+        <div class="product-info-column">
+          <div class="product-meta-row">
+            <span class="product-category-pill" id="pd-category-pill">Category</span>
+            <span class="product-brand-tag" id="pd-brand-tag" style="display: none;">Brand</span>
+            <span class="product-brand-tag" id="pd-sku-tag" style="display: none;">SKU</span>
+          </div>
+
+          <h1 class="product-page-title" id="pd-title">Product Title</h1>
+
+          <!-- Rating & Reviews Summary -->
+          <div class="product-rating-row">
+            <div class="product-rating-badge" id="pd-rating-badge">
+              <span id="pd-rating-stars">★★★★★</span>
+              <span id="pd-rating-score">5.0</span>
+            </div>
+            <a href="#reviews-section" class="product-reviews-link" id="pd-reviews-link">
+              (0 Customer Reviews)
+            </a>
+          </div>
+
+          <!-- Pricing Card -->
+          <div class="product-pricing-card">
+            <span class="product-price-current" id="pd-current-price">₹0.00</span>
+            <span class="product-price-original" id="pd-original-price" style="display: none;">₹0.00</span>
+            <span class="product-discount-pill" id="pd-discount-pill" style="display: none;">Save 0%</span>
+          </div>
+
+          <!-- Stock Status -->
+          <div class="product-stock-row">
+            <span class="stock-badge" id="pd-stock-badge">In Stock</span>
+            <span id="pd-stock-text" style="color: var(--color-text-muted);">Available in stock</span>
+          </div>
+
+          <!-- Description Block -->
+          <div>
+            <h4 class="modal-desc-heading">Product Overview</h4>
+            <p class="modal-description" id="pd-description"></p>
+          </div>
+
+          <!-- Features Checklist -->
+          <div id="pd-features-box" class="modal-features-box" style="display: none;">
+            <h4 class="modal-desc-heading">Key Features &amp; Highlights</h4>
+            <ul class="features-list" id="pd-features-list"></ul>
+          </div>
+
+          <!-- Specifications Table -->
+          <div id="pd-specs-box" style="display: none;">
+            <h4 class="modal-desc-heading">Specifications</h4>
+            <table class="specs-table" id="pd-specs-table">
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <!-- Purchase Controls (Quantity + Add to Cart + Wishlist) -->
+          <div class="product-purchase-box">
+            <div class="quantity-control-wrap">
+              <span class="quantity-label">Quantity:</span>
+              <div class="quantity-selector">
+                <button type="button" class="quantity-btn" id="pd-qty-minus" aria-label="Decrease quantity">−</button>
+                <input type="number" id="pd-qty-input" class="quantity-input" value="1" min="1" max="99" aria-label="Item quantity" />
+                <button type="button" class="quantity-btn" id="pd-qty-plus" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <div class="product-action-buttons">
+              <button type="button" class="btn btn-primary btn-add-to-cart-large" id="pd-add-cart-btn">
+                <span>🛒</span>
+                <span id="pd-add-cart-text">Add to Cart</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-wishlist-large" id="pd-wishlist-btn"
+                aria-label="Add to Wishlist">
+                <span class="heart-icon" id="pd-wishlist-icon">♡</span>
+                <span id="pd-wishlist-text">Add to Wishlist</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Trust Badges Strip -->
+          <div class="product-trust-strip">
+            <div class="trust-strip-item">
+              <span class="trust-strip-icon">🚚</span>
+              <div>
+                <div class="trust-strip-title">Fast Shipping</div>
+                <div class="trust-strip-desc">Pan-India express delivery</div>
+              </div>
+            </div>
+            <div class="trust-strip-item">
+              <span class="trust-strip-icon">🔄</span>
+              <div>
+                <div class="trust-strip-title">7-Day Returns</div>
+                <div class="trust-strip-desc">Easy return &amp; refund</div>
+              </div>
+            </div>
+            <div class="trust-strip-item">
+              <span class="trust-strip-icon">🔒</span>
+              <div>
+                <div class="trust-strip-title">Secure Checkout</div>
+                <div class="trust-strip-desc">Multi-tier encryption</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Reviews Section -->
+      <section class="product-reviews-section" id="reviews-section">
+        <div class="reviews-header-wrap">
+          <h3 class="reviews-header-title">Customer Reviews</h3>
+          <span class="reviews-count-chip" id="pd-reviews-chip">0 Reviews</span>
+        </div>
+
+        <div class="reviews-summary-card" id="pd-reviews-summary-card">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Write a Review Box -->
+        <div id="pd-write-review-container"></div>
+
+        <!-- Verified Reviews List -->
+        <div class="reviews-list" id="pd-reviews-list"></div>
+      </section>
+
+      <!-- Related Products Section -->
+      <section class="modal-related-section" id="related-section" style="margin-top: 48px;">
+        <div class="section-header" style="margin-bottom: 24px;">
+          <div>
+            <h3 class="section-title">You May Also Like</h3>
+            <p class="section-subtitle">Handpicked recommendations in the same category</p>
+          </div>
+        </div>
+        <div class="products-grid" id="pd-related-grid">
+          <!-- Related product cards injected dynamically -->
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <!-- Modals: Cart, Wishlist, Auth, Profile, Address, Orders, Checkout -->
+
+  <!-- Shopping Cart Modal -->
+  <div class="modal-backdrop" id="cart-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="cart-modal-title">
+    <div class="modal-container cart-modal-container">
+      <button class="modal-close-icon" id="cart-close-btn" aria-label="Close cart">✕</button>
+
+      <div class="cart-modal-header">
+        <h2 class="cart-modal-title" id="cart-modal-title">Shopping Cart</h2>
+        <span class="product-badge" id="cart-items-count-badge">0 items</span>
+      </div>
+
+      <!-- Cart Loading State -->
+      <div class="modal-state" id="cart-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your cart...</p>
+      </div>
+
+      <!-- Cart Unauthenticated State -->
+      <div class="modal-state" id="cart-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your shopping cart.</p>
+        <button class="btn btn-primary" id="cart-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <!-- Cart Empty State -->
+      <div class="modal-state" id="cart-empty-state" style="display: none;">
+        <div class="empty-icon">🛒</div>
+        <h3 class="empty-title">Your Cart is Empty</h3>
+        <p class="state-text">Browse our catalog and add items to your cart.</p>
+        <a href="index.html" class="btn btn-secondary" id="cart-browse-btn">Browse Catalog</a>
+      </div>
+
+      <!-- Cart Content -->
+      <div class="cart-content" id="cart-content" style="display: none;">
+        <div class="cart-items-list" id="cart-items-list"></div>
+        <div class="cart-summary">
+          <div class="cart-summary-row">
+            <span class="summary-label">Estimated Total:</span>
+            <span class="summary-total" id="cart-total-amount">₹0.00</span>
+          </div>
+          <p class="summary-note">Prices and item totals are calculated dynamically from current catalog prices.</p>
+          <div class="cart-summary-actions">
+            <button class="btn btn-primary" id="cart-checkout-btn">Proceed to Checkout →</button>
+            <button class="btn btn-secondary" id="cart-continue-btn">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div class="modal-backdrop" id="wishlist-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="wishlist-modal-title">
+    <div class="modal-container wishlist-modal-container">
+      <button class="modal-close-icon" id="wishlist-close-btn" aria-label="Close wishlist">✕</button>
+
+      <div class="wishlist-modal-header">
+        <h2 class="wishlist-modal-title" id="wishlist-modal-title">My Wishlist ❤️</h2>
+        <span class="product-badge" id="wishlist-items-count-badge">0 items</span>
+      </div>
+
+      <!-- Wishlist Loading State -->
+      <div class="modal-state" id="wishlist-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your wishlist...</p>
+      </div>
+
+      <!-- Wishlist Unauthenticated State -->
+      <div class="modal-state" id="wishlist-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your saved wishlist items.</p>
+        <button class="btn btn-primary" id="wishlist-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <!-- Wishlist Empty State -->
+      <div class="modal-state" id="wishlist-empty-state" style="display: none;">
+        <div class="empty-icon">❤️</div>
+        <h3 class="empty-title">Your wishlist is empty</h3>
+        <p class="state-text">Explore our collection and add your favorite items to your wishlist!</p>
+        <a href="index.html" class="btn btn-secondary" id="wishlist-continue-btn">Explore Products</a>
+      </div>
+
+      <!-- Wishlist Content -->
+      <div class="wishlist-content" id="wishlist-content" style="display: none;">
+        <div class="wishlist-items-list" id="wishlist-items-list"></div>
+        <div class="wishlist-footer-actions">
+          <a href="index.html" class="btn btn-secondary" id="wishlist-browse-more-btn">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Modal (Log In / Register) -->
+  <div class="modal-backdrop" id="auth-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="auth-modal-title">
+    <div class="modal-container auth-modal-container">
+      <button class="modal-close-icon" id="auth-close-btn" aria-label="Close auth dialog">✕</button>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-login-btn">Log In</button>
+        <button type="button" class="auth-tab" id="tab-register-btn">Register</button>
+      </div>
+
+      <div id="auth-error-alert" class="auth-error-alert" style="display: none;"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email Address</label>
+          <input type="email" id="login-email" required placeholder="you@example.com" class="form-input"
+            autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="form-input"
+            autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="reg-name" class="form-label">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="John Doe" class="form-input" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="reg-email" class="form-label">Email Address</label>
+          <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input"
+            autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="reg-password" class="form-label">Password (min 8 chars, letters &amp; numbers)</label>
+          <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input"
+            autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div class="modal-backdrop" id="profile-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="profile-modal-title">
+    <div class="modal-container profile-modal-container">
+      <button class="modal-close-icon" id="profile-close-btn" aria-label="Close profile modal">✕</button>
+
+      <div class="profile-modal-header">
+        <div>
+          <span class="info-header-badge badge-indigo">👤 Account Settings</span>
+          <h2 class="profile-modal-title" id="profile-modal-title">My Profile</h2>
+        </div>
+        <span class="user-role-badge" id="profile-role-badge">Customer</span>
+      </div>
+
+      <div class="auth-error-alert" id="profile-alert-error" style="display: none;" role="alert"></div>
+      <div class="alert-box alert-success" id="profile-alert-success" style="display: none;" role="alert"></div>
+
+      <div class="profile-modal-body">
+        <form class="profile-form" id="profile-form">
+          <div class="form-grid profile-form-grid">
+            <div class="form-group">
+              <label for="profile-name-input" class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" id="profile-name-input" class="form-input" required
+                placeholder="Enter your full name" />
+            </div>
+
+            <div class="form-group">
+              <label for="profile-email-input" class="form-label">Email Address</label>
+              <input type="email" id="profile-email-input" class="form-input form-input-readonly" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="profile-phone-input" class="form-label">Phone Number</label>
+              <input type="tel" id="profile-phone-input" class="form-input" placeholder="+91 98765 43210" />
+            </div>
+          </div>
+
+          <div class="profile-modal-actions">
+            <button type="submit" class="btn btn-primary" id="profile-save-btn">
+              <span id="profile-save-btn-text">Save Changes</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="profile-close-action-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer" id="main-footer">
+    <div class="container footer-main-grid">
+      <div class="footer-col brand-col">
+        <div class="footer-brand">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">MiniStore</span>
+        </div>
+        <p class="footer-desc">Your verified destination for quality consumer essentials. Authentic goods, direct INR
+          pricing, and express Pan-India fulfillment.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="index.html" class="footer-link-btn">All Products</a></li>
+          <li><a href="index.html" class="footer-link-btn">Special Offers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Accepted Payments</h4>
+        <div class="footer-payment-badges">
+          <span class="payment-badge-tag">⚡ UPI Instant</span>
+          <span class="payment-badge-tag">💵 Cash on Delivery</span>
+          <span class="payment-badge-tag">🏦 Net Banking</span>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom-bar">
+      <p class="footer-text">&copy; 2026 MiniStore. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
+    </div>
+  </footer>
+
+  <script src="product-details.js"></script>
+</body>
+
+</html>

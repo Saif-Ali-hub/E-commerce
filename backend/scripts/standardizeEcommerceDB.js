@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-const ECOMMERCE_URI = 'mongodb://127.0.0.1:27017/E-commerce';
+const ECOMMERCE_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/e-commerce';
 const MINI_ECOMMERCE_URI = 'mongodb://127.0.0.1:27017/mini_ecommerce';
 
 async function uploadToGridFS(bucket, filePath, filename) {
@@ -71,7 +71,22 @@ async function runStandardization() {
   // 3. Inspect existing E-commerce records
   console.log('\n--- STEP 2: Preserving & Enriching Existing E-commerce Products ---');
   const ecomProductsCol = ecommerceConn.collection('products');
-  const existingEcomProducts = await ecomProductsCol.find({}).toArray();
+  let existingEcomProducts = await ecomProductsCol.find({}).toArray();
+  if (existingEcomProducts.length === 0) {
+    const backupLegacyPath = path.join(__dirname, '..', 'backup', 'E-commerce', 'products.json');
+    if (fs.existsSync(backupLegacyPath)) {
+      const backupLegacy = JSON.parse(fs.readFileSync(backupLegacyPath, 'utf-8'));
+      for (const lp of backupLegacy) {
+        const docToInsert = { ...lp };
+        if (typeof docToInsert._id === 'string' && docToInsert._id.length === 24) {
+          docToInsert._id = new mongoose.Types.ObjectId(docToInsert._id);
+        }
+        await ecomProductsCol.insertOne(docToInsert);
+      }
+      existingEcomProducts = await ecomProductsCol.find({}).toArray();
+      console.log(`[RESTORED] Loaded ${existingEcomProducts.length} legacy products from backup.`);
+    }
+  }
   console.log(`Found ${existingEcomProducts.length} existing products in E-commerce.`);
 
   // Curated enhancements for the 3 original legacy products so they display with rich UI & images
@@ -228,8 +243,37 @@ async function runStandardization() {
   const ecomOrdersCol = ecommerceConn.collection('orders');
   const ecomContactsCol = ecommerceConn.collection('contacts');
 
-  const ordersCount = await ecomOrdersCol.countDocuments();
-  const contactsCount = await ecomContactsCol.countDocuments();
+  let ordersCount = await ecomOrdersCol.countDocuments();
+  if (ordersCount === 0) {
+    const backupOrdersPath = path.join(__dirname, '..', 'backup', 'E-commerce', 'orders.json');
+    if (fs.existsSync(backupOrdersPath)) {
+      const backupOrders = JSON.parse(fs.readFileSync(backupOrdersPath, 'utf-8'));
+      for (const ord of backupOrders) {
+        const doc = { ...ord };
+        if (typeof doc._id === 'string' && doc._id.length === 24) doc._id = new mongoose.Types.ObjectId(doc._id);
+        if (typeof doc.user === 'string' && doc.user.length === 24) doc.user = new mongoose.Types.ObjectId(doc.user);
+        await ecomOrdersCol.insertOne(doc);
+      }
+      ordersCount = await ecomOrdersCol.countDocuments();
+      console.log(`[RESTORED] Loaded ${ordersCount} orders from backup.`);
+    }
+  }
+
+  let contactsCount = await ecomContactsCol.countDocuments();
+  if (contactsCount === 0) {
+    const backupContactsPath = path.join(__dirname, '..', 'backup', 'E-commerce', 'contacts.json');
+    if (fs.existsSync(backupContactsPath)) {
+      const backupContacts = JSON.parse(fs.readFileSync(backupContactsPath, 'utf-8'));
+      for (const c of backupContacts) {
+        const doc = { ...c };
+        if (typeof doc._id === 'string' && doc._id.length === 24) doc._id = new mongoose.Types.ObjectId(doc._id);
+        await ecomContactsCol.insertOne(doc);
+      }
+      contactsCount = await ecomContactsCol.countDocuments();
+      console.log(`[RESTORED] Loaded ${contactsCount} contacts from backup.`);
+    }
+  }
+
   const finalProductCount = await ecomProductsCol.countDocuments();
   const finalUserCount = await ecomUsersCol.countDocuments();
 

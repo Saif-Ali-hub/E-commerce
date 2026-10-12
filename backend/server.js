@@ -14,7 +14,8 @@ const addressRoutes = require('./routes/addressRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const { imageRouter, streamImageHandler } = require('./routes/imageRoutes');
 
-// Load environment variables from .env
+// Load environment variables from backend/.env and project root .env
+dotenv.config({ path: path.join(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
@@ -40,8 +41,8 @@ app.get('/api/health', (req, res) => {
     status: isDbConnected ? 'ok' : 'degraded',
     database: isDbConnected ? 'connected' : 'disconnected',
     databaseName: currentDb,
-    targetDatabase: 'E-commerce',
-    isStandardDatabase: currentDb === 'E-commerce',
+    targetDatabase: 'e-commerce',
+    isStandardDatabase: currentDb.toLowerCase() === 'e-commerce',
     message: isDbConnected ? 'API and E-commerce database are running successfully' : 'Database disconnected',
     timestamp: new Date().toISOString()
   });
