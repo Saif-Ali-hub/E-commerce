@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "6ac35824d56ff6c6d5f2396d",
+    "name": "Wireless Mouse",
+    "price": 999,
+    "category": "Electronics",
+    "stock": 140,
+    "ratings": 4.5,
+    "tags": [
+      "computer",
+      "accessory",
+      "wireless",
+      "Mouse",
+      "Mouse"
+    ],
+    "createdAt": "2026-10-05T07:56:20.484Z"
+  },
+  {
+    "_id": "6ac35824d56ff6c6d5f2396e",
+    "name": "Mechanical Keyboard",
+    "price": 999,
+    "category": "Electronics",
+    "stock": 100,
+    "ratings": 4.8,
+    "tags": [
+      "keyboard",
+      "mechanical"
+    ],
+    "createdAt": "2026-10-05T07:56:20.484Z"
+  },
+  {
+    "_id": "6ac35824d56ff6c6d5f2396f",
+    "name": "Gaming Laptop",
+    "price": 85999,
+    "category": "Computers",
+    "stock": 30,
+    "ratings": 4.6,
+    "tags": [
+      "gaming",
+      "laptop"
+    ],
+    "createdAt": "2026-10-05T07:56:20.484Z"
+  }
+]

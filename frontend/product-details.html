@@ -78,6 +78,13 @@
           <span class="nav-badge-pill" id="cart-nav-badge">0</span>
         </button>
 
+        <!-- MiniStore Wallet Button & Rewards Pill (Feature 5) -->
+        <a href="index.html" class="wallet-nav-btn" id="nav-wallet-btn" aria-label="MiniStore Wallet" title="MiniStore Wallet & SuperCoins" style="display: none; text-decoration: none;">
+          <span class="wallet-nav-icon">👛</span>
+          <span class="wallet-nav-balance" id="nav-wallet-balance-text">₹150</span>
+          <span class="wallet-nav-coins-badge" id="nav-wallet-coins-badge" title="Loyalty SuperCoins">🪙 <span id="nav-wallet-coins-text">50</span></span>
+        </a>
+
         <!-- Dark / Light Mode Toggle Button -->
         <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode"
           type="button">
@@ -317,6 +324,28 @@
                 <span id="pd-wishlist-text">Add to Wishlist</span>
               </button>
             </div>
+          </div>
+
+          <!-- Pincode Delivery Estimator Widget (Feature 4) -->
+          <div class="pincode-estimator-widget" id="pd-pincode-widget">
+            <div class="pincode-widget-header">
+              <span class="pincode-widget-title">🚚 Delivery &amp; Service Availability</span>
+              <span class="pincode-hub-tag">Fast Hub Dispatch</span>
+            </div>
+            <div class="pincode-input-wrap">
+              <input
+                type="text"
+                id="pd-pincode-input"
+                class="pincode-input"
+                placeholder="Enter 6-digit Pincode (e.g. 110001)"
+                maxlength="6"
+                inputmode="numeric"
+              />
+              <button type="button" id="pd-pincode-check-btn" class="btn btn-secondary btn-sm pincode-check-btn">
+                Check
+              </button>
+            </div>
+            <div id="pd-pincode-result" class="pincode-result-box" style="display: none;"></div>
           </div>
 
           <!-- Trust Badges Strip -->

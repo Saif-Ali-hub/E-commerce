@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MiniStore Grand Festival Mega Sale! Heavy discounts up to 75% OFF on Electronics, Laptops, Audio & Home essentials.">
+  <title>The Grand Festival Mega Sale | Up to 75% OFF | MiniStore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+
+<body class="festive-page-body">
+  <!-- Top Utility Announcement Bar -->
+  <div class="top-announcement-bar festive-top-bar" id="top-announcement-bar">
+    <div class="container top-bar-inner">
+      <div class="top-bar-left">
+        <span class="announcement-pill festive-pill"><span class="live-beacon-dot"></span> FESTIVAL SALE LIVE</span>
+        <span class="announcement-text">Heavy discounts up to 75% OFF • Extra ₹200 OFF with coupon <strong style="color: #fde047;">FESTIVE10</strong>!</span>
+      </div>
+      <div class="top-bar-right">
+        <span class="top-bar-feature">🪔 100% Genuine Certified</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">🚚 Free Express Delivery</span>
+        <span class="top-bar-sep">•</span>
+        <span class="top-bar-feature">🛡️ 7-Day Easy Returns</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar festive-navbar" id="main-header">
+    <div class="container navbar-inner">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <a href="index.html" class="brand" id="brand-logo" aria-label="MiniStore Home">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">MiniStore</span>
+        </a>
+        <span class="festive-nav-tag">
+          <span class="festive-diya-icon">🪔</span>
+          <span>Festive Sale</span>
+        </span>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="nav-search-wrap" id="nav-search-wrap">
+        <div class="search-input-wrap">
+          <button type="button" class="search-icon-btn" id="search-submit-btn" title="Search" aria-label="Search deals">
+            <span class="search-icon" aria-hidden="true">🔍</span>
+          </button>
+          <input type="text" id="festive-search-input" class="search-input" placeholder="Search festival blockbuster deals..." aria-label="Search festival blockbuster deals" autocomplete="off" />
+          <button id="festive-clear-search-btn" class="clear-search-btn" style="display: none;" title="Clear search" aria-label="Clear search">✕</button>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Shopping Cart Button -->
+        <button class="btn btn-primary btn-sm cart-nav-btn festive-cart-btn" id="nav-cart-btn" aria-label="Shopping Cart">
+          <span class="nav-btn-icon">🛒</span>
+          <span class="nav-btn-label">Cart</span>
+          <span class="nav-badge-pill" id="cart-nav-badge">0</span>
+        </button>
+
+        <!-- Dark / Light Mode Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode" type="button">
+          <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
+        </button>
+
+        <!-- User Profile Dropdown Cluster -->
+        <div class="profile-nav-wrapper" id="profile-nav-wrapper">
+          <button class="btn btn-secondary btn-sm nav-login-btn" id="nav-login-btn" aria-label="Log in or register">
+            <span class="nav-btn-icon">👤</span>
+            <span class="nav-btn-label">Log In</span>
+          </button>
+
+          <div id="nav-user-info" style="display: none;" class="nav-user-cluster">
+            <button class="nav-profile-trigger-btn" id="nav-profile-trigger-btn" type="button" aria-expanded="false" aria-haspopup="true" aria-label="Open user profile menu">
+              <div class="nav-avatar-circle">
+                <span class="nav-avatar-initials" id="nav-avatar-initials">U</span>
+                <img src="" alt="User avatar" class="nav-avatar-img" id="nav-avatar-img" style="display: none;" />
+              </div>
+              <span class="user-greeting" id="nav-user-name">User</span>
+              <span class="nav-profile-chevron" aria-hidden="true">▾</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="profile-dropdown-menu" id="profile-dropdown-menu" role="menu" aria-label="User Account Menu" style="display: none;">
+              <div class="dropdown-user-header">
+                <div class="dropdown-avatar-circle" id="dropdown-avatar-display">
+                  <span class="dropdown-avatar-initials" id="dropdown-avatar-initials">U</span>
+                  <img src="" alt="User avatar" class="dropdown-avatar-img" id="dropdown-avatar-img" style="display: none;" />
+                </div>
+                <div class="dropdown-user-meta">
+                  <span class="dropdown-user-name" id="dropdown-user-name">User</span>
+                  <span class="dropdown-user-email" id="dropdown-user-email">user@example.com</span>
+                  <span class="dropdown-role-badge" id="dropdown-user-role">Customer</span>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-items-list">
+                <button class="dropdown-item" id="dropdown-profile-btn" role="menuitem" type="button">
+                  <span class="dropdown-item-icon">👤</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Profile</span>
+                    <span class="dropdown-item-desc">View &amp; edit details</span>
+                  </div>
+                </button>
+                <button class="dropdown-item wishlist-nav-btn" id="nav-wishlist-btn" role="menuitem" type="button" aria-label="View Wishlist">
+                  <span class="dropdown-item-icon">❤️</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">My Wishlist</span>
+                    <span class="dropdown-item-desc">Saved favorite products</span>
+                  </div>
+                  <span class="nav-badge-pill" id="wishlist-nav-badge">0</span>
+                </button>
+                <a href="index.html" class="dropdown-item" role="menuitem">
+                  <span class="dropdown-item-icon">🏪</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Homepage</span>
+                    <span class="dropdown-item-desc">Browse store home</span>
+                  </div>
+                </a>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-footer">
+                <button class="dropdown-item dropdown-logout-item nav-logout-btn" id="nav-logout-btn" role="menuitem" type="button">
+                  <span class="dropdown-item-icon">🚪</span>
+                  <span class="dropdown-item-title">Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Spectacular Festive Theme Hero Showcase -->
+  <section class="festive-page-hero" id="festive-page-hero">
+    <!-- Festive Ambient Ornaments & Glows -->
+    <div class="festive-hero-glow-1" aria-hidden="true"></div>
+    <div class="festive-hero-glow-2" aria-hidden="true"></div>
+    <div class="festive-sparkle-layer" aria-hidden="true"></div>
+
+    <div class="container festive-hero-container">
+      <!-- Breadcrumb Navigation -->
+      <nav class="breadcrumb-container festive-breadcrumbs" aria-label="Breadcrumb">
+        <ul class="breadcrumb-list">
+          <li><a href="index.html" class="breadcrumb-link">Home</a></li>
+          <li class="breadcrumb-sep" aria-hidden="true">/</li>
+          <li class="breadcrumb-current" aria-current="page">Festival Mega Sale</li>
+        </ul>
+        <a href="index.html" class="btn-back-link festive-back-link">
+          <span>←</span> <span>Back to Catalog</span>
+        </a>
+      </nav>
+
+      <div class="festive-hero-grid">
+        <!-- Left Hero Content -->
+        <div class="festive-hero-text">
+          <div class="festive-celebration-pill">
+            <span class="festive-diya-pulse">🪔</span>
+            <span>DIWALI &amp; FESTIVE SPECIAL DEALS</span>
+            <span class="festive-live-indicator">LIVE NOW</span>
+          </div>
+
+          <h1 class="festive-hero-title">
+            The Grand <span class="festive-gold-gradient">Festival Mega Sale</span>
+          </h1>
+
+          <p class="festive-hero-subtitle">
+            Celebrate the season of joy with blockbuster discounts up to <strong class="festive-heavy-badge">75% OFF</strong>! Handpicked premium electronics, high-speed laptops, studio sound, and home essentials with verified brand warranties.
+          </p>
+
+          <!-- Festive Highlights Pills -->
+          <div class="festive-perks-strip">
+            <div class="festive-perk-item">
+              <span class="perk-icon">⚡</span>
+              <span class="perk-label">Heavy Discounts up to 75%</span>
+            </div>
+            <div class="festive-perk-item">
+              <span class="perk-icon">🎟️</span>
+              <span class="perk-label">Extra ₹200 with FESTIVE10</span>
+            </div>
+            <div class="festive-perk-item">
+              <span class="perk-icon">🚚</span>
+              <span class="perk-label">Free Express Pan-India Delivery</span>
+            </div>
+            <div class="festive-perk-item">
+              <span class="perk-icon">🛡️</span>
+              <span class="perk-label">7-Day Easy Returns Guarantee</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Interactive Festive Urgency Card -->
+        <div class="festive-hero-action-card">
+          <div class="festive-card-header">
+            <div class="festive-timer-badge">
+              <span class="timer-flame">⏳</span>
+              <span class="timer-title">FESTIVE RUSH ENDS IN</span>
+            </div>
+            <span class="festive-status-tag">SELLING FAST</span>
+          </div>
+
+          <!-- Live Countdown Row -->
+          <div class="festive-countdown-display" id="festive-hero-countdown">
+            <div class="festive-time-box">
+              <span class="time-digit" id="festive-hero-days">02</span>
+              <span class="time-unit">Days</span>
+            </div>
+            <span class="time-separator">:</span>
+            <div class="festive-time-box">
+              <span class="time-digit" id="festive-hero-hours">14</span>
+              <span class="time-unit">Hours</span>
+            </div>
+            <span class="time-separator">:</span>
+            <div class="festive-time-box">
+              <span class="time-digit" id="festive-hero-minutes">38</span>
+              <span class="time-unit">Mins</span>
+            </div>
+            <span class="time-separator">:</span>
+            <div class="festive-time-box">
+              <span class="time-digit" id="festive-hero-seconds">45</span>
+              <span class="time-unit">Secs</span>
+            </div>
+          </div>
+
+          <!-- Coupon Ticket -->
+          <div class="festive-ticket-box">
+            <div class="ticket-header">
+              <span class="ticket-title">🪔 EXCLUSIVE FESTIVE COUPON</span>
+              <span class="ticket-save-badge">FLAT ₹200 OFF</span>
+            </div>
+            <div class="ticket-code-row">
+              <span class="ticket-code" id="festive-code-display">FESTIVE10</span>
+              <button type="button" class="btn-copy-ticket" id="btn-copy-ticket" aria-label="Copy festive coupon code">
+                <span class="copy-label">Copy Code</span>
+              </button>
+            </div>
+            <span class="ticket-subtext">Valid on all orders above ₹1,499. Applied at checkout.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Festive Deals Catalog Area -->
+  <main class="container festive-catalog-main" style="padding-top: 24px; padding-bottom: 70px;">
+    <!-- Festive Category Filter Bar & Sorting Toolbar -->
+    <div class="festive-controls-bar">
+      <!-- Deal Category Filter Tabs -->
+      <div class="festive-filter-tabs" id="festive-filter-tabs" role="tablist" aria-label="Filter festive deals by category">
+        <button type="button" class="festive-tab active" data-filter="all" role="tab" aria-selected="true">
+          <span>🔥</span> <span>All Festive Deals</span>
+        </button>
+        <button type="button" class="festive-tab" data-filter="mega-deals" role="tab" aria-selected="false">
+          <span>⚡</span> <span>60%+ Heavy Discounts</span>
+        </button>
+        <button type="button" class="festive-tab" data-filter="Computers" role="tab" aria-selected="false">
+          <span>💻</span> <span>Laptops &amp; PCs</span>
+        </button>
+        <button type="button" class="festive-tab" data-filter="Electronics" role="tab" aria-selected="false">
+          <span>⚡</span> <span>Electronics</span>
+        </button>
+        <button type="button" class="festive-tab" data-filter="Accessories" role="tab" aria-selected="false">
+          <span>🎧</span> <span>Audio &amp; Gadgets</span>
+        </button>
+        <button type="button" class="festive-tab" data-filter="Home" role="tab" aria-selected="false">
+          <span>🏠</span> <span>Home &amp; Kitchen</span>
+        </button>
+        <button type="button" class="festive-tab" data-filter="Sports" role="tab" aria-selected="false">
+          <span>⚽</span> <span>Sports &amp; Fitness</span>
+        </button>
+      </div>
+
+      <!-- Toolbar Bottom: Count Display & Sorting Options -->
+      <div class="festive-toolbar-subrow">
+        <div class="festive-deals-count-box">
+          <span class="festive-pulse-dot"></span>
+          <span class="festive-count-text" id="festive-items-count-display">Loading blockbuster deals...</span>
+        </div>
+
+        <div class="festive-sort-wrap">
+          <label for="festive-sort-select" class="sort-label">Sort Deals By:</label>
+          <select id="festive-sort-select" class="sort-select festive-sort-select" aria-label="Sort festive deals">
+            <option value="discount-desc">🔥 Biggest Discount (High to Low)</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Top Rated &amp; Popular</option>
+            <option value="featured">Featured Blockbusters</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Search / Filter Status Summary -->
+    <div class="category-filter-summary" id="festive-filter-summary" style="display: none;">
+      <span class="filter-summary-text" id="festive-filter-summary-text">Showing filtered deals</span>
+      <button type="button" class="btn btn-secondary btn-sm" id="festive-reset-filter-btn">Clear Filter</button>
+    </div>
+
+    <!-- State 1: Shimmer Loading Skeleton -->
+    <div id="festive-loading-state" class="products-grid festive-products-grid" aria-busy="true">
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+    </div>
+
+    <!-- State 2: Error State -->
+    <div id="festive-error-state" class="product-not-found-card" style="display: none;">
+      <div class="product-not-found-icon">⚠️</div>
+      <h2 class="product-not-found-title">Unable to Load Festive Deals</h2>
+      <p class="product-not-found-desc" id="festive-error-message">
+        We could not load the festival deals. Please check your network or try again.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 12px;">
+        <button type="button" class="btn btn-primary" id="festive-retry-btn">↻ Retry</button>
+        <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+      </div>
+    </div>
+
+    <!-- State 3: Empty State -->
+    <div id="festive-empty-state" class="product-not-found-card" style="display: none;">
+      <div class="product-not-found-icon">🪔</div>
+      <h2 class="product-not-found-title">No Deals Found</h2>
+      <p class="product-not-found-desc">No products matched your selected festive deal filter. Try resetting your filter to explore all festival specials!</p>
+      <button type="button" class="btn btn-primary" id="festive-empty-reset-btn">View All Festive Deals</button>
+    </div>
+
+    <!-- State 4: Festive Products Grid -->
+    <div class="products-grid festive-products-grid" id="festive-products-grid" style="display: none;">
+      <!-- Populated dynamically via festive-sale.js -->
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-container" id="festive-pagination-container" style="display: none;">
+      <div class="pagination-controls">
+        <button class="pagination-btn pagination-nav-btn pagination-prev-btn" id="festive-prev-page-btn" aria-label="Previous Page">
+          <span class="pagination-arrow" aria-hidden="true">←</span>
+          <span>Previous</span>
+        </button>
+        <div class="pagination-pages" id="festive-pagination-pages"></div>
+        <button class="pagination-btn pagination-nav-btn pagination-next-btn" id="festive-next-page-btn" aria-label="Next Page">
+          <span>Next</span>
+          <span class="pagination-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modals: Product Details, Cart, Wishlist, Auth, Profile -->
+
+  <!-- Product Details Modal -->
+  <div class="modal-backdrop" id="product-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-product-title">
+    <div class="modal-container product-modal-container">
+      <button class="modal-close-icon" id="modal-close-btn" aria-label="Close product details">✕</button>
+
+      <div class="modal-state" id="modal-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading deal details...</p>
+      </div>
+
+      <div class="modal-state modal-error" id="modal-error" style="display: none;">
+        <div class="error-icon">⚠️</div>
+        <h3 class="error-title">Deal Not Found</h3>
+        <p class="state-text" id="modal-error-message">Unable to load the requested product details.</p>
+        <button class="btn btn-secondary" id="modal-error-back-btn">Back to Deals</button>
+      </div>
+
+      <div class="modal-content" id="modal-content" style="display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Shopping Cart Modal -->
+  <div class="modal-backdrop" id="cart-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cart-modal-title">
+    <div class="modal-container cart-modal-container">
+      <button class="modal-close-icon" id="cart-close-btn" aria-label="Close cart">✕</button>
+
+      <div class="cart-modal-header">
+        <h2 class="cart-modal-title" id="cart-modal-title">Shopping Cart</h2>
+        <span class="product-badge" id="cart-items-count-badge">0 items</span>
+      </div>
+
+      <div class="modal-state" id="cart-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your cart...</p>
+      </div>
+
+      <div class="modal-state" id="cart-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your shopping cart.</p>
+        <button class="btn btn-primary" id="cart-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <div class="modal-state" id="cart-empty-state" style="display: none;">
+        <div class="empty-icon">🛒</div>
+        <h3 class="empty-title">Your Cart is Empty</h3>
+        <p class="state-text">Browse our festive catalog and add deals to your cart.</p>
+        <button class="btn btn-secondary" id="cart-browse-btn">Explore Deals</button>
+      </div>
+
+      <div class="cart-content" id="cart-content" style="display: none;">
+        <div class="cart-items-list" id="cart-items-list"></div>
+        <div class="cart-summary">
+          <div class="cart-summary-row">
+            <span class="summary-label">Estimated Total:</span>
+            <span class="summary-total" id="cart-total-amount">₹0.00</span>
+          </div>
+          <p class="summary-note">Festive discounts and promotional pricing are applied at checkout.</p>
+          <div class="cart-summary-actions">
+            <a href="index.html?open=checkout" class="btn btn-primary" id="cart-checkout-btn">Proceed to Checkout →</a>
+            <button class="btn btn-secondary" id="cart-continue-btn">Continue Shopping</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div class="modal-backdrop" id="wishlist-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wishlist-modal-title">
+    <div class="modal-container wishlist-modal-container">
+      <button class="modal-close-icon" id="wishlist-close-btn" aria-label="Close wishlist">✕</button>
+
+      <div class="wishlist-modal-header">
+        <h2 class="wishlist-modal-title" id="wishlist-modal-title">My Wishlist ❤️</h2>
+        <span class="product-badge" id="wishlist-items-count-badge">0 items</span>
+      </div>
+
+      <div class="modal-state" id="wishlist-loading" style="display: none;">
+        <div class="spinner"></div>
+        <p class="state-text">Loading your wishlist...</p>
+      </div>
+
+      <div class="modal-state" id="wishlist-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Authentication Required</h3>
+        <p class="state-text">Please log in to your account to view and manage your saved wishlist items.</p>
+        <button class="btn btn-primary" id="wishlist-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <div class="modal-state" id="wishlist-empty-state" style="display: none;">
+        <div class="empty-icon">❤️</div>
+        <h3 class="empty-title">Your wishlist is empty</h3>
+        <p class="state-text">Explore our collection and add your favorite items to your wishlist!</p>
+        <button class="btn btn-secondary" id="wishlist-continue-btn">Explore Deals</button>
+      </div>
+
+      <div class="wishlist-content" id="wishlist-content" style="display: none;">
+        <div class="wishlist-items-list" id="wishlist-items-list"></div>
+        <div class="wishlist-footer-actions">
+          <button class="btn btn-secondary" id="wishlist-browse-more-btn">Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Modal (Log In / Register) -->
+  <div class="modal-backdrop" id="auth-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <div class="modal-container auth-modal-container">
+      <button class="modal-close-icon" id="auth-close-btn" aria-label="Close auth dialog">✕</button>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="tab-login-btn">Log In</button>
+        <button type="button" class="auth-tab" id="tab-register-btn">Register</button>
+      </div>
+
+      <div id="auth-error-alert" class="auth-error-alert" style="display: none;"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email Address</label>
+          <input type="email" id="login-email" required placeholder="you@example.com" class="form-input" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="form-input" autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="reg-name" class="form-label">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="John Doe" class="form-input" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="reg-email" class="form-label">Email Address</label>
+          <input type="email" id="reg-email" required placeholder="you@example.com" class="form-input" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="reg-password" class="form-label">Password (min 8 chars, letters &amp; numbers)</label>
+          <input type="password" id="reg-password" required minlength="8" placeholder="••••••••" class="form-input" autocomplete="new-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div class="modal-backdrop" id="profile-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal-container profile-modal-container">
+      <button class="modal-close-icon" id="profile-close-btn" aria-label="Close profile modal">✕</button>
+
+      <div class="profile-modal-header">
+        <div>
+          <span class="info-header-badge badge-indigo">👤 Account Settings</span>
+          <h2 class="profile-modal-title" id="profile-modal-title">My Profile</h2>
+        </div>
+        <span class="user-role-badge" id="profile-role-badge">Customer</span>
+      </div>
+
+      <div class="auth-error-alert" id="profile-alert-error" style="display: none;" role="alert"></div>
+      <div class="alert-box alert-success" id="profile-alert-success" style="display: none;" role="alert"></div>
+
+      <div class="profile-modal-body">
+        <form class="profile-form" id="profile-form">
+          <div class="form-grid profile-form-grid">
+            <div class="form-group">
+              <label for="profile-name-input" class="form-label">Full Name <span class="required">*</span></label>
+              <input type="text" id="profile-name-input" class="form-input" required placeholder="Enter your full name" />
+            </div>
+            <div class="form-group">
+              <label for="profile-email-input" class="form-label">Email Address</label>
+              <input type="email" id="profile-email-input" class="form-input form-input-readonly" readonly />
+            </div>
+            <div class="form-group">
+              <label for="profile-phone-input" class="form-label">Phone Number</label>
+              <input type="tel" id="profile-phone-input" class="form-input" placeholder="+91 98765 43210" />
+            </div>
+          </div>
+          <div class="profile-modal-actions">
+            <button type="submit" class="btn btn-primary" id="profile-save-btn">
+              <span id="profile-save-btn-text">Save Changes</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="profile-close-action-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer festive-footer" id="main-footer">
+    <div class="container footer-main-grid">
+      <div class="footer-col brand-col">
+        <div class="footer-brand">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-text">MiniStore</span>
+        </div>
+        <p class="footer-desc">Celebrate with MiniStore's verified festive offers. Direct INR pricing, certified brand warranties, and lightning express Pan-India shipping.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Festival Highlights</h4>
+        <ul class="footer-links">
+          <li><a href="festive-sale.html" class="footer-link-btn">Grand Festival Sale</a></li>
+          <li><a href="index.html" class="footer-link-btn">Full Catalog</a></li>
+          <li><a href="category.html?name=Electronics" class="footer-link-btn">Electronics Specials</a></li>
+          <li><a href="category.html?name=Computers" class="footer-link-btn">Computer Deals</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Accepted Payment Modes</h4>
+        <div class="footer-payment-badges">
+          <span class="payment-badge-tag">⚡ UPI Instant Pay</span>
+          <span class="payment-badge-tag">💵 Cash on Delivery</span>
+          <span class="payment-badge-tag">🏦 Credit / Debit Cards</span>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom-bar">
+      <p class="footer-text">&copy; 2026 MiniStore. Happy Festive Shopping! 🪔✨</p>
+    </div>
+  </footer>
+
+  <script src="festive-sale.js"></script>
+</body>
+
+</html>

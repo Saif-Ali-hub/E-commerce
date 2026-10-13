@@ -1,0 +1,37 @@
+[
+  {
+    "_id": "6ac35824d56ff6c6d5f23973",
+    "orderId": "ORD001",
+    "user": "John Doe",
+    "products": [
+      {
+        "name": "Wireless Mouse",
+        "quantity": 1,
+        "price": 799
+      },
+      {
+        "name": "Mechanical Keyboard",
+        "quantity": 1,
+        "price": 2499
+      }
+    ],
+    "total": 3298,
+    "status": "Delivered",
+    "createdAt": "2026-10-05T07:56:20.505Z"
+  },
+  {
+    "_id": "6ac35824d56ff6c6d5f23974",
+    "orderId": "ORD002",
+    "user": "Jane Smith",
+    "products": [
+      {
+        "name": "Gaming Laptop",
+        "quantity": 1,
+        "price": 85999
+      }
+    ],
+    "total": 85999,
+    "status": "Pending",
+    "createdAt": "2026-10-05T07:56:20.505Z"
+  }
+]

@@ -110,6 +110,31 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: false
     },
+    subtotalAmount: {
+      type: Number,
+      default: 0
+    },
+    discountAmount: {
+      type: Number,
+      default: 0
+    },
+    coupon: {
+      code: { type: String, trim: true, default: null },
+      discountAmount: { type: Number, default: 0 },
+      discountType: { type: String, default: null },
+      discountValue: { type: Number, default: 0 }
+    },
+    // MiniStore Wallet & Loyalty Rewards (Feature 5)
+    walletDiscount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Wallet discount cannot be negative']
+    },
+    coinsEarned: {
+      type: Number,
+      default: 0,
+      min: [0, 'Coins earned cannot be negative']
+    },
     shippingAddress: {
       type: shippingAddressSnapshotSchema,
       required: false
@@ -117,8 +142,8 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       enum: {
-        values: ['UPI', 'COD', 'NET_BANKING'],
-        message: 'Invalid payment method. Allowed: UPI, COD, NET_BANKING'
+        values: ['UPI', 'COD', 'NET_BANKING', 'WALLET'],
+        message: 'Invalid payment method. Allowed: UPI, COD, NET_BANKING, WALLET'
       },
       required: false
     },
@@ -142,6 +167,36 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       default: 'Pending'
+    },
+    invoiceNumber: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    tracking: {
+      carrier: {
+        type: String,
+        trim: true,
+        default: 'MiniStore Express'
+      },
+      trackingNumber: {
+        type: String,
+        trim: true,
+        default: null
+      },
+      estimatedDeliveryDate: {
+        type: Date,
+        default: null
+      },
+      history: [
+        {
+          status: { type: String, required: true },
+          title: { type: String, required: true },
+          description: { type: String, default: '' },
+          location: { type: String, default: 'Fulfillment Center' },
+          timestamp: { type: Date, default: Date.now }
+        }
+      ]
     }
   },
   {
@@ -149,7 +204,7 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save hook to normalize totalAmount <-> total and items <-> products
+// Pre-save hook to normalize totalAmount <-> total, items <-> products, invoiceNumber, and tracking defaults
 orderSchema.pre('save', function () {
   if (this.totalAmount === undefined && this.total !== undefined) {
     this.totalAmount = this.total;
@@ -164,6 +219,40 @@ orderSchema.pre('save', function () {
       quantity: p.quantity,
       subtotal: p.price * p.quantity
     }));
+  }
+
+  // Auto-generate invoiceNumber if not set
+  if (!this.invoiceNumber) {
+    const ymd = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    this.invoiceNumber = `INV-${ymd}-${rand}`;
+  }
+
+  // Auto-initialize tracking details if not set
+  if (!this.tracking) {
+    this.tracking = {};
+  }
+  if (!this.tracking.carrier) {
+    this.tracking.carrier = 'MiniStore Express';
+  }
+  if (!this.tracking.trackingNumber) {
+    const randCode = Math.floor(100000 + Math.random() * 900000);
+    this.tracking.trackingNumber = `MS-TRK-${randCode}`;
+  }
+  if (!this.tracking.estimatedDeliveryDate) {
+    // Expected delivery in 3 days
+    this.tracking.estimatedDeliveryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  }
+  if (!Array.isArray(this.tracking.history) || this.tracking.history.length === 0) {
+    this.tracking.history = [
+      {
+        status: 'Placed',
+        title: 'Order Placed & Confirmed',
+        description: 'Your order has been verified and queued for fulfillment.',
+        location: 'Central Fulfillment Hub, Mumbai',
+        timestamp: new Date()
+      }
+    ];
   }
 });
 

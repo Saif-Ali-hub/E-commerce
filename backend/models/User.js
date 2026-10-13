@@ -111,6 +111,46 @@ const userSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product'
       }
+    ],
+    // Section 7: MiniStore Wallet & Loyalty Coins (Feature 5)
+    walletBalance: {
+      type: Number,
+      default: 0,
+      min: [0, 'Wallet balance cannot be negative']
+    },
+    coins: {
+      type: Number,
+      default: 50,
+      min: [0, 'Coins cannot be negative']
+    },
+    walletTransactions: [
+      {
+        type: {
+          type: String,
+          enum: ['credit', 'debit'],
+          required: true
+        },
+        amount: {
+          type: Number,
+          default: 0
+        },
+        coins: {
+          type: Number,
+          default: 0
+        },
+        description: {
+          type: String,
+          required: true
+        },
+        referenceId: {
+          type: String,
+          default: null
+        },
+        date: {
+          type: Date,
+          default: Date.now
+        }
+      }
     ]
   },
   {

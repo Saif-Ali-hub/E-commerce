@@ -12,6 +12,9 @@ const adminRoutes = require('./routes/adminRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const addressRoutes = require('./routes/addressRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const saleRoutes = require('./routes/saleRoutes');
+const couponRoutes = require('./routes/couponRoutes');
+const walletRoutes = require('./routes/walletRoutes');
 const { imageRouter, streamImageHandler } = require('./routes/imageRoutes');
 
 // Load environment variables from backend/.env and project root .env
@@ -57,6 +60,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/sales', saleRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/wallet', walletRoutes);
 
 // Server port
 const PORT = process.env.PORT || 5000;

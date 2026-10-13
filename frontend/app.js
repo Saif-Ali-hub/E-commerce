@@ -213,6 +213,81 @@ const successPaymentMethod = document.getElementById('success-payment-method');
 const successPaymentStatus = document.getElementById('success-payment-status');
 const successPaymentNote = document.getElementById('success-payment-note');
 const successOrderDate = document.getElementById('success-order-date');
+const receiptCouponRow = document.getElementById('receipt-coupon-row');
+const successCouponInfo = document.getElementById('success-coupon-info');
+
+// DOM Elements - Promo / Coupon in Cart
+const cartPromoSection = document.getElementById('cart-promo-section');
+const cartPromoInputGroup = document.getElementById('cart-promo-input-group');
+const cartCouponInput = document.getElementById('cart-coupon-input');
+const cartCouponApplyBtn = document.getElementById('cart-coupon-apply-btn');
+const cartCouponFeedback = document.getElementById('cart-coupon-feedback');
+const cartAvailableCouponsWrap = document.getElementById('cart-available-coupons-wrap');
+const cartAvailableCouponsChips = document.getElementById('cart-available-coupons-chips');
+const cartAppliedCouponCard = document.getElementById('cart-applied-coupon-card');
+const cartAppliedCouponCode = document.getElementById('cart-applied-coupon-code');
+const cartAppliedCouponSaving = document.getElementById('cart-applied-coupon-saving');
+const cartRemoveCouponBtn = document.getElementById('cart-remove-coupon-btn');
+const cartSubtotalAmount = document.getElementById('cart-subtotal-amount');
+const cartDiscountRow = document.getElementById('cart-discount-row');
+const cartDiscountCodeBadge = document.getElementById('cart-discount-code-badge');
+const cartDiscountAmount = document.getElementById('cart-discount-amount');
+
+// DOM Elements - Promo / Coupon in Checkout
+const checkoutPromoBox = document.getElementById('checkout-promo-box');
+const checkoutPromoInputGroup = document.getElementById('checkout-promo-input-group');
+const checkoutCouponInput = document.getElementById('checkout-coupon-input');
+const checkoutCouponApplyBtn = document.getElementById('checkout-coupon-apply-btn');
+const checkoutCouponFeedback = document.getElementById('checkout-coupon-feedback');
+const checkoutAppliedCouponCard = document.getElementById('checkout-applied-coupon-card');
+const checkoutAppliedCouponCode = document.getElementById('checkout-applied-coupon-code');
+const checkoutAppliedCouponSaving = document.getElementById('checkout-applied-coupon-saving');
+const checkoutRemoveCouponBtn = document.getElementById('checkout-remove-coupon-btn');
+const checkoutSubtotalAmount = document.getElementById('checkout-subtotal-amount');
+const checkoutDiscountRow = document.getElementById('checkout-discount-row');
+const checkoutDiscountCodeBadge = document.getElementById('checkout-discount-code-badge');
+const checkoutDiscountAmount = document.getElementById('checkout-discount-amount');
+
+// DOM Elements - MiniStore Wallet & Loyalty Rewards (Feature 5)
+const navWalletBtn = document.getElementById('nav-wallet-btn');
+const navWalletBalanceText = document.getElementById('nav-wallet-balance-text');
+const navWalletCoinsBadge = document.getElementById('nav-wallet-coins-badge');
+const navWalletCoinsText = document.getElementById('nav-wallet-coins-text');
+const navWalletDropdownBtn = document.getElementById('nav-wallet-dropdown-btn');
+const dropdownWalletBalanceText = document.getElementById('dropdown-wallet-balance-text');
+const dropdownCoinsText = document.getElementById('dropdown-coins-text');
+const walletModal = document.getElementById('wallet-modal');
+const walletCloseBtn = document.getElementById('wallet-close-btn');
+const walletUnauthState = document.getElementById('wallet-unauth-state');
+const walletLoginPromptBtn = document.getElementById('wallet-login-prompt-btn');
+const walletContent = document.getElementById('wallet-content');
+const walletModalBalanceDisplay = document.getElementById('wallet-modal-balance-display');
+const walletModalCoinsDisplay = document.getElementById('wallet-modal-coins-display');
+const walletCoinsWorthText = document.getElementById('wallet-coins-worth-text');
+const walletTopupInput = document.getElementById('wallet-topup-input');
+const walletTopupSubmitBtn = document.getElementById('wallet-topup-submit-btn');
+const walletTopupAlert = document.getElementById('wallet-topup-alert');
+const walletCoinsSelect = document.getElementById('wallet-coins-select');
+const walletRedeemSubmitBtn = document.getElementById('wallet-redeem-submit-btn');
+const walletRedeemAlert = document.getElementById('wallet-redeem-alert');
+const walletTransactionsList = document.getElementById('wallet-transactions-list');
+const walletTxnCountBadge = document.getElementById('wallet-txn-count-badge');
+
+// DOM Elements - Checkout Wallet Redemption (Feature 5)
+const checkoutWalletBox = document.getElementById('checkout-wallet-box');
+const checkoutWalletCheckbox = document.getElementById('checkout-wallet-checkbox');
+const checkoutWalletAvailableText = document.getElementById('checkout-wallet-available-text');
+const checkoutWalletDeductionBadge = document.getElementById('checkout-wallet-deduction-badge');
+const checkoutCoinsRewardText = document.getElementById('checkout-coins-reward-text');
+const checkoutWalletDiscountRow = document.getElementById('checkout-wallet-discount-row');
+const checkoutWalletDiscountAmount = document.getElementById('checkout-wallet-discount-amount');
+const receiptWalletRow = document.getElementById('receipt-wallet-row');
+const successWalletDeduction = document.getElementById('success-wallet-deduction');
+const receiptCoinsRow = document.getElementById('receipt-coins-row');
+const successCoinsEarned = document.getElementById('success-coins-earned');
+
+let userWallet = { walletBalance: 150, coins: 50, transactions: [] };
+let useCheckoutWallet = true;
 
 // DOM Elements - Addresses Modal
 const navAddressesBtn = document.getElementById('nav-addresses-btn');
@@ -336,6 +411,84 @@ const statTotalProducts = document.getElementById('stat-total-products');
 const statTotalOrders = document.getElementById('stat-total-orders');
 const statPendingOrders = document.getElementById('stat-pending-orders');
 const statTotalReviews = document.getElementById('stat-total-reviews');
+
+// Admin Sellers & Merchant Verification Elements
+const statPendingSellers = document.getElementById('stat-pending-sellers');
+const cardPendingMerchants = document.getElementById('card-pending-merchants');
+const cardOverviewProducts = document.getElementById('card-overview-products');
+const cardOverviewOrders = document.getElementById('card-overview-orders');
+const cardOverviewPendingOrders = document.getElementById('card-overview-pending-orders');
+const cardOverviewReviews = document.getElementById('card-overview-reviews');
+const adminPendingOrdersCount = document.getElementById('admin-pending-orders-count');
+const adminTabSellers = document.getElementById('admin-tab-sellers');
+const adminPendingSellersCount = document.getElementById('admin-pending-sellers-count');
+const adminSellersSection = document.getElementById('admin-sellers-section');
+const adminSellersTbody = document.getElementById('admin-sellers-tbody');
+const refreshSellersBtn = document.getElementById('refresh-sellers-btn');
+const adminSellersTotalNum = document.getElementById('admin-sellers-total-num');
+const adminSellersPendingNum = document.getElementById('admin-sellers-pending-num');
+const adminSellersVerifiedNum = document.getElementById('admin-sellers-verified-num');
+const adminSellersRejectedNum = document.getElementById('admin-sellers-rejected-num');
+
+let allAdminSellers = [];
+let currentSellerFilter = 'all';
+
+// Admin Sales & Campaigns Elements
+const adminTabSales = document.getElementById('admin-tab-sales');
+const adminSalesSection = document.getElementById('admin-sales-section');
+const overviewSaleDot = document.getElementById('overview-sale-dot');
+const overviewSaleStatusBadge = document.getElementById('overview-sale-status-badge');
+const overviewSaleTitle = document.getElementById('overview-sale-title');
+const overviewSaleSubtitle = document.getElementById('overview-sale-subtitle');
+const overviewSaleTimer = document.getElementById('overview-sale-timer');
+const overviewManageSaleBtn = document.getElementById('overview-manage-sale-btn');
+
+const adminSaleBadge = document.getElementById('admin-sale-badge');
+const adminSalePulse = document.getElementById('admin-sale-pulse');
+const adminSaleBadgeText = document.getElementById('admin-sale-badge-text');
+const adminSaleTypePill = document.getElementById('admin-sale-type-pill');
+const adminSaleEndDisplay = document.getElementById('admin-sale-end-display');
+const adminSaleName = document.getElementById('admin-sale-name');
+const adminSaleTagline = document.getElementById('admin-sale-tagline');
+const adminSaleDesc = document.getElementById('admin-sale-desc');
+
+const btnExtendSale24h = document.getElementById('btn-extend-sale-24h');
+const btnExtendSale48h = document.getElementById('btn-extend-sale-48h');
+const btnExtendSale7d = document.getElementById('btn-extend-sale-7d');
+const btnEndSaleNow = document.getElementById('btn-end-sale-now');
+const btnResumeSaleNow = document.getElementById('btn-resume-sale-now');
+const refreshSalesBtn = document.getElementById('refresh-sales-btn');
+
+const adminSaleForm = document.getElementById('admin-sale-form');
+const saleInputName = document.getElementById('sale-input-name');
+const saleInputBadge = document.getElementById('sale-input-badge');
+const saleInputTagline = document.getElementById('sale-input-tagline');
+const saleInputEndDate = document.getElementById('sale-input-end-date');
+const saleInputCoupon = document.getElementById('sale-input-coupon');
+const saleInputDesc = document.getElementById('sale-input-desc');
+
+const adminDealsCount = document.getElementById('admin-deals-count');
+const adminDealsChipList = document.getElementById('admin-deals-chip-list');
+const adminSalesHistory = document.getElementById('admin-sales-history');
+
+// Admin Coupon Management Elements
+const adminTabCoupons = document.getElementById('admin-tab-coupons');
+const adminCouponsSection = document.getElementById('admin-coupons-section');
+const adminNewCouponBtn = document.getElementById('admin-new-coupon-btn');
+const refreshCouponsBtn = document.getElementById('refresh-coupons-btn');
+const adminCouponCreator = document.getElementById('admin-coupon-creator');
+const closeCouponCreatorBtn = document.getElementById('close-coupon-creator-btn');
+const cancelCreateCouponBtn = document.getElementById('cancel-create-coupon-btn');
+const adminCreateCouponForm = document.getElementById('admin-create-coupon-form');
+const adminCouponsTbody = document.getElementById('admin-coupons-tbody');
+const newCouponCodeInput = document.getElementById('new-coupon-code');
+const newCouponTypeInput = document.getElementById('new-coupon-type');
+const newCouponValueInput = document.getElementById('new-coupon-value');
+const newCouponMinOrderInput = document.getElementById('new-coupon-min-order');
+const newCouponMaxDiscountInput = document.getElementById('new-coupon-max-discount');
+const newCouponUsageLimitInput = document.getElementById('new-coupon-usage-limit');
+const newCouponExpiryInput = document.getElementById('new-coupon-expiry');
+const newCouponDescInput = document.getElementById('new-coupon-desc');
 
 // Admin Products Management
 const openAddProductBtn = document.getElementById('open-add-product-btn');
@@ -987,9 +1140,11 @@ function updateAuthUI() {
 
     if (navAddressesBtn) navAddressesBtn.style.display = 'inline-flex';
     if (navOrdersBtn) navOrdersBtn.style.display = 'inline-flex';
+    if (navWalletBtn) navWalletBtn.style.display = 'inline-flex';
     if (navAdminBtn) {
       navAdminBtn.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
     }
+    fetchUserWallet();
 
     // Restore cached lightweight badge/state from localStorage without making API calls
     const savedCartCount = parseInt(localStorage.getItem('ministore_cart_count') || '0', 10);
@@ -1018,9 +1173,11 @@ function updateAuthUI() {
 
     if (navAddressesBtn) navAddressesBtn.style.display = 'none';
     if (navOrdersBtn) navOrdersBtn.style.display = 'none';
+    if (navWalletBtn) navWalletBtn.style.display = 'none';
     if (navAdminBtn) navAdminBtn.style.display = 'none';
     if (adminModal) adminModal.style.display = 'none';
     if (addressModal) addressModal.style.display = 'none';
+    if (walletModal) walletModal.style.display = 'none';
     if (profileModal) profileModal.style.display = 'none';
     userAddresses = [];
     selectedCheckoutAddressId = null;
@@ -1573,6 +1730,9 @@ async function initCategorySections() {
     if (categoryShowcaseLoading) {
       categoryShowcaseLoading.style.display = 'none';
     }
+    if (Array.isArray(allProducts) && allProducts.length > 0) {
+      renderCategorySections(allProducts, []);
+    }
   }
 }
 
@@ -1583,7 +1743,9 @@ function renderCategorySections(products, categoriesList) {
     categoryShowcaseLoading.style.display = 'none';
   }
 
-  const rawCategories = Array.isArray(categoriesList) ? categoriesList : [];
+  const rawCategories = (Array.isArray(categoriesList) && categoriesList.length > 0)
+    ? categoriesList
+    : (Array.isArray(products) ? products.map(p => p.category) : []);
   const distinctCategories = Array.from(
     new Set(rawCategories.map(c => (typeof c === 'string' ? c : c?.category)?.trim()).filter(Boolean))
   ).sort();
@@ -1638,7 +1800,7 @@ function renderCategorySections(products, categoriesList) {
           </div>
           <div class="category-showcase-text-wrap">
             <h2 class="category-showcase-title">${escapeHtml(catName)}</h2>
-            <span class="category-showcase-subtitle">${catProducts.length} ${catProducts.length === 1 ? 'item' : 'items'} available in store</span>
+            <span class="category-showcase-subtitle">${catProducts.length} ${catProducts.length === 1 ? 'item' : 'items'} available</span>
           </div>
         </div>
         <a href="${categoryPageUrl}" class="category-showcase-view-all" aria-label="View all ${escapeHtml(catName)} products">
@@ -2075,6 +2237,42 @@ function renderModalContent(product) {
           </div>
         ` : ''}
 
+        <!-- Pincode Delivery Estimator Widget (Feature 4) -->
+        <div class="pincode-estimator-widget" id="modal-pincode-widget">
+          <div class="pincode-widget-header">
+            <span class="pincode-widget-title">🚚 Delivery &amp; Service Availability</span>
+            <span class="pincode-hub-tag">Fast Hub Dispatch</span>
+          </div>
+          <div class="pincode-input-wrap">
+            <input
+              type="text"
+              id="modal-pincode-input"
+              class="pincode-input"
+              placeholder="Enter 6-digit Pincode (e.g. 110001)"
+              maxlength="6"
+              inputmode="numeric"
+            />
+            <button type="button" id="modal-pincode-check-btn" class="btn btn-secondary btn-sm pincode-check-btn">
+              Check
+            </button>
+          </div>
+          <div id="modal-pincode-result" class="pincode-result-box" style="display: none;"></div>
+          <div class="pincode-perks-list">
+            <div class="pincode-perk-item">
+              <span class="perk-icon">⚡</span>
+              <span>Fast Courier Dispatch (Dispatched within 24 Hours)</span>
+            </div>
+            <div class="pincode-perk-item">
+              <span class="perk-icon">💵</span>
+              <span>Cash / UPI on Delivery Available</span>
+            </div>
+            <div class="pincode-perk-item">
+              <span class="perk-icon">🔄</span>
+              <span>7 Days Replacement &amp; Return Policy</span>
+            </div>
+          </div>
+        </div>
+
         <!-- 10. Add to Cart, Wishlist, and Back button -->
         <div class="modal-actions">
           <button
@@ -2199,6 +2397,9 @@ function renderModalContent(product) {
 
   // Setup Dynamic Related Products
   loadRelatedProducts(product._id);
+
+  // Setup Pincode Delivery Estimator (Feature 4)
+  setupModalPincodeEstimator(modalContent);
 
   modalLoading.style.display = 'none';
   modalError.style.display = 'none';
@@ -2932,7 +3133,7 @@ async function openCartModal() {
   cartContent.style.display = 'none';
   cartEmptyState.style.display = 'none';
 
-  await fetchCart();
+  await Promise.all([fetchCart(), fetchAvailableCoupons()]);
 
   cartLoading.style.display = 'none';
 
@@ -2946,6 +3147,259 @@ async function openCartModal() {
 
 function closeCartModal() {
   closeModalWithAnimation(cartModal);
+}
+
+// ============================================================
+// Promo Code & Coupon System (Cart & Checkout)
+// ============================================================
+let appliedCoupon = null;
+let availableCouponsList = [];
+
+async function fetchAvailableCoupons() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/coupons/active`);
+    const data = await res.json();
+    if (res.ok && data.success && Array.isArray(data.data)) {
+      availableCouponsList = data.data;
+    }
+  } catch (err) {
+    console.error('Failed to load active coupons:', err.message);
+  }
+}
+
+function renderAvailableCoupons(currentSubtotal = 0) {
+  if (!cartAvailableCouponsChips) return;
+  cartAvailableCouponsChips.innerHTML = '';
+
+  if (!availableCouponsList || availableCouponsList.length === 0) {
+    if (cartAvailableCouponsWrap) cartAvailableCouponsWrap.style.display = 'none';
+    return;
+  }
+
+  if (cartAvailableCouponsWrap) cartAvailableCouponsWrap.style.display = 'block';
+
+  availableCouponsList.forEach(coupon => {
+    const chip = document.createElement('div');
+    chip.className = 'coupon-chip';
+    chip.title = coupon.description || `Click to apply ${coupon.code}`;
+
+    const discountText = coupon.discountType === 'PERCENTAGE'
+      ? `${coupon.discountValue}% OFF`
+      : `₹${coupon.discountValue} OFF`;
+
+    chip.innerHTML = `
+      <span class="chip-code">🏷️ ${coupon.code}</span>
+      <span class="chip-desc">${discountText}</span>
+      <span class="chip-action">+ Apply</span>
+    `;
+
+    chip.addEventListener('click', () => {
+      applyCouponCode(coupon.code, 'cart');
+    });
+
+    cartAvailableCouponsChips.appendChild(chip);
+  });
+}
+
+function updateCouponTotals(calculatedSubtotal = 0) {
+  if (cartSubtotalAmount) {
+    cartSubtotalAmount.textContent = currencyFormatter.format(calculatedSubtotal);
+  }
+  if (checkoutSubtotalAmount) {
+    checkoutSubtotalAmount.textContent = currencyFormatter.format(calculatedSubtotal);
+  }
+
+  if (appliedCoupon) {
+    // Check if subtotal still meets minimum order requirement
+    const minOrder = appliedCoupon.minOrderAmount || 0;
+    if (calculatedSubtotal < minOrder) {
+      const needed = Math.round(minOrder - calculatedSubtotal);
+      const msg = `Add ₹${needed} more to your cart to retain coupon "${appliedCoupon.code}" (Min. order ₹${minOrder}).`;
+
+      // Update Cart UI
+      if (cartDiscountRow) cartDiscountRow.style.display = 'none';
+      if (cartTotalAmount) cartTotalAmount.textContent = currencyFormatter.format(calculatedSubtotal);
+      if (cartAppliedCouponCard) cartAppliedCouponCard.style.display = 'none';
+      if (cartPromoInputGroup) cartPromoInputGroup.style.display = 'flex';
+      if (cartCouponFeedback) {
+        cartCouponFeedback.className = 'promo-feedback error';
+        cartCouponFeedback.textContent = msg;
+        cartCouponFeedback.style.display = 'block';
+      }
+
+      // Update Checkout UI
+      if (checkoutDiscountRow) checkoutDiscountRow.style.display = 'none';
+      if (checkoutTotalAmount) checkoutTotalAmount.textContent = currencyFormatter.format(calculatedSubtotal);
+      if (checkoutAppliedCouponCard) checkoutAppliedCouponCard.style.display = 'none';
+      if (checkoutPromoInputGroup) checkoutPromoInputGroup.style.display = 'flex';
+      if (checkoutCouponFeedback) {
+        checkoutCouponFeedback.className = 'promo-feedback error';
+        checkoutCouponFeedback.textContent = msg;
+        checkoutCouponFeedback.style.display = 'block';
+      }
+      return;
+    }
+
+    // Recalculate discount based on current subtotal
+    let discount = 0;
+    if (appliedCoupon.discountType === 'PERCENTAGE') {
+      discount = Math.round((calculatedSubtotal * appliedCoupon.discountValue) / 100);
+      if (appliedCoupon.maxDiscountAmount && discount > appliedCoupon.maxDiscountAmount) {
+        discount = appliedCoupon.maxDiscountAmount;
+      }
+    } else {
+      discount = Math.min(appliedCoupon.discountValue, calculatedSubtotal);
+    }
+
+    appliedCoupon.discountAmount = discount;
+    appliedCoupon.finalTotal = Math.max(0, calculatedSubtotal - discount);
+
+    // Sync Cart UI
+    if (cartDiscountRow) cartDiscountRow.style.display = 'flex';
+    if (cartDiscountCodeBadge) cartDiscountCodeBadge.textContent = appliedCoupon.code;
+    if (cartDiscountAmount) cartDiscountAmount.textContent = `-${currencyFormatter.format(discount)}`;
+    if (cartTotalAmount) cartTotalAmount.textContent = currencyFormatter.format(appliedCoupon.finalTotal);
+    if (cartAppliedCouponCard) cartAppliedCouponCard.style.display = 'flex';
+    if (cartAppliedCouponCode) cartAppliedCouponCode.textContent = appliedCoupon.code;
+    if (cartAppliedCouponSaving) cartAppliedCouponSaving.textContent = `${currencyFormatter.format(discount)} OFF applied`;
+    if (cartPromoInputGroup) cartPromoInputGroup.style.display = 'none';
+    if (cartCouponFeedback) cartCouponFeedback.style.display = 'none';
+
+    // Sync Checkout UI
+    if (checkoutDiscountRow) checkoutDiscountRow.style.display = 'flex';
+    if (checkoutDiscountCodeBadge) checkoutDiscountCodeBadge.textContent = appliedCoupon.code;
+    if (checkoutDiscountAmount) checkoutDiscountAmount.textContent = `-${currencyFormatter.format(discount)}`;
+    if (checkoutTotalAmount) checkoutTotalAmount.textContent = currencyFormatter.format(appliedCoupon.finalTotal);
+    if (checkoutAppliedCouponCard) checkoutAppliedCouponCard.style.display = 'flex';
+    if (checkoutAppliedCouponCode) checkoutAppliedCouponCode.textContent = appliedCoupon.code;
+    if (checkoutAppliedCouponSaving) checkoutAppliedCouponSaving.textContent = `${currencyFormatter.format(discount)} OFF applied`;
+    if (checkoutPromoInputGroup) checkoutPromoInputGroup.style.display = 'none';
+    if (checkoutCouponFeedback) checkoutCouponFeedback.style.display = 'none';
+  } else {
+    // No coupon active
+    if (cartDiscountRow) cartDiscountRow.style.display = 'none';
+    if (cartTotalAmount) cartTotalAmount.textContent = currencyFormatter.format(calculatedSubtotal);
+    if (cartAppliedCouponCard) cartAppliedCouponCard.style.display = 'none';
+    if (cartPromoInputGroup) cartPromoInputGroup.style.display = 'flex';
+
+    if (checkoutDiscountRow) checkoutDiscountRow.style.display = 'none';
+    if (checkoutTotalAmount) checkoutTotalAmount.textContent = currencyFormatter.format(calculatedSubtotal);
+    if (checkoutAppliedCouponCard) checkoutAppliedCouponCard.style.display = 'none';
+    if (checkoutPromoInputGroup) checkoutPromoInputGroup.style.display = 'flex';
+  }
+
+  // Feature 5: Sync checkout wallet deduction & cashback preview
+  updateCheckoutWalletCalculation(calculatedSubtotal, appliedCoupon ? appliedCoupon.discountAmount : 0);
+}
+
+async function applyCouponCode(code, source = 'cart') {
+  const token = getAuthToken();
+  if (!token) {
+    openAuthModal('login', 'Please log in to apply promo coupons.');
+    return;
+  }
+
+  const cleanCode = (code || '').trim().toUpperCase();
+  const feedbackEl = source === 'cart' ? cartCouponFeedback : checkoutCouponFeedback;
+
+  if (!cleanCode) {
+    if (feedbackEl) {
+      feedbackEl.className = 'promo-feedback error';
+      feedbackEl.textContent = 'Please enter a coupon code.';
+      feedbackEl.style.display = 'block';
+    }
+    return;
+  }
+
+  // Calculate current cart subtotal
+  let subtotal = 0;
+  if (currentCart && Array.isArray(currentCart.items)) {
+    subtotal = currentCart.items.reduce((sum, item) => {
+      const prod = item.product;
+      if (!prod) return sum;
+      const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (prod.price || 0));
+      return sum + (unitPrice * item.quantity);
+    }, 0);
+  }
+
+  const applyBtn = source === 'cart' ? cartCouponApplyBtn : checkoutCouponApplyBtn;
+
+  if (applyBtn) {
+    applyBtn.disabled = true;
+    applyBtn.textContent = 'Verifying...';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/coupons/validate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ code: cleanCode, subtotal })
+    });
+
+    const result = await res.json();
+
+    if (res.ok && result.success && result.valid) {
+      appliedCoupon = result.data;
+      if (cartCouponInput) cartCouponInput.value = '';
+      if (checkoutCouponInput) checkoutCouponInput.value = '';
+
+      if (feedbackEl) {
+        feedbackEl.className = 'promo-feedback success';
+        feedbackEl.textContent = result.message;
+        feedbackEl.style.display = 'block';
+      }
+
+      showToast(`🎉 ${result.message}`);
+      updateCouponTotals(subtotal);
+    } else {
+      if (feedbackEl) {
+        feedbackEl.className = 'promo-feedback error';
+        feedbackEl.textContent = result.message || 'Invalid coupon code.';
+        feedbackEl.style.display = 'block';
+      }
+      showToast(result.message || 'Coupon could not be applied');
+    }
+  } catch (err) {
+    if (feedbackEl) {
+      feedbackEl.className = 'promo-feedback error';
+      feedbackEl.textContent = 'Network error verifying coupon code.';
+      feedbackEl.style.display = 'block';
+    }
+  } finally {
+    if (applyBtn) {
+      applyBtn.disabled = false;
+      applyBtn.textContent = 'Apply';
+    }
+  }
+}
+
+function removeAppliedCoupon() {
+  appliedCoupon = null;
+
+  if (cartCouponFeedback) {
+    cartCouponFeedback.style.display = 'none';
+    cartCouponFeedback.textContent = '';
+  }
+  if (checkoutCouponFeedback) {
+    checkoutCouponFeedback.style.display = 'none';
+    checkoutCouponFeedback.textContent = '';
+  }
+
+  let subtotal = 0;
+  if (currentCart && Array.isArray(currentCart.items)) {
+    subtotal = currentCart.items.reduce((sum, item) => {
+      const prod = item.product;
+      if (!prod) return sum;
+      const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (prod.price || 0));
+      return sum + (unitPrice * item.quantity);
+    }, 0);
+  }
+
+  updateCouponTotals(subtotal);
+  showToast('Coupon removed.');
 }
 
 function renderCartContent() {
@@ -2966,8 +3420,11 @@ function renderCartContent() {
     const product = item.product;
     if (!product) return;
 
-    const unitPrice = product.price || 0;
-    const subtotal = unitPrice * item.quantity;
+    const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (product.price || 0));
+    const regularPrice = item.regularPrice || product.price || unitPrice;
+    const isDiscounted = item.isFestiveDiscount || (unitPrice < regularPrice);
+    const discountPct = isDiscounted && regularPrice > 0 ? Math.round(((regularPrice - unitPrice) / regularPrice) * 100) : 0;
+    const subtotal = item.subtotal !== undefined ? item.subtotal : (unitPrice * item.quantity);
     calculatedGrandTotal += subtotal;
     totalItemCount += item.quantity;
 
@@ -2987,7 +3444,11 @@ function renderCartContent() {
       <div class="cart-item-info">
         <span class="cart-item-category">${escapeHtml(product.category)}</span>
         <h4 class="cart-item-name">${escapeHtml(product.name)}</h4>
-        <span class="cart-item-unit-price">${currencyFormatter.format(unitPrice)} each</span>
+        <div class="cart-item-price-wrap" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0;">
+          <span class="cart-item-unit-price" style="font-weight: 700; color: ${isDiscounted ? '#10b981' : 'var(--color-text-muted)'}; font-size: 0.95rem;">${currencyFormatter.format(unitPrice)} each</span>
+          ${isDiscounted ? `<span style="text-decoration: line-through; color: var(--color-text-muted); font-size: 0.82rem;">${currencyFormatter.format(regularPrice)}</span>` : ''}
+          ${isDiscounted ? `<span style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">${discountPct}% FESTIVE OFF</span>` : ''}
+        </div>
         ${isAtMaxStock ? `<span class="cart-item-stock-warning">Max available stock reached (${product.stock})</span>` : ''}
       </div>
       <div class="cart-item-actions">
@@ -3042,7 +3503,8 @@ function renderCartContent() {
     cartItemsList.appendChild(itemCard);
   });
 
-  cartTotalAmount.textContent = currencyFormatter.format(calculatedGrandTotal);
+  updateCouponTotals(calculatedGrandTotal);
+  renderAvailableCoupons(calculatedGrandTotal);
   updateCartCountBadge(totalItemCount);
   cartContent.style.display = 'block';
 }
@@ -3699,6 +4161,7 @@ function selectCheckoutAddress(addressId) {
 function formatPaymentMethodName(method) {
   if (!method) return 'Not Specified';
   switch (method) {
+    case 'WALLET': return 'MiniStore Wallet (1-Click Instant)';
     case 'UPI': return 'UPI';
     case 'COD': return 'Cash on Delivery';
     case 'NET_BANKING': return 'Net Banking';
@@ -3714,6 +4177,8 @@ function formatPaymentStatusBadge(status) {
 
 function formatPaymentNote(method) {
   switch (method) {
+    case 'WALLET':
+      return '👛 Paid in full using MiniStore Wallet. Zero cash collection required on delivery.';
     case 'COD':
       return '💵 Order placed successfully. Payment will be collected on delivery.';
     case 'UPI':
@@ -3726,7 +4191,7 @@ function formatPaymentNote(method) {
 }
 
 function selectPaymentMethod(method) {
-  const validMethods = ['UPI', 'COD', 'NET_BANKING'];
+  const validMethods = ['UPI', 'COD', 'NET_BANKING', 'WALLET'];
   if (!validMethods.includes(method)) return;
 
   selectedPaymentMethod = method;
@@ -3800,23 +4265,34 @@ async function openCheckoutModal() {
     const product = item.product;
     if (!product) return;
 
-    const unitPrice = product.price || 0;
-    const subtotal = unitPrice * item.quantity;
+    const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (product.price || 0));
+    const regularPrice = item.regularPrice || product.price || unitPrice;
+    const isDiscounted = item.isFestiveDiscount || (unitPrice < regularPrice);
+    const subtotal = item.subtotal !== undefined ? item.subtotal : (unitPrice * item.quantity);
     grandTotal += subtotal;
 
     const row = document.createElement('div');
     row.className = 'checkout-item-row';
     row.innerHTML = `
       <div class="checkout-item-info">
-        <span class="checkout-item-name">${escapeHtml(product.name)}</span>
-        <span class="checkout-item-math">${currencyFormatter.format(unitPrice)} × ${item.quantity}</span>
+        <span class="checkout-item-name">${escapeHtml(product.name)} ${isDiscounted ? '<span style="color: #10b981; font-size: 0.74rem; font-weight: 700; margin-left: 4px;">(Festive Deal)</span>' : ''}</span>
+        <span class="checkout-item-math">${currencyFormatter.format(unitPrice)} × ${item.quantity} ${isDiscounted ? `<span style="text-decoration: line-through; color: var(--color-text-muted); font-size: 0.8em; margin-left: 4px;">(${currencyFormatter.format(regularPrice)})</span>` : ''}</span>
       </div>
       <span class="checkout-item-subtotal">${currencyFormatter.format(subtotal)}</span>
     `;
     checkoutItemsSummary.appendChild(row);
   });
 
-  checkoutTotalAmount.textContent = currencyFormatter.format(grandTotal);
+  if (checkoutSubtotalAmount) checkoutSubtotalAmount.textContent = currencyFormatter.format(grandTotal);
+  updateCouponTotals(grandTotal);
+
+  // Sync wallet balance & checkout deduction (Feature 5)
+  if (checkoutWalletCheckbox) {
+    checkoutWalletCheckbox.checked = true;
+    useCheckoutWallet = true;
+  }
+  await fetchUserWallet();
+  updateCheckoutWalletCalculation(grandTotal, appliedCoupon ? appliedCoupon.discountAmount : 0);
 
   // Load and display saved delivery addresses for selection
   await fetchCheckoutAddresses();
@@ -3846,8 +4322,22 @@ async function placeOrder() {
   }
 
   // Validate payment method is selected
-  const validMethods = ['UPI', 'COD', 'NET_BANKING'];
-  if (!selectedPaymentMethod || !validMethods.includes(selectedPaymentMethod)) {
+  const validMethods = ['UPI', 'COD', 'NET_BANKING', 'WALLET'];
+  
+  // Calculate if wallet fully covers payable amount
+  const cartSub = calculateCartSubtotalAmount();
+  const cDisc = appliedCoupon ? (appliedCoupon.discountAmount || 0) : 0;
+  const netAfter = Math.max(0, cartSub - cDisc);
+  const wAvail = userWallet.walletBalance || 0;
+  const wDeduct = (useCheckoutWallet && wAvail > 0) ? Math.min(wAvail, netAfter) : 0;
+  const netPayable = Math.max(0, netAfter - wDeduct);
+
+  let finalPayment = selectedPaymentMethod;
+  if (netPayable === 0 && wDeduct > 0) {
+    finalPayment = 'WALLET';
+  }
+
+  if (!finalPayment || !validMethods.includes(finalPayment)) {
     if (checkoutPaymentAlert) {
       checkoutPaymentAlert.textContent = 'Please select a valid payment method before placing your order.';
       checkoutPaymentAlert.style.display = 'block';
@@ -3874,7 +4364,9 @@ async function placeOrder() {
       },
       body: JSON.stringify({
         addressId: selectedCheckoutAddressId,
-        paymentMethod: selectedPaymentMethod
+        paymentMethod: finalPayment,
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
+        useWallet: useCheckoutWallet
       })
     });
 
@@ -3896,9 +4388,43 @@ async function placeOrder() {
     updateCartCountBadge(0);
 
     // Populate success receipt
-    successOrderId.textContent = `#${order._id}`;
+    successOrderId.textContent = `#${order.orderId || order._id}`;
     successOrderStatus.textContent = order.status || 'Pending';
     successOrderTotal.textContent = currencyFormatter.format(order.totalAmount);
+
+    if (order.coupon && order.coupon.code) {
+      if (receiptCouponRow) {
+        receiptCouponRow.style.display = 'flex';
+        successCouponInfo.textContent = `-${currencyFormatter.format(order.discountAmount || order.coupon.discountAmount)} (${order.coupon.code})`;
+      }
+    } else {
+      if (receiptCouponRow) receiptCouponRow.style.display = 'none';
+    }
+    appliedCoupon = null; // reset coupon after successful order
+
+    // Wallet deduction row on receipt (Feature 5)
+    if (order.walletDiscount && order.walletDiscount > 0) {
+      if (receiptWalletRow) {
+        receiptWalletRow.style.display = 'flex';
+        if (successWalletDeduction) {
+          successWalletDeduction.textContent = `-${currencyFormatter.format(order.walletDiscount)}`;
+        }
+      }
+    } else {
+      if (receiptWalletRow) receiptWalletRow.style.display = 'none';
+    }
+
+    // SuperCoins cashback earned on receipt (Feature 5)
+    if (receiptCoinsRow) {
+      receiptCoinsRow.style.display = 'flex';
+      if (successCoinsEarned) {
+        successCoinsEarned.textContent = `+${order.coinsEarned || 25} SuperCoins (5% Cashback)`;
+      }
+    }
+
+    // Refresh wallet balance
+    fetchUserWallet();
+    appliedCoupon = null; // reset coupon after successful order
 
     if (successPaymentMethod) {
       successPaymentMethod.textContent = formatPaymentMethodName(order.paymentMethod || selectedPaymentMethod);
@@ -4072,10 +4598,41 @@ function renderOrdersList(orders) {
         <span class="order-total-label">Total Amount:</span>
         <span class="order-total-val">${currencyFormatter.format(order.totalAmount)}</span>
       </div>
+      <div class="order-card-actions">
+        <button type="button" class="btn track-order-btn" data-order-id="${escapeHtml(order._id)}">
+          📍 Track Shipment
+        </button>
+        <button type="button" class="btn print-invoice-btn" data-order-id="${escapeHtml(order._id)}">
+          📄 Tax Invoice
+        </button>
+      </div>
     `;
 
     ordersListContent.appendChild(orderCard);
   });
+
+  // Action listeners for order cards
+  ordersListContent.onclick = (e) => {
+    const trackBtn = e.target.closest('.track-order-btn');
+    if (trackBtn) {
+      const orderId = trackBtn.getAttribute('data-order-id');
+      if (orderId && typeof window.openTrackingForOrder === 'function') {
+        closeOrdersModal();
+        window.openTrackingForOrder(orderId);
+      }
+      return;
+    }
+
+    const invoiceBtn = e.target.closest('.print-invoice-btn');
+    if (invoiceBtn) {
+      const orderId = invoiceBtn.getAttribute('data-order-id');
+      const order = orders.find(o => String(o._id) === String(orderId));
+      if (order && typeof window.openInvoiceModal === 'function') {
+        window.openInvoiceModal(order);
+      }
+      return;
+    }
+  };
 
   ordersListContent.style.display = 'flex';
 }
@@ -4138,8 +4695,24 @@ document.addEventListener('DOMContentLoaded', () => {
   initCategorySections();
   initScrollReveal();
   initHeroInteractiveFeatures();
+  initFestivalSaleBanner();
   initHeroBackgroundSlider();
   initFooterFunctionality();
+
+  // Handle open modal query params (e.g., coming from festive sale or external link)
+  if (urlParams.get('open') === 'checkout') {
+    setTimeout(() => {
+      if (getAuthToken()) {
+        openCheckoutModal();
+      } else {
+        openAuthModal('login', 'Please log in to proceed to checkout.');
+      }
+    }, 400);
+  } else if (urlParams.get('open') === 'cart') {
+    setTimeout(() => {
+      openCartModal();
+    }, 400);
+  }
 });
 
 // Theme Toggle Button
@@ -4152,8 +4725,21 @@ if (refreshBtn) refreshBtn.addEventListener('click', () => fetchProducts(current
 if (retryBtn) retryBtn.addEventListener('click', () => fetchProducts(currentPage));
 
 // ============================================================
-// Search Autocomplete & Suggestions
 // ============================================================
+// Search Autocomplete, Recent Searches & Instant Suggestions
+// ============================================================
+const RECENT_SEARCHES_STORAGE_KEY = 'ministore_recent_searches';
+const POPULAR_TRENDING_SEARCHES = [
+  'Wireless Mouse',
+  'Headphones',
+  'Smart Watch',
+  'Festive Sale',
+  'Bluetooth Speaker',
+  'Yoga Mat',
+  'Backpack',
+  'Gaming Keyboard'
+];
+
 let suggestionDebounceTimer = null;
 let activeSuggestionIndex = -1;
 let currentSuggestionsList = [];
@@ -4170,6 +4756,43 @@ window.handleSuggestionImageError = function (img) {
   }
 };
 
+function getRecentSearches() {
+  try {
+    const raw = localStorage.getItem(RECENT_SEARCHES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveRecentSearch(query) {
+  if (!query || typeof query !== 'string') return;
+  const clean = query.trim();
+  if (clean.length < 2) return;
+
+  try {
+    const existing = getRecentSearches();
+    const updated = [clean, ...existing.filter(q => q.toLowerCase() !== clean.toLowerCase())].slice(0, 8);
+    localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(updated));
+  } catch (e) {}
+}
+
+function removeRecentSearch(query) {
+  try {
+    const existing = getRecentSearches();
+    const updated = existing.filter(q => q.toLowerCase() !== query.toLowerCase());
+    localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(updated));
+    renderRecentSearchesDropdown();
+  } catch (e) {}
+}
+
+function clearAllRecentSearches() {
+  try {
+    localStorage.removeItem(RECENT_SEARCHES_STORAGE_KEY);
+    renderRecentSearchesDropdown();
+  } catch (e) {}
+}
+
 function closeSuggestionsDropdown() {
   if (!searchSuggestionsDropdown) return;
   searchSuggestionsDropdown.style.display = 'none';
@@ -4180,6 +4803,96 @@ function closeSuggestionsDropdown() {
     searchInput.setAttribute('aria-expanded', 'false');
     searchInput.removeAttribute('aria-activedescendant');
   }
+}
+
+function renderRecentSearchesDropdown() {
+  if (!searchSuggestionsDropdown) return;
+  const recent = getRecentSearches();
+
+  let html = `
+    <div class="search-history-panel" id="search-history-panel">
+      <div class="recent-searches-header">
+        <span class="recent-header-title">🕒 Recent Searches</span>
+        ${recent.length > 0 ? `<button type="button" class="recent-clear-all-btn" id="recent-clear-all-btn">Clear All</button>` : ''}
+      </div>
+  `;
+
+  if (recent.length > 0) {
+    html += `<div class="recent-searches-pills">`;
+    recent.forEach(q => {
+      html += `
+        <div class="recent-search-pill" data-query="${escapeHtml(q)}">
+          <span class="recent-pill-text">🕒 ${escapeHtml(q)}</span>
+          <button type="button" class="recent-pill-remove" data-query="${escapeHtml(q)}" title="Remove from history" aria-label="Remove">✕</button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div class="recent-empty-hint">Search for products, categories, or festive deals</div>`;
+  }
+
+  // Trending Searches section
+  html += `
+      <div class="trending-searches-section">
+        <span class="trending-header-title">🔥 Trending Searches</span>
+        <div class="trending-chips-wrap">
+          ${POPULAR_TRENDING_SEARCHES.map(t => `
+            <button type="button" class="trending-chip" data-query="${escapeHtml(t)}">
+              🔥 ${escapeHtml(t)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  searchSuggestionsDropdown.innerHTML = html;
+  searchSuggestionsDropdown.style.display = 'block';
+  if (searchInput) {
+    searchInput.setAttribute('aria-expanded', 'true');
+    searchInput.removeAttribute('aria-activedescendant');
+  }
+
+  // Attach event listeners for recent pills and trending chips
+  const clearBtn = searchSuggestionsDropdown.querySelector('#recent-clear-all-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearAllRecentSearches();
+    });
+  }
+
+  searchSuggestionsDropdown.querySelectorAll('.recent-pill-text').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const parent = el.closest('.recent-search-pill');
+      const query = parent ? parent.dataset.query : '';
+      if (query) {
+        submitSearchQuery(query);
+      }
+    });
+  });
+
+  searchSuggestionsDropdown.querySelectorAll('.recent-pill-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const query = btn.dataset.query;
+      if (query) {
+        removeRecentSearch(query);
+      }
+    });
+  });
+
+  searchSuggestionsDropdown.querySelectorAll('.trending-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const query = chip.dataset.query;
+      if (query) {
+        submitSearchQuery(query);
+      }
+    });
+  });
 }
 
 function highlightMatch(text, query) {
@@ -4193,11 +4906,10 @@ function highlightMatch(text, query) {
   return safeText.replace(regex, '<span class="suggestion-highlight">$1</span>');
 }
 
-function renderSuggestionsDropdown(suggestions, query, totalMatches = 0, hasMore = false) {
+function renderSuggestionsDropdown(suggestions, query, totalMatches = 0, hasMore = false, categories = []) {
   if (!searchSuggestionsDropdown) return;
 
   if (!suggestions || suggestions.length === 0) {
-    // Empty state: render clear "No matching products found"
     const emptyHtml = `
       <div class="suggestions-status-message suggestions-empty" role="status">
         <span class="suggestions-empty-icon" aria-hidden="true">🔍</span>
@@ -4219,11 +4931,28 @@ function renderSuggestionsDropdown(suggestions, query, totalMatches = 0, hasMore
   currentSuggestionsList = suggestions;
   activeSuggestionIndex = -1;
 
-  let html = '<ul class="suggestions-list" role="listbox" id="suggestions-list-box">';
+  let html = '';
+
+  // Render category shortcuts bar if matching categories returned
+  if (Array.isArray(categories) && categories.length > 0) {
+    html += `
+      <div class="suggestions-categories-bar">
+        <span class="suggestions-cat-label">Categories:</span>
+        <div class="suggestions-cat-chips">
+          ${categories.map(cat => `
+            <button type="button" class="suggestion-cat-chip" data-category="${escapeHtml(cat)}">
+              📁 ${escapeHtml(cat)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  html += '<ul class="suggestions-list" role="listbox" id="suggestions-list-box">';
   suggestions.forEach((item, index) => {
     const highlightedName = highlightMatch(item.name, query);
     const categoryLabel = item.category ? escapeHtml(item.category) : '';
-    const priceLabel = item.price ? `₹${item.price.toLocaleString('en-IN')}` : '';
     const imgUrl = formatProductImageUrl(item.image);
     const isOutOfStock = typeof item.stock === 'number' && item.stock <= 0;
     const stockTag = isOutOfStock
@@ -4249,7 +4978,15 @@ function renderSuggestionsDropdown(suggestions, query, totalMatches = 0, hasMore
           </div>
         </div>
         <div class="suggestion-price-col">
-          ${priceLabel ? `<span class="suggestion-price">${priceLabel}</span>` : ''}
+          ${item.hasDiscount ? `
+            <div class="suggestion-deal-wrap">
+              <span class="suggestion-deal-price">₹${item.price.toLocaleString('en-IN')}</span>
+              <del class="suggestion-regular-price">₹${item.regularPrice.toLocaleString('en-IN')}</del>
+              <span class="suggestion-discount-badge">-${item.discountPercent}%</span>
+            </div>
+          ` : `
+            <span class="suggestion-price">₹${(item.price || 0).toLocaleString('en-IN')}</span>
+          `}
         </div>
       </li>
     `;
@@ -4296,6 +5033,23 @@ function renderSuggestionsDropdown(suggestions, query, totalMatches = 0, hasMore
     });
   });
 
+  // Attach listener to category shortcut chips
+  searchSuggestionsDropdown.querySelectorAll('.suggestion-cat-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const cat = chip.dataset.category;
+      closeSuggestionsDropdown();
+      if (cat) {
+        currentCategory = cat;
+        if (categoryFilter) categoryFilter.value = cat;
+        if (searchInput) searchInput.value = '';
+        currentSearchTerm = '';
+        if (clearSearchBtn) clearSearchBtn.style.display = 'none';
+        applyFiltersAndRender(true);
+      }
+    });
+  });
+
   // Attach listener to "View all results" button if present
   const viewAllBtn = searchSuggestionsDropdown.querySelector('#suggestions-view-all-btn');
   if (viewAllBtn) {
@@ -4336,6 +5090,10 @@ function submitSearchQuery(query) {
     suggestionAbortController.abort();
   }
 
+  if (normalized) {
+    saveRecentSearch(normalized);
+  }
+
   if (searchInput) {
     searchInput.value = normalized;
   }
@@ -4349,7 +5107,7 @@ function submitSearchQuery(query) {
 async function fetchSuggestions(query) {
   const trimmed = (query || '').trim();
   if (!trimmed || trimmed.length < 1) {
-    closeSuggestionsDropdown();
+    renderRecentSearchesDropdown();
     return;
   }
 
@@ -4365,7 +5123,6 @@ async function fetchSuggestions(query) {
       signal: suggestionAbortController.signal
     });
 
-    // Discard response if a newer request was dispatched
     if (currentRequestId !== latestSuggestionRequestId) {
       return;
     }
@@ -4377,20 +5134,18 @@ async function fetchSuggestions(query) {
 
     const result = await response.json();
 
-    // Verify search input still matches query before rendering
     if (!searchInput || searchInput.value.trim().length < 1) {
-      closeSuggestionsDropdown();
+      renderRecentSearchesDropdown();
       return;
     }
 
     if (result.success && Array.isArray(result.data)) {
-      renderSuggestionsDropdown(result.data, trimmed, result.totalMatches, result.hasMore);
+      renderSuggestionsDropdown(result.data, trimmed, result.totalMatches, result.hasMore, result.categories);
     } else {
       closeSuggestionsDropdown();
     }
   } catch (error) {
     if (error.name === 'AbortError') {
-      // Intentionally aborted due to newer keystroke; do not clear UI or error out
       return;
     }
     console.debug('Autocomplete fetch error:', error);
@@ -4413,14 +5168,30 @@ if (searchInput) {
       applyFiltersAndRender(true);
     }, 300);
 
-    // 2. Debounced autocomplete suggestions (from 1st character, 220ms)
+    // 2. Debounced autocomplete suggestions
     clearTimeout(suggestionDebounceTimer);
     if (query.length < 1) {
-      closeSuggestionsDropdown();
+      renderRecentSearchesDropdown();
     } else {
       suggestionDebounceTimer = setTimeout(() => {
         fetchSuggestions(query);
-      }, 220);
+      }, 200);
+    }
+  });
+
+  searchInput.addEventListener('focus', () => {
+    const q = (searchInput.value || '').trim();
+    if (q.length === 0) {
+      renderRecentSearchesDropdown();
+    } else {
+      fetchSuggestions(q);
+    }
+  });
+
+  searchInput.addEventListener('click', () => {
+    const q = (searchInput.value || '').trim();
+    if (q.length === 0) {
+      renderRecentSearchesDropdown();
     }
   });
 
@@ -4467,7 +5238,6 @@ if (searchInput) {
         return;
       }
     } else if (e.key === 'Tab') {
-      // Natural Tab key navigation: close suggestions dropdown
       closeSuggestionsDropdown();
     }
   });
@@ -4573,6 +5343,26 @@ if (cartModal) {
   });
 }
 
+// Cart Coupon & Promo Code Event Listeners
+if (cartCouponApplyBtn) {
+  cartCouponApplyBtn.addEventListener('click', () => {
+    applyCouponCode(cartCouponInput ? cartCouponInput.value : '', 'cart');
+  });
+}
+
+if (cartCouponInput) {
+  cartCouponInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyCouponCode(cartCouponInput.value, 'cart');
+    }
+  });
+}
+
+if (cartRemoveCouponBtn) {
+  cartRemoveCouponBtn.addEventListener('click', removeAppliedCoupon);
+}
+
 // Wishlist Modal Trigger & Close
 if (navWishlistBtn) navWishlistBtn.addEventListener('click', openWishlistModal);
 if (wishlistCloseBtn) wishlistCloseBtn.addEventListener('click', closeWishlistModal);
@@ -4617,6 +5407,26 @@ if (checkoutModal) {
   checkoutModal.addEventListener('click', (e) => {
     if (e.target === checkoutModal) closeCheckoutModal();
   });
+}
+
+// Checkout Coupon & Promo Code Event Listeners
+if (checkoutCouponApplyBtn) {
+  checkoutCouponApplyBtn.addEventListener('click', () => {
+    applyCouponCode(checkoutCouponInput ? checkoutCouponInput.value : '', 'checkout');
+  });
+}
+
+if (checkoutCouponInput) {
+  checkoutCouponInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyCouponCode(checkoutCouponInput.value, 'checkout');
+    }
+  });
+}
+
+if (checkoutRemoveCouponBtn) {
+  checkoutRemoveCouponBtn.addEventListener('click', removeAppliedCoupon);
 }
 
 // Payment method selection listeners
@@ -5099,19 +5909,34 @@ function setAdminTab(tabName) {
 
   // Toggle Tab Button Classes
   if (adminTabOverview) adminTabOverview.classList.toggle('active', tabName === 'overview');
+  if (adminTabSales) adminTabSales.classList.toggle('active', tabName === 'sales');
+  if (adminTabCoupons) adminTabCoupons.classList.toggle('active', tabName === 'coupons');
   if (adminTabProducts) adminTabProducts.classList.toggle('active', tabName === 'products');
   if (adminTabOrders) adminTabOrders.classList.toggle('active', tabName === 'orders');
   if (adminTabReviews) adminTabReviews.classList.toggle('active', tabName === 'reviews');
   if (adminTabAnalytics) adminTabAnalytics.classList.toggle('active', tabName === 'analytics');
+  if (adminTabSellers) adminTabSellers.classList.toggle('active', tabName === 'sellers');
 
-  // Toggle Section Displays
+  // Smooth scroll active tab into view in nav bar
+  const activeTabBtn = document.getElementById(`admin-tab-${tabName}`);
+  if (activeTabBtn && typeof activeTabBtn.scrollIntoView === 'function') {
+    activeTabBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  }
+
+  // Toggle Section Displays consistently as flex
   if (adminOverviewSection) adminOverviewSection.style.display = tabName === 'overview' ? 'flex' : 'none';
+  if (adminSalesSection) adminSalesSection.style.display = tabName === 'sales' ? 'flex' : 'none';
+  if (adminCouponsSection) adminCouponsSection.style.display = tabName === 'coupons' ? 'flex' : 'none';
+  if (adminSellersSection) adminSellersSection.style.display = tabName === 'sellers' ? 'flex' : 'none';
   if (adminProductsSection) adminProductsSection.style.display = tabName === 'products' ? 'flex' : 'none';
   if (adminOrdersSection) adminOrdersSection.style.display = tabName === 'orders' ? 'flex' : 'none';
   if (adminReviewsSection) adminReviewsSection.style.display = tabName === 'reviews' ? 'flex' : 'none';
   if (adminAnalyticsSection) adminAnalyticsSection.style.display = tabName === 'analytics' ? 'flex' : 'none';
 
   if (tabName === 'overview') fetchAdminStats();
+  if (tabName === 'sellers') fetchAdminSellers();
+  if (tabName === 'sales') fetchAdminSales();
+  if (tabName === 'coupons') fetchAdminCoupons();
   if (tabName === 'products') fetchAdminProducts();
   if (tabName === 'orders') fetchAdminOrders();
   if (tabName === 'reviews') fetchAdminReviews();
@@ -5159,12 +5984,56 @@ async function fetchAdminStats() {
       if (statTotalOrders) statTotalOrders.textContent = data.data.orders ?? 0;
       if (statPendingOrders) statPendingOrders.textContent = data.data.pendingOrders ?? 0;
       if (statTotalReviews) statTotalReviews.textContent = data.data.reviews ?? 0;
+      if (statPendingSellers) statPendingSellers.textContent = data.data.pendingSellers ?? 0;
+      if (adminPendingSellersCount) {
+        const pCount = data.data.pendingSellers || 0;
+        adminPendingSellersCount.textContent = pCount;
+        adminPendingSellersCount.style.display = pCount > 0 ? 'inline-block' : 'none';
+      }
+      if (adminPendingOrdersCount) {
+        const poCount = data.data.pendingOrders || 0;
+        adminPendingOrdersCount.textContent = poCount;
+        adminPendingOrdersCount.style.display = poCount > 0 ? 'inline-block' : 'none';
+      }
     } else {
       if (adminAlertBox) {
         adminAlertBox.textContent = data.message || 'Failed to load dashboard metrics';
         adminAlertBox.style.display = 'block';
       }
     }
+
+    // Also fetch live sale status to populate Overview spotlight card
+    fetch(`${API_BASE_URL}/sales/current`)
+      .then(r => r.json())
+      .then(saleRes => {
+        if (saleRes && saleRes.success && saleRes.data) {
+          const sale = saleRes.data;
+          if (overviewSaleTitle) overviewSaleTitle.textContent = sale.name || 'Festival Mega Sale';
+          if (overviewSaleSubtitle) {
+            overviewSaleSubtitle.textContent = sale.isLive
+              ? `⚡ Heavy Festive Discounts Active across ${sale.discountedProductsCount || 27} Catalog Deals`
+              : '🛑 Festival Sale is currently ENDED. Catalog products are at regular prices.';
+          }
+          if (overviewSaleDot) {
+            overviewSaleDot.className = sale.isLive ? 'sale-status-dot' : 'sale-status-dot ended';
+          }
+          if (overviewSaleStatusBadge) {
+            overviewSaleStatusBadge.textContent = sale.isLive ? 'LIVE NOW' : 'ENDED';
+            overviewSaleStatusBadge.style.color = sale.isLive ? '#10b981' : '#ef4444';
+          }
+          if (overviewSaleTimer) {
+            if (sale.isLive && sale.remainingMs > 0) {
+              const d = Math.floor(sale.remainingMs / (1000 * 60 * 60 * 24));
+              const h = Math.floor((sale.remainingMs / (1000 * 60 * 60)) % 24);
+              const m = Math.floor((sale.remainingMs / (1000 * 60)) % 60);
+              overviewSaleTimer.textContent = `${d}d ${h}h ${m}m remaining`;
+            } else {
+              overviewSaleTimer.textContent = 'Sale Concluded';
+            }
+          }
+        }
+      })
+      .catch(() => {});
   } catch (err) {
     if (adminAlertBox) {
       adminAlertBox.textContent = 'Network error fetching dashboard metrics';
@@ -5386,7 +6255,7 @@ function renderAdminOrdersTable(orders) {
     return;
   }
 
-  const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  const statuses = ['Pending', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'];
 
   adminOrdersTbody.innerHTML = orders.map(order => {
     const customerText = order.user ? `${escapeHtml(order.user.name)} (${escapeHtml(order.user.email)})` : 'Unknown User';
@@ -5424,9 +6293,14 @@ function renderAdminOrdersTable(orders) {
           </div>
         </td>
         <td>
-          <select class="admin-status-select" data-id="${escapeHtml(order._id)}" aria-label="Update order status">
-            ${statusOptions}
-          </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <select class="admin-status-select" data-id="${escapeHtml(order._id)}" aria-label="Update order status">
+              ${statusOptions}
+            </select>
+            <button type="button" class="btn btn-secondary btn-xs admin-view-invoice-btn" data-id="${escapeHtml(order._id)}" title="View Customer Invoice">
+              📄
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -5445,6 +6319,16 @@ function renderAdminOrdersTable(orders) {
       const orderId = select.dataset.id;
       const newPaymentStatus = select.value;
       await updateOrderPaymentStatus(orderId, newPaymentStatus, select);
+    });
+  });
+
+  adminOrdersTbody.querySelectorAll('.admin-view-invoice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const orderId = btn.dataset.id;
+      const order = orders.find(o => String(o._id) === String(orderId));
+      if (order && typeof window.openInvoiceModal === 'function') {
+        window.openInvoiceModal(order);
+      }
     });
   });
 }
@@ -6000,25 +6884,753 @@ function renderAnalyticsRecentOrders(orders) {
   }).join('');
 }
 
+// ============================================================
+// Admin Sales & Campaigns Management
+// ============================================================
+
+let currentAdminSaleData = null;
+
+async function fetchAdminSales() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sales`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success && data.data) {
+      currentAdminSaleData = data.data;
+      renderAdminSalesUI(data.data);
+    } else {
+      showToast(data.message || 'Failed to load sale campaign data');
+    }
+  } catch (err) {
+    showToast('Network error loading sale campaign data');
+  }
+}
+
+function renderAdminSalesUI(sale) {
+  if (!sale) return;
+
+  const isLive = Boolean(sale.isLive);
+
+  // Status Badge
+  if (adminSaleBadge) {
+    adminSaleBadge.className = isLive ? 'live-pulse-badge' : 'live-pulse-badge ended';
+  }
+  if (adminSaleBadgeText) {
+    adminSaleBadgeText.textContent = isLive ? 'LIVE SALE ACTIVE' : 'SALE ENDED / INACTIVE';
+  }
+  if (adminSaleTypePill) {
+    adminSaleTypePill.textContent = (sale.bannerBadge || 'FESTIVAL SPECIAL').toUpperCase();
+  }
+
+  // Heading & Details
+  if (adminSaleName) adminSaleName.textContent = sale.name || 'Festival Mega Sale';
+  if (adminSaleTagline) adminSaleTagline.textContent = sale.tagline || 'Festive Deals Live!';
+  if (adminSaleDesc) {
+    adminSaleDesc.textContent = sale.discountDescription || 'Heavy festive discounts active across top catalog items.';
+  }
+
+  // Remaining Time Display
+  if (adminSaleEndDisplay) {
+    if (isLive && sale.remainingMs > 0) {
+      const d = Math.floor(sale.remainingMs / (1000 * 60 * 60 * 24));
+      const h = Math.floor((sale.remainingMs / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((sale.remainingMs / (1000 * 60)) % 60);
+      adminSaleEndDisplay.textContent = `⏳ Ends in: ${d}d ${h}h ${m}m (${new Date(sale.endDate).toLocaleDateString()})`;
+      adminSaleEndDisplay.style.color = '#f59e0b';
+    } else {
+      adminSaleEndDisplay.textContent = '🛑 Sale Status: Concluded / Inactive';
+      adminSaleEndDisplay.style.color = '#ef4444';
+    }
+  }
+
+  // Control Buttons Toggle
+  if (btnEndSaleNow) btnEndSaleNow.style.display = isLive ? 'inline-flex' : 'none';
+  if (btnResumeSaleNow) btnResumeSaleNow.style.display = isLive ? 'none' : 'inline-flex';
+
+  // Form Fields Population
+  if (saleInputName) saleInputName.value = sale.name || '';
+  if (saleInputBadge) saleInputBadge.value = sale.bannerBadge || '';
+  if (saleInputTagline) saleInputTagline.value = sale.tagline || '';
+  if (saleInputCoupon) saleInputCoupon.value = sale.couponCode || 'FESTIVE10';
+  if (saleInputDesc) saleInputDesc.value = sale.discountDescription || '';
+
+  if (saleInputEndDate && sale.endDate) {
+    try {
+      const endObj = new Date(sale.endDate);
+      const pad = (n) => String(n).padStart(2, '0');
+      const formattedDT = `${endObj.getFullYear()}-${pad(endObj.getMonth() + 1)}-${pad(endObj.getDate())}T${pad(endObj.getHours())}:${pad(endObj.getMinutes())}`;
+      saleInputEndDate.value = formattedDT;
+    } catch (e) {
+      // fallback
+    }
+  }
+
+  // Deals Chip List
+  if (adminDealsCount) adminDealsCount.textContent = (sale.catalogItems && sale.catalogItems.length) || 27;
+  if (adminDealsChipList && Array.isArray(sale.catalogItems)) {
+    adminDealsChipList.innerHTML = sale.catalogItems.map(item => `
+      <span class="deal-chip">
+        <span>${escapeHtml(item.name.replace(/\b\w/g, l => l.toUpperCase()))}</span>
+        <span class="deal-chip-pct">${item.discountPct}% OFF</span>
+      </span>
+    `).join('');
+  }
+
+  // Audit History Timeline
+  if (adminSalesHistory) {
+    const historyList = Array.isArray(sale.history) ? sale.history.slice(-8).reverse() : [];
+    if (historyList.length === 0) {
+      adminSalesHistory.innerHTML = '<div style="color:var(--color-text-muted); font-size:0.8rem;">No activity logged yet.</div>';
+    } else {
+      adminSalesHistory.innerHTML = historyList.map(h => {
+        const timeStr = new Date(h.timestamp || Date.now()).toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const actionClass = (h.action || '').toLowerCase();
+        return `
+          <div class="history-item ${actionClass}">
+            <span class="history-action-badge">${escapeHtml(h.action || 'LOG')}</span>
+            <span class="history-details">${escapeHtml(h.details || '')} (by ${escapeHtml(h.performedBy || 'Admin')})</span>
+            <span class="history-time">${timeStr}</span>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+}
+
+async function extendAdminSale(hours = 24, customEndDate = null) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sales/extend`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ hours, customEndDate })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(`🎉 ${data.message}`);
+      fetchAdminSales();
+      initFestivalSaleBanner();
+    } else {
+      showToast(data.message || 'Failed to extend sale');
+    }
+  } catch (err) {
+    showToast('Network error extending sale');
+  }
+}
+
+async function endAdminSale() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  const confirmed = confirm('Are you sure you want to END the Live Festival Sale now?\n\nThis will immediately conclude the sale, turn off festive deals across the storefront, and restore standard catalog prices.');
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sales/end`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(`🛑 ${data.message}`);
+      fetchAdminSales();
+      initFestivalSaleBanner();
+    } else {
+      showToast(data.message || 'Failed to end sale');
+    }
+  } catch (err) {
+    showToast('Network error ending sale');
+  }
+}
+
+async function resumeAdminSale() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sales/resume`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(`🚀 ${data.message}`);
+      fetchAdminSales();
+      initFestivalSaleBanner();
+    } else {
+      showToast(data.message || 'Failed to resume sale');
+    }
+  } catch (err) {
+    showToast('Network error resuming sale');
+  }
+}
+
+async function saveAdminSaleSettings(e) {
+  if (e) e.preventDefault();
+  const token = getAuthToken();
+  if (!token) return;
+
+  const payload = {
+    name: saleInputName ? saleInputName.value.trim() : undefined,
+    bannerBadge: saleInputBadge ? saleInputBadge.value.trim() : undefined,
+    tagline: saleInputTagline ? saleInputTagline.value.trim() : undefined,
+    couponCode: saleInputCoupon ? saleInputCoupon.value.trim() : undefined,
+    discountDescription: saleInputDesc ? saleInputDesc.value.trim() : undefined,
+    endDate: saleInputEndDate ? saleInputEndDate.value : undefined
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sales/update`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast('✓ Campaign settings updated and synced across storefront!');
+      fetchAdminSales();
+      initFestivalSaleBanner();
+    } else {
+      showToast(data.message || 'Failed to update campaign settings');
+    }
+  } catch (err) {
+    showToast('Network error updating campaign settings');
+  }
+}
+
+// ============================================================
+// Admin Coupons & Discounts Management
+// ============================================================
+async function fetchAdminCoupons() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  if (adminCouponsTbody) {
+    adminCouponsTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px;"><div class="spinner"></div> Loading coupons...</td></tr>`;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/coupons`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success && Array.isArray(data.data)) {
+      renderAdminCoupons(data.data);
+    } else {
+      if (adminCouponsTbody) {
+        adminCouponsTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color: #ef4444;">${data.message || 'Failed to load coupons.'}</td></tr>`;
+      }
+    }
+  } catch (err) {
+    if (adminCouponsTbody) {
+      adminCouponsTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color: #ef4444;">Network error loading coupons.</td></tr>`;
+    }
+  }
+}
+
+function renderAdminCoupons(coupons) {
+  if (!adminCouponsTbody) return;
+
+  if (!coupons || coupons.length === 0) {
+    adminCouponsTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 32px; color: var(--color-text-muted);">No coupons created yet. Click "➕ New Coupon" to create your first discount offer.</td></tr>`;
+    return;
+  }
+
+  const now = new Date();
+
+  adminCouponsTbody.innerHTML = coupons.map(c => {
+    const isExpired = c.expiryDate && new Date(c.expiryDate) < now;
+    let statusClass = 'active';
+    let statusLabel = 'Active';
+
+    if (isExpired) {
+      statusClass = 'expired';
+      statusLabel = 'Expired';
+    } else if (!c.isActive) {
+      statusClass = 'disabled';
+      statusLabel = 'Disabled';
+    }
+
+    const discountLabel = c.discountType === 'PERCENTAGE'
+      ? `${c.discountValue}% OFF ${c.maxDiscountAmount ? `(Max ₹${c.maxDiscountAmount})` : ''}`
+      : `₹${c.discountValue} FLAT OFF`;
+
+    const minOrderLabel = c.minOrderAmount > 0 ? `₹${c.minOrderAmount}` : 'None (₹0)';
+    const usageLabel = c.usageLimit ? `${c.usageCount || 0} / ${c.usageLimit}` : `${c.usageCount || 0} uses`;
+    const expiryFormatted = c.expiryDate ? new Date(c.expiryDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Never';
+
+    return `
+      <tr>
+        <td>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="coupon-code-pill">🏷️ ${escapeHtml(c.code)}</span>
+            <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="copyCouponCodeToClipboard('${escapeHtml(c.code)}')" title="Copy Code">📋</button>
+          </div>
+          ${c.description ? `<div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 4px;">${escapeHtml(c.description)}</div>` : ''}
+        </td>
+        <td>
+          <span class="coupon-discount-badge">${discountLabel}</span>
+        </td>
+        <td style="font-size: 0.82rem; font-weight: 600;">${minOrderLabel}</td>
+        <td>
+          <span class="coupon-usage-badge">${usageLabel}</span>
+        </td>
+        <td style="font-size: 0.8rem; color: var(--color-text-muted);">${expiryFormatted}</td>
+        <td>
+          <span class="coupon-status-pill ${statusClass}">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>
+            ${statusLabel}
+          </span>
+        </td>
+        <td>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.74rem; padding: 4px 8px;" onclick="toggleAdminCoupon('${c._id}')">
+              ${c.isActive ? 'Disable' : 'Enable'}
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.74rem; padding: 4px 8px; color: #ef4444;" onclick="deleteAdminCoupon('${c._id}', '${escapeHtml(c.code)}')">
+              🗑️
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function copyCouponCodeToClipboard(code) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => {
+      showToast(`Copied coupon code "${code}" to clipboard!`);
+    }).catch(() => {
+      showToast(`Code: ${code}`);
+    });
+  } else {
+    showToast(`Code: ${code}`);
+  }
+}
+
+async function createAdminCoupon(e) {
+  if (e) e.preventDefault();
+  const token = getAuthToken();
+  if (!token) return;
+
+  const code = newCouponCodeInput ? newCouponCodeInput.value.trim().toUpperCase() : '';
+  const discountType = newCouponTypeInput ? newCouponTypeInput.value : 'FLAT';
+  const discountValue = newCouponValueInput ? parseFloat(newCouponValueInput.value) : 0;
+  const minOrderAmount = newCouponMinOrderInput ? parseFloat(newCouponMinOrderInput.value) || 0 : 0;
+  const maxDiscountAmount = newCouponMaxDiscountInput && newCouponMaxDiscountInput.value ? parseFloat(newCouponMaxDiscountInput.value) : null;
+  const usageLimit = newCouponUsageLimitInput && newCouponUsageLimitInput.value ? parseInt(newCouponUsageLimitInput.value, 10) : null;
+  const expiryDate = newCouponExpiryInput ? newCouponExpiryInput.value : '';
+  const description = newCouponDescInput ? newCouponDescInput.value.trim() : '';
+
+  if (!code) {
+    showToast('Please enter a coupon code.');
+    return;
+  }
+  if (!discountValue || discountValue <= 0) {
+    showToast('Please enter a valid discount value.');
+    return;
+  }
+  if (!expiryDate) {
+    showToast('Please select an expiry date.');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submit-create-coupon-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/coupons`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        code,
+        discountType,
+        discountValue,
+        minOrderAmount,
+        maxDiscountAmount,
+        usageLimit,
+        expiryDate,
+        description
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(`🎉 ${data.message}`);
+      if (adminCouponCreator) adminCouponCreator.style.display = 'none';
+      if (adminCreateCouponForm) adminCreateCouponForm.reset();
+      fetchAdminCoupons();
+      fetchAvailableCoupons();
+    } else {
+      showToast(data.message || 'Failed to create coupon.');
+    }
+  } catch (err) {
+    showToast('Network error creating coupon.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save & Activate Coupon';
+    }
+  }
+}
+
+async function toggleAdminCoupon(id) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/coupons/${id}/toggle`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(data.message);
+      fetchAdminCoupons();
+      fetchAvailableCoupons();
+    } else {
+      showToast(data.message || 'Failed to toggle coupon status.');
+    }
+  } catch (err) {
+    showToast('Network error toggling coupon.');
+  }
+}
+
+async function deleteAdminCoupon(id, code) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  const confirmed = confirm(`Are you sure you want to permanently delete coupon "${code}"?`);
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/coupons/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast(data.message);
+      fetchAdminCoupons();
+      fetchAvailableCoupons();
+    } else {
+      showToast(data.message || 'Failed to delete coupon.');
+    }
+  } catch (err) {
+    showToast('Network error deleting coupon.');
+  }
+}
+
+// ============================================================
+// Admin Seller Verification & Approval Handlers
+// ============================================================
+async function fetchAdminSellers() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  if (adminSellersTbody) {
+    adminSellersTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--color-text-muted);">Loading merchant profiles...</td></tr>`;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sellers`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = await res.json();
+
+    if (res.ok && result.success && result.data) {
+      const data = result.data;
+      allAdminSellers = data.sellers || [];
+
+      if (adminSellersTotalNum) adminSellersTotalNum.textContent = data.total || 0;
+      if (adminSellersPendingNum) adminSellersPendingNum.textContent = data.pending || 0;
+      if (adminSellersVerifiedNum) adminSellersVerifiedNum.textContent = data.verified || 0;
+      if (adminSellersRejectedNum) adminSellersRejectedNum.textContent = data.rejected || 0;
+
+      if (adminPendingSellersCount) {
+        adminPendingSellersCount.textContent = data.pending || 0;
+        adminPendingSellersCount.style.display = data.pending > 0 ? 'inline-block' : 'none';
+      }
+
+      renderAdminSellersTable(currentSellerFilter);
+    } else {
+      if (adminSellersTbody) {
+        adminSellersTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--color-text-muted);">Failed to load sellers.</td></tr>`;
+      }
+    }
+  } catch (err) {
+    if (adminSellersTbody) {
+      adminSellersTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--color-danger);">Network error fetching sellers.</td></tr>`;
+    }
+  }
+}
+
+function renderAdminSellersTable(filter = 'all') {
+  if (!adminSellersTbody) return;
+
+  currentSellerFilter = filter;
+  let filtered = allAdminSellers;
+
+  if (filter !== 'all') {
+    filtered = allAdminSellers.filter(s => (s.sellerDetails?.verificationStatus || 'pending') === filter);
+  }
+
+  if (filtered.length === 0) {
+    adminSellersTbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; padding: 32px; color: var(--color-text-muted);">
+          No merchants found matching the "${filter}" filter.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  adminSellersTbody.innerHTML = filtered.map(seller => {
+    const sd = seller.sellerDetails || {};
+    const status = (sd.verificationStatus || 'pending').toLowerCase();
+    const isVerified = status === 'verified';
+    const isRejected = status === 'rejected';
+    const isPending = status === 'pending';
+
+    let badgeHtml = '';
+    if (isVerified) {
+      badgeHtml = `<span class="badge-verification badge-verified">✅ Verified</span>`;
+    } else if (isRejected) {
+      badgeHtml = `<span class="badge-verification badge-rejected">❌ Rejected</span>`;
+    } else {
+      badgeHtml = `<span class="badge-verification badge-pending">⏳ Pending Review</span>`;
+    }
+
+    let actionsHtml = '';
+    if (isPending) {
+      actionsHtml = `
+        <div class="seller-action-btn-group">
+          <button type="button" class="btn-approve-seller" onclick="verifyAdminSeller('${seller._id}', 'verified')">✅ Approve</button>
+          <button type="button" class="btn-reject-seller" onclick="verifyAdminSeller('${seller._id}', 'rejected')">❌ Reject</button>
+        </div>
+      `;
+    } else if (isVerified) {
+      actionsHtml = `
+        <div class="seller-action-btn-group">
+          <button type="button" class="btn-reject-seller" onclick="verifyAdminSeller('${seller._id}', 'rejected')">Revoke</button>
+        </div>
+      `;
+    } else {
+      actionsHtml = `
+        <div class="seller-action-btn-group">
+          <button type="button" class="btn-approve-seller" onclick="verifyAdminSeller('${seller._id}', 'verified')">Re-Approve</button>
+        </div>
+      `;
+    }
+
+    return `
+      <tr>
+        <td>
+          <strong style="color: var(--color-text-main); font-size: 0.95rem; display: block;">${escapeHtml(sd.businessName || '—')}</strong>
+          <small style="color: var(--color-text-muted);">Owner: ${escapeHtml(seller.name)} (${escapeHtml(seller.email)})</small>
+        </td>
+        <td>
+          <div>📞 <strong>${escapeHtml(sd.contactNumber || seller.phone || '—')}</strong></div>
+          <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px;">📍 ${escapeHtml(sd.businessAddress || '—')}</div>
+        </td>
+        <td>
+          <div>PAN: <span class="badge-code">${escapeHtml(sd.pan || '—')}</span></div>
+          <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px;">GSTIN: ${escapeHtml(sd.gstin || 'Exempt / Not Applicable')}</div>
+        </td>
+        <td>${badgeHtml}</td>
+        <td class="text-right">${actionsHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function verifyAdminSeller(id, status) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  const actionName = status === 'verified' ? 'approve' : (status === 'rejected' ? 'reject' : 'update');
+  const confirmed = confirm(`Are you sure you want to ${actionName} this merchant application?`);
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/sellers/${id}/verify`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    const result = await res.json();
+    if (res.ok && result.success) {
+      showToast(`✓ ${result.message}`);
+      fetchAdminSellers();
+      fetchAdminStats();
+
+      // If the currently logged-in user is this seller, update their profile badge in real time!
+      const currentUser = getAuthUser();
+      if (currentUser && currentUser.id === id) {
+        if (!currentUser.sellerDetails) currentUser.sellerDetails = {};
+        currentUser.sellerDetails.verificationStatus = status;
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        if (sellerVerificationStatusBadge) {
+          if (status === 'verified') {
+            sellerVerificationStatusBadge.textContent = '✅ Verified Merchant';
+            sellerVerificationStatusBadge.className = 'badge-verification badge-verified';
+          } else if (status === 'rejected') {
+            sellerVerificationStatusBadge.textContent = '❌ Verification Rejected';
+            sellerVerificationStatusBadge.className = 'badge-verification badge-rejected';
+          } else {
+            sellerVerificationStatusBadge.textContent = '⏳ Pending Verification';
+            sellerVerificationStatusBadge.className = 'badge-verification badge-pending';
+          }
+        }
+      }
+    } else {
+      showToast(result.message || 'Failed to update merchant verification status.');
+    }
+  } catch (err) {
+    showToast('Network error updating merchant status.');
+  }
+}
+
+// Expose handlers to global window for inline onclick handlers
+window.copyCouponCodeToClipboard = copyCouponCodeToClipboard;
+window.toggleAdminCoupon = toggleAdminCoupon;
+window.deleteAdminCoupon = deleteAdminCoupon;
+window.verifyAdminSeller = verifyAdminSeller;
+
 // Event Listeners - Admin Modal Controls
 if (navAdminBtn) navAdminBtn.addEventListener('click', openAdminModal);
 if (adminCloseBtn) adminCloseBtn.addEventListener('click', closeAdminModal);
 if (refreshAdminBtn) {
   refreshAdminBtn.addEventListener('click', () => {
     if (currentAdminTab === 'overview') fetchAdminStats();
+    if (currentAdminTab === 'sellers') fetchAdminSellers();
+    if (currentAdminTab === 'sales') fetchAdminSales();
     if (currentAdminTab === 'products') fetchAdminProducts();
     if (currentAdminTab === 'orders') fetchAdminOrders();
     if (currentAdminTab === 'reviews') fetchAdminReviews();
     if (currentAdminTab === 'analytics') fetchAdminAnalytics();
+    if (currentAdminTab === 'coupons') fetchAdminCoupons();
     showToast('Admin data refreshed.');
   });
 }
 
 if (adminTabOverview) adminTabOverview.addEventListener('click', () => setAdminTab('overview'));
+if (adminTabSellers) adminTabSellers.addEventListener('click', () => setAdminTab('sellers'));
+if (cardPendingMerchants) cardPendingMerchants.addEventListener('click', () => setAdminTab('sellers'));
+if (cardOverviewProducts) cardOverviewProducts.addEventListener('click', () => setAdminTab('products'));
+if (cardOverviewOrders) cardOverviewOrders.addEventListener('click', () => setAdminTab('orders'));
+if (cardOverviewPendingOrders) cardOverviewPendingOrders.addEventListener('click', () => setAdminTab('orders'));
+if (cardOverviewReviews) cardOverviewReviews.addEventListener('click', () => setAdminTab('reviews'));
+if (refreshSellersBtn) refreshSellersBtn.addEventListener('click', fetchAdminSellers);
+if (adminTabSales) adminTabSales.addEventListener('click', () => setAdminTab('sales'));
+if (adminTabCoupons) adminTabCoupons.addEventListener('click', () => setAdminTab('coupons'));
 if (adminTabProducts) adminTabProducts.addEventListener('click', () => setAdminTab('products'));
 if (adminTabOrders) adminTabOrders.addEventListener('click', () => setAdminTab('orders'));
 if (adminTabReviews) adminTabReviews.addEventListener('click', () => setAdminTab('reviews'));
 if (adminTabAnalytics) adminTabAnalytics.addEventListener('click', () => setAdminTab('analytics'));
+
+// Seller filter pills listener
+document.querySelectorAll('#seller-filter-pills .filter-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#seller-filter-pills .filter-pill').forEach(p => p.classList.remove('is-active'));
+    pill.classList.add('is-active');
+    const filter = pill.getAttribute('data-seller-filter') || 'all';
+    renderAdminSellersTable(filter);
+  });
+});
+
+if (overviewManageSaleBtn) {
+  overviewManageSaleBtn.addEventListener('click', () => setAdminTab('sales'));
+}
+
+// Admin Coupon Action Listeners
+if (refreshCouponsBtn) refreshCouponsBtn.addEventListener('click', fetchAdminCoupons);
+if (adminNewCouponBtn) {
+  adminNewCouponBtn.addEventListener('click', () => {
+    if (adminCouponCreator) {
+      adminCouponCreator.style.display = adminCouponCreator.style.display === 'none' ? 'block' : 'none';
+      if (adminCouponCreator.style.display === 'block') {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 30);
+        if (newCouponExpiryInput && !newCouponExpiryInput.value) {
+          newCouponExpiryInput.value = tomorrow.toISOString().split('T')[0];
+        }
+        if (newCouponCodeInput) newCouponCodeInput.focus();
+      }
+    }
+  });
+}
+if (closeCouponCreatorBtn) {
+  closeCouponCreatorBtn.addEventListener('click', () => {
+    if (adminCouponCreator) adminCouponCreator.style.display = 'none';
+  });
+}
+if (cancelCreateCouponBtn) {
+  cancelCreateCouponBtn.addEventListener('click', () => {
+    if (adminCouponCreator) adminCouponCreator.style.display = 'none';
+  });
+}
+if (adminCreateCouponForm) {
+  adminCreateCouponForm.addEventListener('submit', createAdminCoupon);
+}
+
+// Sales Action Button Listeners
+if (btnExtendSale24h) btnExtendSale24h.addEventListener('click', () => extendAdminSale(24));
+if (btnExtendSale48h) btnExtendSale48h.addEventListener('click', () => extendAdminSale(48));
+if (btnExtendSale7d) btnExtendSale7d.addEventListener('click', () => extendAdminSale(168));
+if (btnEndSaleNow) btnEndSaleNow.addEventListener('click', endAdminSale);
+if (btnResumeSaleNow) btnResumeSaleNow.addEventListener('click', resumeAdminSale);
+if (refreshSalesBtn) refreshSalesBtn.addEventListener('click', fetchAdminSales);
+if (adminSaleForm) adminSaleForm.addEventListener('submit', saveAdminSaleSettings);
 
 if (refreshAnalyticsBtn) refreshAnalyticsBtn.addEventListener('click', () => fetchAdminAnalytics());
 if (retryAnalyticsBtn) retryAnalyticsBtn.addEventListener('click', () => fetchAdminAnalytics());
@@ -6141,6 +7753,100 @@ function initHeroInteractiveFeatures() {
       closeAllHeroPopovers();
     }
   });
+}
+
+// ============================================================
+// Festival Mega Sale Banner (Live Countdown & Coupon Copy)
+// ============================================================
+
+function initFestivalSaleBanner() {
+  const daysEl = document.getElementById('festive-days');
+  const hoursEl = document.getElementById('festive-hours');
+  const minsEl = document.getElementById('festive-minutes');
+  const secsEl = document.getElementById('festive-seconds');
+  const copyBtn = document.getElementById('btn-copy-festive-coupon');
+  const bannerBadge = document.querySelector('.festive-badge');
+  const bannerTitle = document.querySelector('.festive-title');
+
+  let targetTime = Date.now() + (48 * 60 * 60 * 1000);
+  let isSaleLive = true;
+
+  // Sync with live server campaign
+  fetch(`${API_BASE_URL}/sales/current`)
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success && res.data) {
+        const sale = res.data;
+        isSaleLive = Boolean(sale.isLive);
+        if (sale.endDate) {
+          targetTime = new Date(sale.endDate).getTime();
+        }
+        if (bannerBadge && sale.bannerBadge) {
+          bannerBadge.textContent = sale.bannerBadge;
+        }
+        if (!isSaleLive && bannerTitle) {
+          bannerTitle.innerHTML = 'Festive Sale Has Concluded <span class="badge-ended" style="background:#ef4444; color:#fff; font-size:0.5em; padding:2px 8px; border-radius:4px; vertical-align:middle;">ENDED</span>';
+        }
+      }
+    })
+    .catch(() => {});
+
+  function updateCountdown() {
+    const now = Date.now();
+    let diff = Math.max(0, targetTime - now);
+
+    if (!isSaleLive || diff <= 0) {
+      if (daysEl) daysEl.textContent = '00';
+      if (hoursEl) hoursEl.textContent = '00';
+      if (minsEl) minsEl.textContent = '00';
+      if (secsEl) secsEl.textContent = '00';
+      return;
+    }
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    if (daysEl) daysEl.textContent = String(d).padStart(2, '0');
+    if (hoursEl) hoursEl.textContent = String(h).padStart(2, '0');
+    if (minsEl) minsEl.textContent = String(m).padStart(2, '0');
+    if (secsEl) secsEl.textContent = String(s).padStart(2, '0');
+  }
+
+  updateCountdown();
+  if (!window._festiveCountdownInterval) {
+    window._festiveCountdownInterval = setInterval(updateCountdown, 1000);
+  }
+
+  // 2. Interactive Coupon Copying with Feedback
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const code = 'FESTIVE10';
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(code);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = code;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        copyBtn.classList.add('copied');
+        const copyText = copyBtn.querySelector('.copy-text');
+        if (copyText) copyText.textContent = '✓ Copied!';
+        showToast('🎉 Coupon code FESTIVE10 copied! Apply at checkout for ₹200 off.');
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          if (copyText) copyText.textContent = 'Copy Code';
+        }, 3000);
+      } catch (err) {
+        showToast('Code: FESTIVE10 (Flat ₹200 off)');
+      }
+    });
+  }
 }
 
 // ============================================================
@@ -6592,17 +8298,71 @@ function initFooterFunctionality() {
     });
   }
 
+  let currentTrackedOrder = null;
+
+  // Global helper to open tracking for a specific order
+  window.openTrackingForOrder = async function(orderId) {
+    if (!orderTrackingModal) return;
+    openFooterModal(orderTrackingModal);
+    if (trackingInput) {
+      trackingInput.value = orderId;
+    }
+    if (trackingError) trackingError.style.display = 'none';
+    if (trackingUnauth) trackingUnauth.style.display = 'none';
+    if (trackingResult) trackingResult.style.display = 'none';
+    if (trackingLoading) trackingLoading.style.display = 'flex';
+
+    const token = getAuthToken();
+    if (!token) {
+      if (trackingLoading) trackingLoading.style.display = 'none';
+      if (trackingUnauth) trackingUnauth.style.display = 'block';
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const result = await response.json();
+      if (trackingLoading) trackingLoading.style.display = 'none';
+
+      if (!response.ok || !result.success || !result.data) {
+        if (trackingError) {
+          trackingError.textContent = result.message || `Order #${orderId} could not be retrieved.`;
+          trackingError.style.display = 'block';
+        }
+        return;
+      }
+
+      renderTrackingResult(result.data);
+    } catch (err) {
+      console.error('Track order direct fetch error:', err);
+      if (trackingLoading) trackingLoading.style.display = 'none';
+      if (trackingError) {
+        trackingError.textContent = 'Network error while querying order status.';
+        trackingError.style.display = 'block';
+      }
+    }
+  };
+
   function renderTrackingResult(order) {
     if (!trackingResult) return;
+    currentTrackedOrder = order;
 
     const idEl = document.getElementById('track-result-id');
     const dateEl = document.getElementById('track-result-date');
     const statusEl = document.getElementById('track-result-status');
     const paymentEl = document.getElementById('track-result-payment');
     const paymentStatusEl = document.getElementById('track-result-payment-status');
+    const carrierEl = document.getElementById('track-result-carrier');
+    const awbEl = document.getElementById('track-result-awb');
+    const etaEl = document.getElementById('track-result-eta');
+    const timelineEl = document.getElementById('track-result-timeline');
     const itemsEl = document.getElementById('track-result-items');
     const addressEl = document.getElementById('track-result-address');
     const totalEl = document.getElementById('track-result-total');
+    const copyAwbBtn = document.getElementById('track-copy-awb-btn');
+    const viewInvoiceBtn = document.getElementById('track-view-invoice-btn');
 
     if (idEl) idEl.textContent = `Order #${order._id}`;
 
@@ -6620,7 +8380,7 @@ function initFooterFunctionality() {
     const currentStatus = (order.status || 'Pending').trim();
     if (statusEl) {
       statusEl.textContent = currentStatus;
-      statusEl.className = 'status-badge in-stock';
+      statusEl.className = `status-badge ${currentStatus.toLowerCase() === 'cancelled' ? 'badge-danger' : 'in-stock'}`;
     }
 
     if (paymentEl) {
@@ -6633,20 +8393,74 @@ function initFooterFunctionality() {
       paymentStatusEl.className = `payment-status-badge badge-${pStatus.toLowerCase()}`;
     }
 
-    // Visual Stepper Stages
+    // Carrier & AWB details
+    const carrierName = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'MiniStore Express';
+    const awbNumber = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `MS-TRK-${order._id.slice(-6).toUpperCase()}`;
+
+    if (carrierEl) carrierEl.textContent = carrierName;
+    if (awbEl) awbEl.textContent = awbNumber;
+
+    if (etaEl) {
+      if (currentStatus.toLowerCase() === 'delivered') {
+        etaEl.textContent = 'Package Delivered';
+        etaEl.className = 'courier-banner-val text-success';
+      } else if (currentStatus.toLowerCase() === 'cancelled') {
+        etaEl.textContent = 'Order Cancelled';
+        etaEl.className = 'courier-banner-val text-danger';
+      } else if (order.tracking && order.tracking.estimatedDeliveryDate) {
+        const etaDate = new Date(order.tracking.estimatedDeliveryDate).toLocaleDateString(undefined, {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        etaEl.textContent = etaDate;
+        etaEl.className = 'courier-banner-val text-success';
+      } else {
+        etaEl.textContent = '3 to 4 Business Days';
+        etaEl.className = 'courier-banner-val text-success';
+      }
+    }
+
+    // Copy AWB action
+    if (copyAwbBtn) {
+      copyAwbBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(awbNumber);
+          copyAwbBtn.textContent = '✓';
+          showToast(`Tracking code ${awbNumber} copied to clipboard!`);
+          setTimeout(() => { copyAwbBtn.textContent = '📋'; }, 2000);
+        } catch (e) {
+          showToast(`Tracking code: ${awbNumber}`);
+        }
+      };
+    }
+
+    // View Invoice button action
+    if (viewInvoiceBtn) {
+      viewInvoiceBtn.onclick = () => {
+        if (currentTrackedOrder && typeof window.openInvoiceModal === 'function') {
+          window.openInvoiceModal(currentTrackedOrder);
+        }
+      };
+    }
+
+    // Visual 5-Stage Stepper
     const statusLower = currentStatus.toLowerCase();
     const stepPlaced = document.getElementById('step-placed');
     const stepProcessing = document.getElementById('step-processing');
     const stepShipped = document.getElementById('step-shipped');
+    const stepOutForDelivery = document.getElementById('step-out-for-delivery');
     const stepDelivered = document.getElementById('step-delivered');
     const line1 = document.getElementById('line-1');
     const line2 = document.getElementById('line-2');
     const line3 = document.getElementById('line-3');
+    const line4 = document.getElementById('line-4');
 
-    [stepPlaced, stepProcessing, stepShipped, stepDelivered].forEach(s => {
+    [stepPlaced, stepProcessing, stepShipped, stepOutForDelivery, stepDelivered].forEach(s => {
       if (s) s.className = 'stepper-step';
     });
-    [line1, line2, line3].forEach(l => {
+    [line1, line2, line3, line4].forEach(l => {
       if (l) l.className = 'stepper-line';
     });
 
@@ -6657,7 +8471,17 @@ function initFooterFunctionality() {
       if (line2) line2.classList.add('completed');
       if (stepShipped) stepShipped.classList.add('completed');
       if (line3) line3.classList.add('completed');
+      if (stepOutForDelivery) stepOutForDelivery.classList.add('completed');
+      if (line4) line4.classList.add('completed');
       if (stepDelivered) stepDelivered.classList.add('completed', 'current');
+    } else if (statusLower === 'out for delivery') {
+      if (stepPlaced) stepPlaced.classList.add('completed');
+      if (line1) line1.classList.add('completed');
+      if (stepProcessing) stepProcessing.classList.add('completed');
+      if (line2) line2.classList.add('completed');
+      if (stepShipped) stepShipped.classList.add('completed');
+      if (line3) line3.classList.add('completed');
+      if (stepOutForDelivery) stepOutForDelivery.classList.add('current');
     } else if (statusLower === 'shipped') {
       if (stepPlaced) stepPlaced.classList.add('completed');
       if (line1) line1.classList.add('completed');
@@ -6670,6 +8494,48 @@ function initFooterFunctionality() {
       if (stepProcessing) stepProcessing.classList.add('current');
     } else {
       if (stepPlaced) stepPlaced.classList.add('current');
+    }
+
+    // Real-Time Activity Log Timeline
+    if (timelineEl) {
+      let historyEvents = (order.tracking && Array.isArray(order.tracking.history) && order.tracking.history.length > 0)
+        ? order.tracking.history
+        : [
+            {
+              status: 'Placed',
+              title: 'Order Placed & Confirmed',
+              description: 'Order details verified and sent to fulfillment center.',
+              location: 'Central Fulfillment Hub, Mumbai',
+              timestamp: order.createdAt
+            }
+          ];
+
+      // Sort newest first
+      const sortedEvents = [...historyEvents].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      timelineEl.innerHTML = sortedEvents.map((ev, idx) => {
+        const isLatest = idx === 0;
+        const timeFormatted = new Date(ev.timestamp).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        return `
+          <div class="timeline-node ${isLatest ? 'current' : 'active'}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-title-row">
+                <span class="timeline-title">${escapeHtml(ev.title)}</span>
+                <span class="timeline-time">🕒 ${timeFormatted}</span>
+              </div>
+              <div class="timeline-desc">${escapeHtml(ev.description || '')}</div>
+              ${ev.location ? `<div class="timeline-location">📍 ${escapeHtml(ev.location)}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // Items list
@@ -6727,6 +8593,134 @@ function initFooterFunctionality() {
   const orderTrackingCloseBtn = document.getElementById('order-tracking-close-btn');
   if (orderTrackingCloseBtn) {
     orderTrackingCloseBtn.addEventListener('click', () => closeFooterModal(orderTrackingModal));
+  }
+
+  // ============================================================
+  // BRANDED INVOICE MODAL SYSTEM
+  // ============================================================
+  const invoiceModal = document.getElementById('invoice-modal');
+  const invoicePrintBtn = document.getElementById('invoice-print-btn');
+  const invoiceCloseBtn = document.getElementById('invoice-close-btn');
+
+  window.openInvoiceModal = function(order) {
+    if (!invoiceModal || !order) return;
+
+    const invNumEl = document.getElementById('inv-num');
+    const invDateEl = document.getElementById('inv-date');
+    const invOrderIdEl = document.getElementById('inv-order-id');
+    const invOrderDateEl = document.getElementById('inv-order-date');
+    const invPayModeEl = document.getElementById('inv-pay-mode');
+    const invPayStatusEl = document.getElementById('inv-pay-status');
+    const invShipAddressEl = document.getElementById('inv-ship-address');
+    const invCarrierEl = document.getElementById('inv-carrier');
+    const invAwbEl = document.getElementById('inv-awb');
+    const invItemsBody = document.getElementById('inv-items-body');
+    const invSubtotalEl = document.getElementById('inv-subtotal');
+    const invDiscountRow = document.getElementById('inv-discount-row');
+    const invDiscountEl = document.getElementById('inv-discount');
+    const invGrandTotalEl = document.getElementById('inv-grand-total');
+
+    const createdDate = new Date(order.createdAt || Date.now());
+    const formattedCreated = createdDate.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+
+    const invoiceNum = order.invoiceNumber || `INV-${createdDate.toISOString().slice(0, 10).replace(/-/g, '')}-${order._id.slice(-4).toUpperCase()}`;
+
+    if (invNumEl) invNumEl.textContent = invoiceNum;
+    if (invDateEl) invDateEl.textContent = formattedCreated;
+    if (invOrderIdEl) invOrderIdEl.textContent = `#${order._id}`;
+    if (invOrderDateEl) invOrderDateEl.textContent = formattedCreated;
+    if (invPayModeEl) invPayModeEl.textContent = formatPaymentMethodName(order.paymentMethod) || 'UPI';
+
+    if (invPayStatusEl) {
+      const pStatus = (order.paymentStatus || 'Pending').trim();
+      invPayStatusEl.textContent = pStatus;
+      invPayStatusEl.className = `inv-meta-val ${pStatus.toLowerCase() === 'paid' ? 'text-success' : 'text-warning'}`;
+    }
+
+    if (invCarrierEl) {
+      invCarrierEl.textContent = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'MiniStore Express';
+    }
+    if (invAwbEl) {
+      invAwbEl.textContent = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `MS-TRK-${order._id.slice(-6).toUpperCase()}`;
+    }
+
+    if (invShipAddressEl) {
+      if (order.shippingAddress) {
+        const a = order.shippingAddress;
+        invShipAddressEl.innerHTML = `
+          <strong>${escapeHtml(a.fullName || 'Valued Customer')}</strong><br>
+          Phone: ${escapeHtml(a.phone || 'N/A')}<br>
+          ${escapeHtml(a.addressLine1 || '')}${a.addressLine2 ? ', ' + escapeHtml(a.addressLine2) : ''}<br>
+          ${escapeHtml(a.city || '')}, ${escapeHtml(a.state || '')} - <strong>${escapeHtml(a.postalCode || '')}</strong>, ${escapeHtml(a.country || 'India')}
+        `;
+      } else {
+        invShipAddressEl.innerHTML = `<strong>Valued Customer</strong><br>Pan-India Direct Express Delivery`;
+      }
+    }
+
+    // Items Table Rows
+    if (invItemsBody) {
+      const items = Array.isArray(order.items) && order.items.length > 0
+        ? order.items
+        : (Array.isArray(order.products) ? order.products : []);
+
+      invItemsBody.innerHTML = items.map((it, idx) => {
+        const itemPrice = Number(it.price) || 0;
+        const itemQty = Number(it.quantity) || 1;
+        const lineTotal = Number(it.subtotal) || (itemPrice * itemQty);
+
+        return `
+          <tr>
+            <td style="text-align: center; color: #64748b;">${idx + 1}</td>
+            <td>
+              <strong>${escapeHtml(it.name || 'Product')}</strong>
+            </td>
+            <td style="text-align: right;">${currencyFormatter.format(itemPrice)}</td>
+            <td style="text-align: center;">${itemQty}</td>
+            <td style="text-align: right; font-weight: 700;">${currencyFormatter.format(lineTotal)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Pricing Breakdown
+    const subtotal = Number(order.subtotalAmount) || Number(order.totalAmount) || 0;
+    const discount = Number(order.discountAmount) || (order.coupon ? Number(order.coupon.discountAmount) : 0);
+    const grandTotal = Number(order.totalAmount) || 0;
+
+    if (invSubtotalEl) invSubtotalEl.textContent = currencyFormatter.format(subtotal);
+
+    if (invDiscountRow && invDiscountEl) {
+      if (discount > 0) {
+        const couponSuffix = order.coupon && order.coupon.code ? ` (${escapeHtml(order.coupon.code)})` : '';
+        invDiscountEl.textContent = `- ${currencyFormatter.format(discount)}${couponSuffix}`;
+        invDiscountRow.style.display = 'flex';
+      } else {
+        invDiscountRow.style.display = 'none';
+      }
+    }
+
+    if (invGrandTotalEl) invGrandTotalEl.textContent = currencyFormatter.format(grandTotal);
+
+    openFooterModal(invoiceModal);
+  };
+
+  window.closeInvoiceModal = function() {
+    if (invoiceModal) closeFooterModal(invoiceModal);
+  };
+
+  if (invoiceCloseBtn) {
+    invoiceCloseBtn.addEventListener('click', window.closeInvoiceModal);
+  }
+
+  if (invoicePrintBtn) {
+    invoicePrintBtn.addEventListener('click', () => {
+      window.print();
+    });
   }
 
   // 3. SHIPPING & DELIVERY
@@ -6838,6 +8832,575 @@ function initFooterFunctionality() {
       });
     }
   });
+}
+
+// ============================================================
+// Feature 4: Pincode Delivery Estimator & Delivery Services
+// ============================================================
+
+async function checkPincodeServiceability(pincode, resultElement) {
+  if (!resultElement) return;
+
+  const cleanPin = String(pincode || '').trim();
+  const pinRegex = /^[1-9][0-9]{5}$/;
+
+  if (!pinRegex.test(cleanPin)) {
+    resultElement.className = 'pincode-result-box pincode-result-error';
+    resultElement.innerHTML = '⚠️ Please enter a valid 6-digit Indian PIN code (e.g. 110001, 560001).';
+    resultElement.style.display = 'block';
+    return;
+  }
+
+  resultElement.className = 'pincode-result-box';
+  resultElement.innerHTML = 'Checking courier serviceability & dispatch hubs...';
+  resultElement.style.display = 'block';
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/addresses/check-pincode/${cleanPin}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.serviceable) {
+      resultElement.className = 'pincode-result-box pincode-result-error';
+      resultElement.innerHTML = `⚠️ ${data.message || 'Courier delivery currently unavailable for this PIN.'}`;
+      return;
+    }
+
+    localStorage.setItem('ministore_checked_pincode', cleanPin);
+    resultElement.className = 'pincode-result-box pincode-result-success';
+    resultElement.innerHTML = `
+      <div class="pincode-delivery-line">
+        <span>🚚 Delivery by ${data.estimatedDeliveryDate} (${data.estimatedDays})</span>
+      </div>
+      <div class="pincode-location-line">
+        📍 Delivering to <strong>${escapeHtml(data.city)}, ${escapeHtml(data.state)}</strong> (${cleanPin})
+      </div>
+      <div class="pincode-perk-chips">
+        <span class="pincode-perk-chip">✓ Free Delivery</span>
+        ${data.codAvailable ? '<span class="pincode-perk-chip">✓ Cash on Delivery Available</span>' : ''}
+        ${data.expressAvailable ? '<span class="pincode-perk-chip">⚡ Express Metro Hub</span>' : ''}
+      </div>
+      <div class="pincode-cutoff-text">
+        ⏱️ ${data.cutoffText || 'Order now for fastest courier dispatch'}
+      </div>
+    `;
+  } catch (err) {
+    resultElement.className = 'pincode-result-box pincode-result-error';
+    resultElement.innerHTML = '⚠️ Could not connect to courier estimator service.';
+  }
+}
+
+function setupModalPincodeEstimator(container) {
+  if (!container) return;
+  const pinInput = container.querySelector('#modal-pincode-input');
+  const pinBtn = container.querySelector('#modal-pincode-check-btn');
+  const pinResult = container.querySelector('#modal-pincode-result');
+
+  if (!pinInput || !pinBtn || !pinResult) return;
+
+  const defaultAddr = userAddresses.find(a => a.isDefault);
+  const preferredPin = (defaultAddr && defaultAddr.postalCode) || localStorage.getItem('ministore_checked_pincode') || '110001';
+  pinInput.value = preferredPin;
+  checkPincodeServiceability(preferredPin, pinResult);
+
+  pinBtn.addEventListener('click', () => {
+    checkPincodeServiceability(pinInput.value, pinResult);
+  });
+
+  pinInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      checkPincodeServiceability(pinInput.value, pinResult);
+    }
+  });
+}
+
+// ============================================================
+// Feature 5: MiniStore Wallet & Loyalty Rewards System
+// ============================================================
+
+function calculateCartSubtotalAmount() {
+  let subtotal = 0;
+  if (currentCart && Array.isArray(currentCart.items)) {
+    currentCart.items.forEach(item => {
+      const product = item.product;
+      if (!product) return;
+      const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (product.price || 0));
+      subtotal += unitPrice * item.quantity;
+    });
+  }
+  return subtotal;
+}
+
+function updateCheckoutWalletCalculation(subtotal = 0, couponDiscount = 0) {
+  if (!checkoutWalletBox) return;
+
+  const afterCoupon = Math.max(0, subtotal - couponDiscount);
+  const availBalance = userWallet.walletBalance || 0;
+
+  if (checkoutWalletAvailableText) {
+    checkoutWalletAvailableText.textContent = currencyFormatter.format(availBalance);
+  }
+
+  // Calculate cashback coins preview (5% of order subtotal, min 10 coins)
+  const coinsReward = Math.max(10, Math.round(subtotal * 0.05));
+  if (checkoutCoinsRewardText) {
+    checkoutCoinsRewardText.textContent = `+${coinsReward} SuperCoins`;
+  }
+
+  const isChecked = checkoutWalletCheckbox ? checkoutWalletCheckbox.checked : false;
+  useCheckoutWallet = isChecked;
+
+  // Fair Usage Policy: A user can use wallet balance to pay up to 50% of the payable cart total
+  const maxAllowedWallet = Math.round((afterCoupon * 0.5) * 100) / 100;
+  let walletDeduction = 0;
+  if (isChecked && availBalance > 0 && afterCoupon > 0) {
+    walletDeduction = Math.min(availBalance, maxAllowedWallet);
+  }
+
+  const finalGrandTotal = Math.max(0, Math.round((afterCoupon - walletDeduction) * 100) / 100);
+
+  if (checkoutTotalAmount) {
+    checkoutTotalAmount.textContent = currencyFormatter.format(finalGrandTotal);
+  }
+
+  if (walletDeduction > 0) {
+    checkoutWalletBox.classList.add('is-active');
+    if (checkoutWalletDiscountRow) {
+      checkoutWalletDiscountRow.style.display = 'flex';
+      if (checkoutWalletDiscountAmount) {
+        checkoutWalletDiscountAmount.textContent = `-${currencyFormatter.format(walletDeduction)}`;
+      }
+    }
+    if (checkoutWalletDeductionBadge) {
+      checkoutWalletDeductionBadge.textContent = `-${currencyFormatter.format(walletDeduction)}`;
+      checkoutWalletDeductionBadge.style.display = 'inline-block';
+    }
+  } else {
+    checkoutWalletBox.classList.remove('is-active');
+    if (checkoutWalletDiscountRow) {
+      checkoutWalletDiscountRow.style.display = 'none';
+    }
+    if (checkoutWalletDeductionBadge) {
+      checkoutWalletDeductionBadge.textContent = '₹0.00';
+    }
+  }
+}
+
+async function fetchUserWallet() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/wallet`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = await res.json();
+    if (res.ok && result.success && result.data) {
+      userWallet = result.data;
+      updateWalletUI();
+    }
+  } catch (err) {
+    console.error('Fetch wallet error:', err);
+  }
+}
+
+function updateWalletUI() {
+  const balance = userWallet.walletBalance || 0;
+  const coins = userWallet.coins || 0;
+
+  if (navWalletBalanceText) navWalletBalanceText.textContent = `₹${Math.round(balance)}`;
+  if (navWalletCoinsText) navWalletCoinsText.textContent = coins;
+  if (dropdownWalletBalanceText) dropdownWalletBalanceText.textContent = `₹${balance.toFixed(2)}`;
+  if (dropdownCoinsText) dropdownCoinsText.textContent = coins;
+
+  if (walletModalBalanceDisplay) walletModalBalanceDisplay.textContent = currencyFormatter.format(balance);
+  if (walletModalCoinsDisplay) walletModalCoinsDisplay.textContent = `🪙 ${coins}`;
+  if (walletCoinsWorthText) walletCoinsWorthText.textContent = `Worth ₹${(coins * 0.5).toFixed(2)} (Redeemable anytime)`;
+
+  if (checkoutWalletAvailableText) checkoutWalletAvailableText.textContent = currencyFormatter.format(balance);
+}
+
+function openWalletModal() {
+  if (!walletModal) return;
+  closeProfileDropdown();
+  walletModal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  const token = getAuthToken();
+  if (!token) {
+    if (walletContent) walletContent.style.display = 'none';
+    if (walletUnauthState) walletUnauthState.style.display = 'flex';
+    return;
+  }
+
+  if (walletUnauthState) walletUnauthState.style.display = 'none';
+  if (walletContent) walletContent.style.display = 'block';
+
+  fetchUserWallet().then(() => {
+    renderWalletTransactions(userWallet.transactions || []);
+  });
+}
+
+function closeWalletModal() {
+  if (!walletModal) return;
+  closeModalWithAnimation(walletModal, () => {
+    if (walletTopupAlert) walletTopupAlert.style.display = 'none';
+    if (walletRedeemAlert) walletRedeemAlert.style.display = 'none';
+  });
+}
+
+function renderWalletTransactions(txns = []) {
+  if (!walletTransactionsList) return;
+  walletTransactionsList.innerHTML = '';
+
+  if (walletTxnCountBadge) {
+    walletTxnCountBadge.textContent = `${txns.length} ${txns.length === 1 ? 'Activity' : 'Activities'}`;
+  }
+
+  if (txns.length === 0) {
+    walletTransactionsList.innerHTML = `
+      <div style="text-align: center; padding: 24px; color: var(--color-text-muted); font-size: 0.86rem;">
+        No transaction history found yet.
+      </div>
+    `;
+    return;
+  }
+
+  txns.forEach(tx => {
+    const isCredit = tx.type === 'credit';
+    const row = document.createElement('div');
+    row.className = 'wallet-txn-item';
+
+    const dateStr = new Date(tx.date || Date.now()).toLocaleDateString('en-IN', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    row.innerHTML = `
+      <div class="wallet-txn-left">
+        <span class="wallet-txn-desc">${escapeHtml(tx.description || 'Wallet Activity')}</span>
+        <span class="wallet-txn-date">${dateStr}</span>
+      </div>
+      <div class="wallet-txn-right">
+        ${tx.amount > 0 ? `<span class="wallet-txn-amount ${isCredit ? 'credit' : 'debit'}">${isCredit ? '+' : '-'}${currencyFormatter.format(tx.amount)}</span>` : ''}
+        ${tx.coins ? `<span class="wallet-txn-coins">${tx.coins > 0 ? '+' : ''}${tx.coins} SuperCoins</span>` : ''}
+      </div>
+    `;
+
+    walletTransactionsList.appendChild(row);
+  });
+}
+
+// ============================================================
+// Secure Payment Gateway Simulation for Wallet Top-up
+// ============================================================
+let pendingGatewayTopupAmount = 1000;
+let currentGatewayPaymentMethod = 'UPI';
+
+function openWalletGatewayModal(amount) {
+  const token = getAuthToken();
+  if (!token) {
+    showToast('Please log in to recharge your wallet.');
+    return;
+  }
+  const num = Number(amount);
+  if (isNaN(num) || num < 10 || num > 50000) {
+    if (walletTopupAlert) {
+      walletTopupAlert.className = 'wallet-alert alert-error';
+      walletTopupAlert.textContent = 'Please enter an amount between ₹10 and ₹50,000.';
+      walletTopupAlert.style.display = 'block';
+    }
+    return;
+  }
+
+  if (walletTopupAlert) walletTopupAlert.style.display = 'none';
+  pendingGatewayTopupAmount = num;
+
+  const modal = document.getElementById('wallet-gateway-modal');
+  const amountDisp = document.getElementById('gateway-amount-display');
+  const payLabel = document.getElementById('gateway-pay-amount-label');
+  const procView = document.getElementById('gateway-processing-view');
+  const errAlert = document.getElementById('gateway-error-alert');
+
+  if (amountDisp) amountDisp.textContent = currencyFormatter.format(num);
+  if (payLabel) payLabel.textContent = currencyFormatter.format(num);
+  if (procView) procView.style.display = 'none';
+  if (errAlert) errAlert.style.display = 'none';
+
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function closeWalletGatewayModal() {
+  const modal = document.getElementById('wallet-gateway-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function executeGatewayRecharge() {
+  const token = getAuthToken();
+  if (!token) return;
+
+  const procView = document.getElementById('gateway-processing-view');
+  const procStatus = document.getElementById('gateway-processing-status');
+  const errAlert = document.getElementById('gateway-error-alert');
+  const payBtn = document.getElementById('gateway-confirm-pay-btn');
+
+  if (errAlert) errAlert.style.display = 'none';
+
+  // Input validation based on payment method
+  if (currentGatewayPaymentMethod === 'UPI') {
+    const upiInput = document.getElementById('gateway-upi-id');
+    const vpa = upiInput ? upiInput.value.trim() : '';
+    if (!vpa || !vpa.includes('@')) {
+      if (errAlert) {
+        errAlert.textContent = 'Please enter a valid UPI Virtual Payment Address (e.g. user@okhdfcbank).';
+        errAlert.style.display = 'block';
+      }
+      return;
+    }
+  } else if (currentGatewayPaymentMethod === 'CARD') {
+    const cardInput = document.getElementById('gateway-card-number');
+    const cNum = cardInput ? cardInput.value.replace(/\s+/g, '') : '';
+    if (!cNum || cNum.length < 15) {
+      if (errAlert) {
+        errAlert.textContent = 'Please enter a valid 16-digit debit/credit card number.';
+        errAlert.style.display = 'block';
+      }
+      return;
+    }
+  }
+
+  // Show processing animation
+  if (procView) procView.style.display = 'flex';
+  if (payBtn) payBtn.disabled = true;
+
+  if (procStatus) procStatus.textContent = 'Connecting to Secure Banking Gateway...';
+
+  await new Promise(r => setTimeout(r, 700));
+  if (procStatus) procStatus.textContent = `Authorizing ₹${pendingGatewayTopupAmount.toFixed(2)} with ${currentGatewayPaymentMethod} Network...`;
+
+  await new Promise(r => setTimeout(r, 800));
+  if (procStatus) procStatus.textContent = 'Payment Authorized! Verifying transaction token...';
+
+  const gatewayTxnId = `TXN_GATEWAY_${currentGatewayPaymentMethod}_${Date.now()}`;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/wallet/add-money`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        amount: pendingGatewayTopupAmount,
+        paymentMethod: currentGatewayPaymentMethod,
+        gatewayTxnId: gatewayTxnId
+      })
+    });
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      if (procView) procView.style.display = 'none';
+      if (payBtn) payBtn.disabled = false;
+      if (errAlert) {
+        errAlert.textContent = result.message || 'Payment verification failed.';
+        errAlert.style.display = 'block';
+      }
+      return;
+    }
+
+    if (procStatus) procStatus.textContent = '✓ Payment Verified & Approved!';
+    userWallet = result.data;
+    updateWalletUI();
+    renderWalletTransactions(userWallet.transactions || []);
+    if (walletTopupInput) walletTopupInput.value = '';
+
+    await new Promise(r => setTimeout(r, 600));
+    closeWalletGatewayModal();
+    if (procView) procView.style.display = 'none';
+    if (payBtn) payBtn.disabled = false;
+
+    showToast(`✓ Payment of ₹${pendingGatewayTopupAmount.toFixed(2)} verified & credited to wallet!`);
+  } catch (err) {
+    if (procView) procView.style.display = 'none';
+    if (payBtn) payBtn.disabled = false;
+    if (errAlert) {
+      errAlert.textContent = 'Network error communicating with payment gateway.';
+      errAlert.style.display = 'block';
+    }
+  }
+}
+
+async function handleWalletRedeemCoins(coinsToRedeem) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  const num = parseInt(coinsToRedeem, 10);
+  if (isNaN(num) || num < 20) {
+    if (walletRedeemAlert) {
+      walletRedeemAlert.className = 'wallet-alert alert-error';
+      walletRedeemAlert.textContent = 'Minimum 20 SuperCoins required to convert.';
+      walletRedeemAlert.style.display = 'block';
+    }
+    return;
+  }
+
+  if (walletRedeemSubmitBtn) {
+    walletRedeemSubmitBtn.disabled = true;
+    walletRedeemSubmitBtn.textContent = 'Converting...';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/wallet/redeem-coins`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ coinsToRedeem: num })
+    });
+    const result = await res.json();
+
+    if (walletRedeemSubmitBtn) {
+      walletRedeemSubmitBtn.disabled = false;
+      walletRedeemSubmitBtn.textContent = 'Convert Now';
+    }
+
+    if (!res.ok || !result.success) {
+      if (walletRedeemAlert) {
+        walletRedeemAlert.className = 'wallet-alert alert-error';
+        walletRedeemAlert.textContent = result.message || 'Failed to convert coins.';
+        walletRedeemAlert.style.display = 'block';
+      }
+      return;
+    }
+
+    userWallet = result.data;
+    updateWalletUI();
+    renderWalletTransactions(userWallet.transactions || []);
+
+    if (walletRedeemAlert) {
+      walletRedeemAlert.className = 'wallet-alert alert-success';
+      walletRedeemAlert.textContent = `✓ ${result.message}`;
+      walletRedeemAlert.style.display = 'block';
+    }
+    showToast(`✓ Converted ${num} SuperCoins into Wallet Cash!`);
+  } catch (err) {
+    if (walletRedeemSubmitBtn) {
+      walletRedeemSubmitBtn.disabled = false;
+      walletRedeemSubmitBtn.textContent = 'Convert Now';
+    }
+    if (walletRedeemAlert) {
+      walletRedeemAlert.className = 'wallet-alert alert-error';
+      walletRedeemAlert.textContent = 'Network error while converting coins.';
+      walletRedeemAlert.style.display = 'block';
+    }
+  }
+}
+
+// Attach Wallet Event Listeners
+if (navWalletBtn) {
+  navWalletBtn.addEventListener('click', openWalletModal);
+}
+if (navWalletDropdownBtn) {
+  navWalletDropdownBtn.addEventListener('click', openWalletModal);
+}
+if (walletCloseBtn) {
+  walletCloseBtn.addEventListener('click', closeWalletModal);
+}
+if (walletModal) {
+  walletModal.addEventListener('click', (e) => {
+    if (e.target === walletModal) closeWalletModal();
+  });
+}
+if (walletLoginPromptBtn) {
+  walletLoginPromptBtn.addEventListener('click', () => {
+    closeWalletModal();
+    openAuthModal('login', 'Please log in to access your MiniStore Wallet.');
+  });
+}
+
+// Quick amount buttons open payment gateway
+document.querySelectorAll('.btn-wallet-quick').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const amt = btn.getAttribute('data-amount');
+    if (walletTopupInput) walletTopupInput.value = amt;
+    openWalletGatewayModal(amt);
+  });
+});
+
+if (walletTopupSubmitBtn && walletTopupInput) {
+  walletTopupSubmitBtn.addEventListener('click', () => {
+    openWalletGatewayModal(walletTopupInput.value);
+  });
+  walletTopupInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      openWalletGatewayModal(walletTopupInput.value);
+    }
+  });
+}
+
+if (walletRedeemSubmitBtn && walletCoinsSelect) {
+  walletRedeemSubmitBtn.addEventListener('click', () => {
+    handleWalletRedeemCoins(walletCoinsSelect.value);
+  });
+}
+
+if (checkoutWalletCheckbox) {
+  checkoutWalletCheckbox.addEventListener('change', () => {
+    const sub = calculateCartSubtotalAmount();
+    updateCheckoutWalletCalculation(sub, appliedCoupon ? (appliedCoupon.discountAmount || 0) : 0);
+  });
+}
+
+// Gateway Modal Listeners
+const walletGatewayModal = document.getElementById('wallet-gateway-modal');
+const walletGatewayCloseBtn = document.getElementById('wallet-gateway-close-btn');
+const gatewayConfirmPayBtn = document.getElementById('gateway-confirm-pay-btn');
+
+if (walletGatewayCloseBtn) {
+  walletGatewayCloseBtn.addEventListener('click', closeWalletGatewayModal);
+}
+if (walletGatewayModal) {
+  walletGatewayModal.addEventListener('click', (e) => {
+    if (e.target === walletGatewayModal) closeWalletGatewayModal();
+  });
+}
+
+document.querySelectorAll('.gateway-method-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.gateway-method-tab').forEach(t => t.classList.remove('is-active'));
+    tab.classList.add('is-active');
+    const method = tab.getAttribute('data-method');
+    currentGatewayPaymentMethod = method;
+
+    const pUpi = document.getElementById('gateway-panel-upi');
+    const pCard = document.getElementById('gateway-panel-card');
+    const pNb = document.getElementById('gateway-panel-netbanking');
+
+    if (pUpi) pUpi.style.display = method === 'UPI' ? 'flex' : 'none';
+    if (pCard) pCard.style.display = method === 'CARD' ? 'flex' : 'none';
+    if (pNb) pNb.style.display = method === 'NETBANKING' ? 'flex' : 'none';
+  });
+});
+
+document.querySelectorAll('.upi-app-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.upi-app-btn').forEach(b => b.classList.remove('is-selected'));
+    btn.classList.add('is-selected');
+    const vpa = btn.getAttribute('data-vpa');
+    const upiInput = document.getElementById('gateway-upi-id');
+    if (upiInput && vpa) upiInput.value = vpa;
+  });
+});
+
+if (gatewayConfirmPayBtn) {
+  gatewayConfirmPayBtn.addEventListener('click', executeGatewayRecharge);
 }
 
 

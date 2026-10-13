@@ -11,22 +11,35 @@ router.use(authMiddleware);
 // Helper function to validate MongoDB ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
+const { getProductEffectivePrice } = require('../config/festiveDeals');
+
 // Helper to format user cart response
 const formatCartResponse = (user) => {
   const items = (user.cart || []).filter(item => item.product !== null && item.product !== undefined);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalAmount = items.reduce((sum, item) => {
-    const price = typeof item.product === 'object' && item.product.price ? item.product.price : 0;
+    const prod = typeof item.product === 'object' ? item.product : null;
+    const price = getProductEffectivePrice(prod);
     return sum + (price * item.quantity);
   }, 0);
 
   return {
     user: user._id,
-    items: items.map(item => ({
-      product: item.product,
-      quantity: item.quantity,
-      subtotal: (typeof item.product === 'object' && item.product.price ? item.product.price : 0) * item.quantity
-    })),
+    items: items.map(item => {
+      const prod = typeof item.product === 'object' ? item.product : null;
+      const unitPrice = getProductEffectivePrice(prod);
+      const regularPrice = prod && prod.price ? prod.price : unitPrice;
+      const isFestiveDiscount = unitPrice < regularPrice;
+      return {
+        product: item.product,
+        quantity: item.quantity,
+        price: unitPrice,
+        unitPrice,
+        regularPrice,
+        isFestiveDiscount,
+        subtotal: unitPrice * item.quantity
+      };
+    }),
     totalItems,
     totalAmount
   };

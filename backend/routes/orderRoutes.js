@@ -6,16 +6,19 @@ const User = require('../models/User');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const Address = require('../models/Address');
+const Coupon = require('../models/Coupon');
 const authMiddleware = require('../middleware/auth');
 
 // All order routes require JWT authentication
 router.use(authMiddleware);
 
+const { getProductEffectivePrice } = require('../config/festiveDeals');
+
 // Helper function to validate MongoDB ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // Allowed payment methods
-const ALLOWED_PAYMENT_METHODS = ['UPI', 'COD', 'NET_BANKING'];
+const ALLOWED_PAYMENT_METHODS = ['UPI', 'COD', 'NET_BANKING', 'WALLET'];
 
 // ============================================================
 // 1. POST /api/orders - Create an order from authenticated cart
@@ -23,7 +26,7 @@ const ALLOWED_PAYMENT_METHODS = ['UPI', 'COD', 'NET_BANKING'];
 router.post('/', async (req, res) => {
   try {
     const userId = req.user.id;
-    const { addressId, shippingAddress, paymentMethod } = req.body;
+    const { addressId, shippingAddress, paymentMethod, couponCode, useWallet } = req.body;
 
     // 1. Validate payment method
     if (!paymentMethod || typeof paymentMethod !== 'string' || !ALLOWED_PAYMENT_METHODS.includes(paymentMethod.trim())) {
@@ -137,14 +140,16 @@ router.post('/', async (req, res) => {
         });
       }
 
-      // Calculate item subtotal using current database price
-      const subtotal = product.price * cartItem.quantity;
+      // Calculate item subtotal using festive discounted or current effective price
+      const effectivePrice = getProductEffectivePrice(product);
+      const subtotal = effectivePrice * cartItem.quantity;
       calculatedTotal += subtotal;
 
       validatedItems.push({
         product: product._id,
         name: product.name,
-        price: product.price,
+        price: effectivePrice,
+        regularPrice: product.price,
         quantity: cartItem.quantity,
         subtotal
       });
@@ -194,6 +199,89 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // 4.5. Coupon validation and discount application
+    let appliedDiscount = 0;
+    let couponSnapshot = {
+      code: null,
+      discountAmount: 0,
+      discountType: null,
+      discountValue: 0
+    };
+    let matchedCoupon = null;
+
+    if (couponCode && typeof couponCode === 'string' && couponCode.trim()) {
+      const cleanCode = couponCode.trim().toUpperCase();
+      matchedCoupon = await Coupon.findOne({ code: cleanCode });
+
+      if (!matchedCoupon) {
+        // Rollback stock
+        for (const deducted of deductedItems) {
+          try {
+            await Product.findByIdAndUpdate(deducted.product, {
+              $inc: { stock: deducted.quantity },
+              inStock: true
+            });
+          } catch (e) {}
+        }
+        return res.status(400).json({
+          success: false,
+          message: `Coupon code "${cleanCode}" is invalid.`
+        });
+      }
+
+      const eligibility = matchedCoupon.checkEligibility(calculatedTotal);
+      if (!eligibility.valid) {
+        // Rollback stock
+        for (const deducted of deductedItems) {
+          try {
+            await Product.findByIdAndUpdate(deducted.product, {
+              $inc: { stock: deducted.quantity },
+              inStock: true
+            });
+          } catch (e) {}
+        }
+        return res.status(400).json({
+          success: false,
+          message: eligibility.message
+        });
+      }
+
+      appliedDiscount = matchedCoupon.calculateDiscount(calculatedTotal);
+      couponSnapshot = {
+        code: matchedCoupon.code,
+        discountAmount: appliedDiscount,
+        discountType: matchedCoupon.discountType,
+        discountValue: matchedCoupon.discountValue
+      };
+    }
+
+    const amountAfterCoupon = Math.max(0, calculatedTotal - appliedDiscount);
+    let walletDiscount = 0;
+    const wantsWallet = Boolean(useWallet === true || useWallet === 'true');
+
+    if (wantsWallet && (user.walletBalance || 0) > 0 && amountAfterCoupon > 0) {
+      // Fair Usage Policy: A user can use wallet balance to pay up to 50% of the payable amount.
+      // The remaining balance must be paid via regular payment methods (UPI, Card, Net Banking, COD).
+      // This prevents total wipeout to ₹0.00 while providing substantial real savings.
+      const maxAllowedWallet = Math.round((amountAfterCoupon * 0.5) * 100) / 100;
+      walletDiscount = Math.min(user.walletBalance || 0, maxAllowedWallet);
+    }
+
+    const finalOrderTotal = Math.max(0, Math.round((amountAfterCoupon - walletDiscount) * 100) / 100);
+
+    let finalPaymentMethod = cleanPaymentMethod;
+    let finalPaymentStatus = 'Pending';
+    let finalPaymentReference = null;
+
+    if (wantsWallet && finalOrderTotal === 0 && walletDiscount > 0) {
+      finalPaymentMethod = 'WALLET';
+      finalPaymentStatus = 'Paid';
+      finalPaymentReference = `WALLET_TXN_${Date.now()}`;
+    }
+
+    // 5% Cashback Reward in SuperCoins (minimum 10 coins)
+    const coinsEarned = Math.max(10, Math.round(calculatedTotal * 0.05));
+
     // 5. Create and save the order snapshot with payment information
     let savedOrder = null;
     try {
@@ -201,17 +289,56 @@ router.post('/', async (req, res) => {
         user: userId,
         items: validatedItems,
         products: validatedItems, // legacy format compatibility
-        totalAmount: calculatedTotal,
-        total: calculatedTotal, // legacy format compatibility
+        subtotalAmount: calculatedTotal,
+        discountAmount: appliedDiscount,
+        coupon: couponSnapshot,
+        walletDiscount: walletDiscount,
+        coinsEarned: coinsEarned,
+        totalAmount: finalOrderTotal,
+        total: finalOrderTotal, // legacy format compatibility
         shippingAddress: shippingAddressSnapshot,
-        paymentMethod: cleanPaymentMethod,
-        paymentStatus: 'Pending',
-        paymentReference: null,
+        paymentMethod: finalPaymentMethod,
+        paymentStatus: finalPaymentStatus,
+        paymentReference: finalPaymentReference,
         paymentUpdatedAt: new Date(),
         status: 'Pending'
       });
 
       savedOrder = await order.save();
+
+      // If coupon was applied successfully, increment usage count
+      if (matchedCoupon) {
+        await Coupon.findByIdAndUpdate(matchedCoupon._id, { $inc: { usageCount: 1 } });
+      }
+
+      // Update user's wallet balance and reward loyalty coins
+      if (walletDiscount > 0 || coinsEarned > 0) {
+        if (!Array.isArray(user.walletTransactions)) {
+          user.walletTransactions = [];
+        }
+        if (walletDiscount > 0) {
+          user.walletBalance = Math.max(0, (user.walletBalance || 0) - walletDiscount);
+          user.walletTransactions.push({
+            type: 'debit',
+            amount: walletDiscount,
+            description: `Applied to Order #${savedOrder.orderId || savedOrder._id}`,
+            referenceId: String(savedOrder._id),
+            date: new Date()
+          });
+        }
+        if (coinsEarned > 0) {
+          user.coins = (user.coins || 0) + coinsEarned;
+          user.walletTransactions.push({
+            type: 'credit',
+            coins: coinsEarned,
+            amount: 0,
+            description: `5% Cashback Reward for Order #${savedOrder.orderId || savedOrder._id}`,
+            referenceId: String(savedOrder._id),
+            date: new Date()
+          });
+        }
+        await user.save();
+      }
     } catch (orderSaveError) {
       // If order saving fails, restore all deducted stock
       for (const deducted of deductedItems) {
@@ -252,6 +379,79 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Helper to ensure tracking history and invoiceNumber are always fully populated
+function enrichOrderTracking(orderDoc) {
+  const orderObj = orderDoc.toObject ? orderDoc.toObject() : { ...orderDoc };
+  if (!orderObj.invoiceNumber) {
+    const ymd = new Date(orderObj.createdAt || Date.now()).toISOString().slice(0, 10).replace(/-/g, '');
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    orderObj.invoiceNumber = `INV-${ymd}-${rand}`;
+  }
+  if (!orderObj.tracking) {
+    orderObj.tracking = {};
+  }
+  if (!orderObj.tracking.carrier) {
+    orderObj.tracking.carrier = 'MiniStore Express';
+  }
+  if (!orderObj.tracking.trackingNumber) {
+    const code = orderObj._id ? orderObj._id.toString().slice(-6).toUpperCase() : Math.floor(100000 + Math.random() * 900000);
+    orderObj.tracking.trackingNumber = `MS-TRK-${code}`;
+  }
+  if (!orderObj.tracking.estimatedDeliveryDate) {
+    orderObj.tracking.estimatedDeliveryDate = new Date(new Date(orderObj.createdAt || Date.now()).getTime() + 3 * 24 * 60 * 60 * 1000);
+  }
+  if (!Array.isArray(orderObj.tracking.history) || orderObj.tracking.history.length === 0) {
+    const curStatus = orderObj.status || 'Pending';
+    const initialEvents = [
+      {
+        status: 'Placed',
+        title: 'Order Placed & Confirmed',
+        description: 'Order details verified and sent to fulfillment center.',
+        location: 'Central Fulfillment Hub, Mumbai',
+        timestamp: orderObj.createdAt || new Date()
+      }
+    ];
+    if (['Processing', 'Shipped', 'Out for Delivery', 'Delivered'].includes(curStatus)) {
+      initialEvents.push({
+        status: 'Processing',
+        title: 'Order Packed & Quality Inspected',
+        description: 'Item(s) packed in secure tamper-proof packaging.',
+        location: 'Warehouse Hub',
+        timestamp: new Date(new Date(orderObj.createdAt || Date.now()).getTime() + 6 * 60 * 60 * 1000)
+      });
+    }
+    if (['Shipped', 'Out for Delivery', 'Delivered'].includes(curStatus)) {
+      initialEvents.push({
+        status: 'Shipped',
+        title: `Dispatched via ${orderObj.tracking.carrier}`,
+        description: `Handed over to carrier. AWB #${orderObj.tracking.trackingNumber}`,
+        location: 'Regional Logistics Center',
+        timestamp: new Date(new Date(orderObj.createdAt || Date.now()).getTime() + 18 * 60 * 60 * 1000)
+      });
+    }
+    if (['Out for Delivery', 'Delivered'].includes(curStatus)) {
+      initialEvents.push({
+        status: 'Out for Delivery',
+        title: 'Out for Delivery',
+        description: 'Package is out with your delivery partner.',
+        location: 'Local Delivery Facility',
+        timestamp: new Date(new Date(orderObj.createdAt || Date.now()).getTime() + 36 * 60 * 60 * 1000)
+      });
+    }
+    if (curStatus === 'Delivered') {
+      initialEvents.push({
+        status: 'Delivered',
+        title: 'Delivered Successfully',
+        description: 'Package delivered safely.',
+        location: 'Customer Address',
+        timestamp: new Date(new Date(orderObj.createdAt || Date.now()).getTime() + 42 * 60 * 60 * 1000)
+      });
+    }
+    orderObj.tracking.history = initialEvents;
+  }
+  return orderObj;
+}
+
 // ============================================================
 // 2. GET /api/orders - Retrieve authenticated user's orders
 // ============================================================
@@ -261,11 +461,12 @@ router.get('/', async (req, res) => {
 
     // Return only orders belonging to authenticated user, newest first
     const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+    const enriched = orders.map(enrichOrderTracking);
 
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders
+      count: enriched.length,
+      data: enriched
     });
   } catch (error) {
     res.status(500).json({
@@ -283,6 +484,7 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
+    const userRole = req.user.role;
 
     // Validate ObjectId format
     if (!isValidObjectId(id)) {
@@ -294,17 +496,19 @@ router.get('/:id', async (req, res) => {
 
     const order = await Order.findById(id);
 
-    // If order does not exist or belongs to another user, return 404
-    if (!order || order.user.toString() !== userId) {
+    // If order does not exist or belongs to another user (and not admin), return 404
+    if (!order || (order.user.toString() !== userId && userRole !== 'admin')) {
       return res.status(404).json({
         success: false,
         message: 'Order not found'
       });
     }
 
+    const enriched = enrichOrderTracking(order);
+
     res.status(200).json({
       success: true,
-      data: order
+      data: enriched
     });
   } catch (error) {
     res.status(500).json({

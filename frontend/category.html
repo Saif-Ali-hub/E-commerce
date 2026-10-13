@@ -31,8 +31,8 @@
   <div class="top-announcement-bar" id="top-announcement-bar">
     <div class="container top-bar-inner">
       <div class="top-bar-left">
-        <span class="announcement-pill">🚚 FREE DELIVERY</span>
-        <span class="announcement-text">Pan-India express shipping on all orders over ₹499</span>
+        <span class="announcement-pill festive-pill"><span class="live-beacon-dot"></span> FESTIVAL SALE LIVE</span>
+        <span class="announcement-text">Mega festive discounts up to 70% OFF • Use coupon <strong style="color: #fde047;">FESTIVE10</strong> for extra ₹200 off!</span>
       </div>
       <div class="top-bar-right">
         <span class="top-bar-feature">✓ 100% Certified Authentic</span>
@@ -202,34 +202,47 @@
             </p>
           </div>
         </div>
-        <div class="category-page-quick-links" id="category-quick-links">
-          <!-- Dynamically filled with other category links -->
-        </div>
+      </div>
+
+      <!-- Quick Category Pills Navigation -->
+      <div class="category-quick-nav-bar">
+        <span class="category-quick-nav-label">Categories:</span>
+        <nav class="category-page-quick-links" id="category-quick-links" aria-label="Quick category navigation">
+          <!-- Dynamically filled with category pill links -->
+        </nav>
       </div>
     </div>
   </section>
 
   <!-- Main Content Area -->
   <main class="container" style="padding-top: 24px; padding-bottom: 60px;">
-    <!-- Controls Bar: Search within Category, Sorting & View Toggle -->
+    <!-- Festive Category Offer Ribbon -->
+    <div class="category-festive-ribbon" role="region" aria-label="Festival sale promotion">
+      <div class="category-festive-ribbon-left">
+        <span class="festive-mini-badge">🔥 FESTIVAL SALE LIVE</span>
+        <span class="festive-ribbon-text">Festive discounts active! Extra ₹200 off with coupon <strong class="festive-ribbon-code">FESTIVE10</strong> at checkout</span>
+      </div>
+      <a href="festive-sale.html" class="category-festive-ribbon-link">
+        <span>View All Festival Deals</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <!-- Controls Bar: Category Info & Sorting -->
     <div class="category-controls-bar">
-      <!-- In-Category Search -->
-      <div class="category-search-box">
-        <span class="category-search-icon" aria-hidden="true">🔍</span>
-        <input type="text" id="category-filter-search" class="category-search-input"
-          placeholder="Filter within this category..." aria-label="Filter within this category" />
-        <button id="category-clear-filter-btn" class="clear-search-btn" style="display: none;" title="Clear filter"
-          aria-label="Clear category filter">✕</button>
+      <div class="category-controls-info">
+        <span class="category-items-count-text" id="category-items-count-display">All Products</span>
       </div>
 
-      <!-- Category Filter & Sort Options -->
+      <!-- Category Sort Options -->
       <div class="category-sort-wrap">
         <label for="category-sort-select" class="sort-label">Sort By:</label>
         <select id="category-sort-select" class="sort-select" aria-label="Sort products">
           <option value="featured">Featured / Default</option>
+          <option value="trending">Trending</option>
           <option value="price-asc">Price: Low to High</option>
           <option value="price-desc">Price: High to Low</option>
-          <option value="rating">Highest Rated</option>
+          <option value="rating">By Rating</option>
           <option value="newest">Newest Arrivals</option>
         </select>
       </div>
@@ -290,13 +303,17 @@
 
     <!-- Pagination Controls -->
     <div class="pagination-container" id="category-pagination-container" style="display: none;">
-      <button class="pagination-btn" id="category-prev-page-btn" aria-label="Previous Page">
-        <span>← Previous</span>
-      </button>
-      <div class="pagination-pages" id="category-pagination-pages"></div>
-      <button class="pagination-btn" id="category-next-page-btn" aria-label="Next Page">
-        <span>Next →</span>
-      </button>
+      <div class="pagination-controls">
+        <button class="pagination-btn pagination-nav-btn pagination-prev-btn" id="category-prev-page-btn" aria-label="Previous Page">
+          <span class="pagination-arrow" aria-hidden="true">←</span>
+          <span>Previous</span>
+        </button>
+        <div class="pagination-pages" id="category-pagination-pages"></div>
+        <button class="pagination-btn pagination-nav-btn pagination-next-btn" id="category-next-page-btn" aria-label="Next Page">
+          <span>Next</span>
+          <span class="pagination-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
     </div>
   </main>
 

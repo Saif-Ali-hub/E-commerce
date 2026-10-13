@@ -5,6 +5,7 @@ const Product = require('../models/Product');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
+const { getProductEffectivePrice } = require('../config/festiveDeals');
 
 // Helper function to validate MongoDB ObjectId
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -202,6 +203,11 @@ router.get('/suggestions', async (req, res) => {
       return aName.localeCompare(bName);
     });
 
+    // Fetch matching categories to suggest quick category jump chips
+    const matchingCategories = await Product.distinct('category', {
+      category: new RegExp(escapedTokens[0], 'i')
+    });
+
     const matchingProducts = candidateProducts.slice(0, limit);
 
     res.status(200).json({
@@ -210,15 +216,24 @@ router.get('/suggestions', async (req, res) => {
       totalMatches: totalMatches,
       limit: limit,
       hasMore: totalMatches > matchingProducts.length,
-      data: matchingProducts.map((p) => ({
-        id: p._id.toString(),
-        _id: p._id.toString(),
-        name: p.name,
-        category: p.category,
-        price: p.price,
-        image: p.image,
-        stock: p.stock
-      }))
+      categories: matchingCategories.slice(0, 3),
+      data: matchingProducts.map((p) => {
+        const effectivePrice = getProductEffectivePrice(p);
+        const hasDiscount = effectivePrice < p.price;
+        const discountPercent = hasDiscount ? Math.round(((p.price - effectivePrice) / p.price) * 100) : 0;
+        return {
+          id: p._id.toString(),
+          _id: p._id.toString(),
+          name: p.name,
+          category: p.category,
+          price: effectivePrice,
+          regularPrice: p.price,
+          hasDiscount,
+          discountPercent,
+          image: p.image,
+          stock: p.stock
+        };
+      })
     });
   } catch (error) {
     res.status(500).json({

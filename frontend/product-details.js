@@ -697,9 +697,16 @@ function renderCartContent() {
   cartContent.style.display = 'block';
   cartItemsList.innerHTML = '';
 
+  let grandTotal = 0;
   items.forEach(item => {
     const p = item.product;
     if (!p) return;
+
+    const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (Number(p.price) || 0));
+    const regularPrice = item.regularPrice || Number(p.price) || unitPrice;
+    const isDiscounted = item.isFestiveDiscount || (unitPrice < regularPrice);
+    const subtotal = item.subtotal !== undefined ? item.subtotal : (unitPrice * (item.quantity || 1));
+    grandTotal += subtotal;
 
     const row = document.createElement('div');
     row.className = 'cart-item-card';
@@ -709,11 +716,14 @@ function renderCartContent() {
       <div class="cart-item-info">
         <span class="cart-item-category">${escapeHtml(p.category)}</span>
         <h4 class="cart-item-name"><a href="product-details.html?id=${p._id}" style="color: inherit; text-decoration: none;">${escapeHtml(p.name)}</a></h4>
-        <div class="cart-item-meta">
-          <span class="cart-item-price">${currencyFormatter.format(p.price)}</span>
+        <div class="cart-item-meta" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+          <span class="cart-item-price" style="font-weight: 700; color: ${isDiscounted ? '#10b981' : 'inherit'};">${currencyFormatter.format(unitPrice)}</span>
+          ${isDiscounted ? `<span style="text-decoration: line-through; color: var(--color-text-muted); font-size: 0.85em;">${currencyFormatter.format(regularPrice)}</span>` : ''}
+          ${isDiscounted ? `<span style="color: #10b981; font-size: 0.72rem; font-weight: 700; background: rgba(16, 185, 129, 0.12); padding: 1px 5px; border-radius: 4px;">Festive Deal</span>` : ''}
         </div>
       </div>
       <div class="cart-item-actions">
+        <span class="cart-item-subtotal" style="font-weight: 700;">${currencyFormatter.format(subtotal)}</span>
         <div class="cart-quantity-controls">
           <button type="button" class="cart-qty-btn cart-qty-minus" data-id="${p._id}">−</button>
           <span class="cart-qty-val">${item.quantity}</span>
@@ -739,7 +749,8 @@ function renderCartContent() {
   });
 
   if (cartTotalAmount) {
-    cartTotalAmount.textContent = currencyFormatter.format(currentCart.totalAmount || 0);
+    const finalTotal = grandTotal > 0 ? grandTotal : (currentCart.totalAmount || 0);
+    cartTotalAmount.textContent = currencyFormatter.format(finalTotal);
   }
 }
 
@@ -1772,5 +1783,92 @@ document.addEventListener('DOMContentLoaded', () => {
   // Error retry button
   if (pdErrorRetryBtn) {
     pdErrorRetryBtn.addEventListener('click', loadProductDetails);
+  }
+
+  // Feature 4: Pincode Delivery Estimator
+  const pdPinInput = document.getElementById('pd-pincode-input');
+  const pdPinBtn = document.getElementById('pd-pincode-check-btn');
+  const pdPinResult = document.getElementById('pd-pincode-result');
+
+  async function checkPdPincode(pincode) {
+    if (!pdPinResult) return;
+    const cleanPin = String(pincode || '').trim();
+    if (!/^[1-9][0-9]{5}$/.test(cleanPin)) {
+      pdPinResult.className = 'pincode-result-box pincode-result-error';
+      pdPinResult.innerHTML = '⚠️ Please enter a valid 6-digit Indian PIN code (e.g. 110001, 560001).';
+      pdPinResult.style.display = 'block';
+      return;
+    }
+
+    pdPinResult.className = 'pincode-result-box';
+    pdPinResult.innerHTML = 'Checking delivery speed and hub availability...';
+    pdPinResult.style.display = 'block';
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/addresses/check-pincode/${cleanPin}`);
+      const data = await res.json();
+      if (!res.ok || !data.serviceable) {
+        pdPinResult.className = 'pincode-result-box pincode-result-error';
+        pdPinResult.innerHTML = `⚠️ ${data.message || 'Location currently unserviceable.'}`;
+        return;
+      }
+
+      localStorage.setItem('ministore_checked_pincode', cleanPin);
+      pdPinResult.className = 'pincode-result-box pincode-result-success';
+      pdPinResult.innerHTML = `
+        <div class="pincode-delivery-line">
+          <span>🚚 Delivery by ${data.estimatedDeliveryDate} (${data.estimatedDays})</span>
+        </div>
+        <div class="pincode-location-line">
+          📍 Delivering to <strong>${data.city}, ${data.state}</strong> (${cleanPin})
+        </div>
+        <div class="pincode-perk-chips">
+          <span class="pincode-perk-chip">✓ Free Delivery</span>
+          ${data.codAvailable ? '<span class="pincode-perk-chip">✓ Cash on Delivery Available</span>' : ''}
+          ${data.expressAvailable ? '<span class="pincode-perk-chip">⚡ Express Metro Hub</span>' : ''}
+        </div>
+        <div class="pincode-cutoff-text">
+          ⏱️ ${data.cutoffText || 'Order now for fastest courier dispatch'}
+        </div>
+      `;
+    } catch (e) {
+      pdPinResult.className = 'pincode-result-box pincode-result-error';
+      pdPinResult.innerHTML = '⚠️ Unable to connect to courier estimator service.';
+    }
+  }
+
+  if (pdPinBtn && pdPinInput) {
+    pdPinBtn.addEventListener('click', () => checkPdPincode(pdPinInput.value));
+    pdPinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        checkPdPincode(pdPinInput.value);
+      }
+    });
+
+    const lastPin = localStorage.getItem('ministore_checked_pincode') || '110001';
+    pdPinInput.value = lastPin;
+    checkPdPincode(lastPin);
+  }
+
+  // Feature 5: Sync Wallet Header Pill
+  const navWalletBtn = document.getElementById('nav-wallet-btn');
+  const navWalletBalanceText = document.getElementById('nav-wallet-balance-text');
+  const navWalletCoinsText = document.getElementById('nav-wallet-coins-text');
+  const userToken = getAuthToken();
+
+  if (userToken && navWalletBtn) {
+    navWalletBtn.style.display = 'inline-flex';
+    fetch(`${API_BASE_URL}/wallet`, {
+      headers: { Authorization: `Bearer ${userToken}` }
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && res.data) {
+          if (navWalletBalanceText) navWalletBalanceText.textContent = `₹${res.data.walletBalance.toFixed(0)}`;
+          if (navWalletCoinsText) navWalletCoinsText.textContent = res.data.coins;
+        }
+      })
+      .catch(() => {});
   }
 });

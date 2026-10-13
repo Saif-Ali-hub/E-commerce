@@ -31,8 +31,8 @@
   <div class="top-announcement-bar" id="top-announcement-bar">
     <div class="container top-bar-inner">
       <div class="top-bar-left">
-        <span class="announcement-pill">🚚 FREE DELIVERY</span>
-        <span class="announcement-text">Pan-India express shipping on all orders over ₹499</span>
+        <span class="announcement-pill festive-pill"><span class="live-beacon-dot"></span> FESTIVAL SALE LIVE</span>
+        <span class="announcement-text">Mega festive discounts up to 70% OFF • Use coupon <strong style="color: #fde047;">FESTIVE10</strong> for extra ₹200 off!</span>
       </div>
       <div class="top-bar-right">
         <span class="top-bar-feature">✓ 100% Certified Authentic</span>
@@ -77,6 +77,13 @@
           <span class="nav-btn-icon">🛒</span>
           <span class="nav-btn-label">Cart</span>
           <span class="nav-badge-pill" id="cart-nav-badge">0</span>
+        </button>
+
+        <!-- MiniStore Wallet Button & Rewards Pill (Feature 5) -->
+        <button class="wallet-nav-btn" id="nav-wallet-btn" aria-label="MiniStore Wallet" title="MiniStore Wallet & SuperCoins" style="display: none;" type="button">
+          <span class="wallet-nav-icon">👛</span>
+          <span class="wallet-nav-balance" id="nav-wallet-balance-text">₹150</span>
+          <span class="wallet-nav-coins-badge" id="nav-wallet-coins-badge" title="Loyalty SuperCoins">🪙 <span id="nav-wallet-coins-text">50</span></span>
         </button>
 
         <!-- Dark / Light Mode Toggle Button (Symbol Only, No Text) -->
@@ -164,6 +171,15 @@
                   <div class="dropdown-item-text">
                     <span class="dropdown-item-title">Saved Addresses</span>
                     <span class="dropdown-item-desc">Manage delivery locations</span>
+                  </div>
+                </button>
+
+                <!-- MiniStore Wallet Option (Feature 5) -->
+                <button class="dropdown-item" id="nav-wallet-dropdown-btn" role="menuitem" type="button" aria-label="MiniStore Wallet">
+                  <span class="dropdown-item-icon">👛</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">MiniStore Wallet &amp; Rewards</span>
+                    <span class="dropdown-item-desc"><span id="dropdown-wallet-balance-text">₹150.00</span> Balance • <span id="dropdown-coins-text">50</span> SuperCoins</span>
                   </div>
                 </button>
 
@@ -359,7 +375,6 @@
             <span class="trust-card-title">Free Express Delivery</span>
             <span class="trust-card-desc">Orders over ₹499</span>
           </div>
-          <span class="feature-hint" aria-hidden="true">ℹ️</span>
 
           <!-- Popover Details -->
           <div class="feature-popover popover-center" role="tooltip">
@@ -385,7 +400,6 @@
             <span class="trust-card-title">Same-Day Dispatch</span>
             <span class="trust-card-desc">Orders before 2 PM</span>
           </div>
-          <span class="feature-hint" aria-hidden="true">ℹ️</span>
 
           <!-- Popover Details -->
           <div class="feature-popover popover-center" role="tooltip">
@@ -411,7 +425,6 @@
             <span class="trust-card-title">100% Genuine Quality</span>
             <span class="trust-card-desc">7-Day easy returns</span>
           </div>
-          <span class="feature-hint" aria-hidden="true">ℹ️</span>
 
           <!-- Popover Details -->
           <div class="feature-popover popover-center" role="tooltip">
@@ -437,7 +450,6 @@
             <span class="trust-card-title">4.9 / 5 Star Rating</span>
             <span class="trust-card-desc">2,400+ Verified buyers</span>
           </div>
-          <span class="feature-hint" aria-hidden="true">ℹ️</span>
 
           <!-- Popover Details -->
           <div class="feature-popover popover-center" role="tooltip">
@@ -463,7 +475,6 @@
             <span class="trust-card-title">Exclusive INR Pricing</span>
             <span class="trust-card-desc">No hidden checkout fees</span>
           </div>
-          <span class="feature-hint" aria-hidden="true">ℹ️</span>
 
           <!-- Popover Details -->
           <div class="feature-popover popover-center" role="tooltip">
@@ -489,7 +500,6 @@
             <span class="trust-card-title">Curated Quality</span>
             <span class="trust-card-desc">Handpicked essentials</span>
           </div>
-          <span class="feature-hint" aria-hidden="true">ℹ️</span>
 
           <!-- Popover Details -->
           <div class="feature-popover popover-center" role="tooltip">
@@ -503,6 +513,111 @@
             <div class="popover-badges">
               <span class="popover-badge-pill">✓ Premium Craftsmanship</span>
               <span class="popover-badge-pill">✓ Multi-stage Testing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Festival Mega Sale Is Live Banner Section -->
+  <section class="festival-sale-section" id="festival-sale-section" aria-label="Festival Mega Sale is Live">
+    <div class="container">
+      <div class="festival-sale-banner" id="festival-sale-banner">
+        <!-- Decorative Ambient Glows -->
+        <div class="festive-glow festive-glow-left" aria-hidden="true"></div>
+        <div class="festive-glow festive-glow-right" aria-hidden="true"></div>
+
+        <div class="festival-banner-content">
+          <!-- Left Column: Badges & Headings -->
+          <div class="festive-info-col">
+            <div class="festive-badge-cluster">
+              <span class="festive-live-beacon">
+                <span class="beacon-dot"></span>
+                <span class="beacon-text">FESTIVAL SALE IS LIVE</span>
+              </span>
+              <span class="festive-tag-pill">✨ LIMITED TIME ONLY</span>
+            </div>
+
+            <h2 class="festive-banner-heading">
+              The Grand <span class="festive-highlight">Festival Mega Sale</span> is Live!
+            </h2>
+            <p class="festive-banner-subheading">
+              Celebrate with extraordinary discounts up to <span class="festive-discount-text">70% OFF</span> across electronics, computers, audio &amp; home essentials. Unbeatable prices with verified Indian brand warranties.
+            </p>
+
+            <!-- Deal Category Chips -->
+            <div class="festive-deals-chips">
+              <a href="festive-sale.html?filter=Electronics" class="festive-deal-chip">
+                <span class="chip-icon">⚡</span>
+                <span class="chip-label">Electronics: <strong>Up to 60% OFF</strong></span>
+              </a>
+              <a href="festive-sale.html?filter=Computers" class="festive-deal-chip">
+                <span class="chip-icon">💻</span>
+                <span class="chip-label">Computers: <strong>Save up to ₹34,000</strong></span>
+              </a>
+              <a href="festive-sale.html?filter=Accessories" class="festive-deal-chip">
+                <span class="chip-icon">🎧</span>
+                <span class="chip-label">Accessories: <strong>Up to 60% OFF</strong></span>
+              </a>
+              <a href="festive-sale.html?filter=Home" class="festive-deal-chip">
+                <span class="chip-icon">🏠</span>
+                <span class="chip-label">Home &amp; Kitchen: <strong>Flat 50% OFF</strong></span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Countdown, Coupon & CTA -->
+          <div class="festive-action-col">
+            <!-- Live Urgency Countdown Box -->
+            <div class="festive-countdown-card">
+              <div class="countdown-header">
+                <span class="countdown-sparkle">⏳</span>
+                <span class="countdown-title">FESTIVE RUSH ENDS IN</span>
+              </div>
+              <div class="countdown-digits-row" id="festive-countdown" aria-label="Festive sale countdown timer">
+                <div class="countdown-box">
+                  <span class="countdown-num" id="festive-days">02</span>
+                  <span class="countdown-unit">Days</span>
+                </div>
+                <span class="countdown-colon">:</span>
+                <div class="countdown-box">
+                  <span class="countdown-num" id="festive-hours">14</span>
+                  <span class="countdown-unit">Hours</span>
+                </div>
+                <span class="countdown-colon">:</span>
+                <div class="countdown-box">
+                  <span class="countdown-num" id="festive-minutes">38</span>
+                  <span class="countdown-unit">Mins</span>
+                </div>
+                <span class="countdown-colon">:</span>
+                <div class="countdown-box">
+                  <span class="countdown-num" id="festive-seconds">45</span>
+                  <span class="countdown-unit">Secs</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Festive Coupon Box -->
+            <div class="festive-coupon-box">
+              <div class="coupon-content">
+                <span class="coupon-label">EXTRA FESTIVE DISCOUNT</span>
+                <div class="coupon-code-wrap">
+                  <span class="coupon-code-badge" id="festive-coupon-code">FESTIVE10</span>
+                  <button type="button" class="btn-copy-coupon" id="btn-copy-festive-coupon" aria-label="Copy coupon code FESTIVE10">
+                    <span class="copy-text">Copy Code</span>
+                  </button>
+                </div>
+              </div>
+              <span class="coupon-note">Instant ₹200 off on orders over ₹1,499</span>
+            </div>
+
+            <!-- CTA Action Button -->
+            <div class="festive-cta-group">
+              <a href="festive-sale.html" class="btn btn-primary festive-primary-btn" id="festive-shop-now-btn">
+                <span>Shop Festive Deals</span>
+                <span class="cta-arrow" aria-hidden="true">→</span>
+              </a>
             </div>
           </div>
         </div>
@@ -599,9 +714,49 @@
         </div>
 
         <div class="cart-summary">
-          <div class="cart-summary-row">
-            <span class="summary-label">Estimated Total:</span>
-            <span class="summary-total" id="cart-total-amount">₹0.00</span>
+          <!-- Interactive Promo / Coupon Section -->
+          <div class="cart-promo-section" id="cart-promo-section">
+            <div class="promo-header">
+              <span class="promo-header-title">🏷️ Apply Promo Code / Coupon</span>
+            </div>
+            
+            <div class="promo-input-group" id="cart-promo-input-group">
+              <input type="text" id="cart-coupon-input" class="promo-input" placeholder="Enter coupon (e.g. FESTIVE10)" autocomplete="off" spellcheck="false">
+              <button type="button" id="cart-coupon-apply-btn" class="btn btn-primary btn-sm promo-apply-btn">Apply</button>
+            </div>
+            <div id="cart-coupon-feedback" class="promo-feedback" style="display: none;"></div>
+
+            <!-- Available Coupons Chips (Click to Apply) -->
+            <div class="available-coupons-wrap" id="cart-available-coupons-wrap">
+              <span class="available-coupons-label">Available Offers:</span>
+              <div class="available-coupons-chips" id="cart-available-coupons-chips">
+                <!-- Dynamically loaded from /api/coupons/active -->
+              </div>
+            </div>
+
+            <!-- Applied Coupon Status Card -->
+            <div class="applied-coupon-card" id="cart-applied-coupon-card" style="display: none;">
+              <div class="applied-coupon-info">
+                <span class="applied-coupon-badge">🏷️ <strong id="cart-applied-coupon-code">FESTIVE10</strong></span>
+                <span class="applied-coupon-saving" id="cart-applied-coupon-saving">₹200.00 OFF applied</span>
+              </div>
+              <button type="button" class="btn-remove-coupon" id="cart-remove-coupon-btn" title="Remove coupon">✕ Remove</button>
+            </div>
+          </div>
+
+          <div class="cart-summary-breakdown">
+            <div class="cart-summary-row">
+              <span class="summary-label">Items Subtotal:</span>
+              <span class="summary-total" id="cart-subtotal-amount">₹0.00</span>
+            </div>
+            <div class="cart-summary-row promo-discount-row" id="cart-discount-row" style="display: none;">
+              <span class="summary-label">🏷️ Coupon Discount (<span id="cart-discount-code-badge"></span>):</span>
+              <span class="summary-total discount-text" id="cart-discount-amount">-₹0.00</span>
+            </div>
+            <div class="cart-summary-row total-highlight-row">
+              <span class="summary-label">Total to Pay:</span>
+              <span class="summary-total" id="cart-total-amount">₹0.00</span>
+            </div>
           </div>
           <p class="summary-note">Prices and item totals are calculated dynamically from current catalog prices.</p>
           <div class="cart-summary-actions">
@@ -776,8 +931,57 @@
           </div>
         </div>
 
+        <!-- Checkout Promo Section -->
+        <div class="checkout-promo-box" id="checkout-promo-box">
+          <div class="checkout-promo-header">
+            <span class="promo-header-title">🏷️ Promo Code / Coupon</span>
+          </div>
+          <div class="promo-input-group" id="checkout-promo-input-group">
+            <input type="text" id="checkout-coupon-input" class="promo-input" placeholder="Coupon Code (e.g. FESTIVE10)" autocomplete="off" spellcheck="false">
+            <button type="button" id="checkout-coupon-apply-btn" class="btn btn-primary btn-sm promo-apply-btn">Apply</button>
+          </div>
+          <div id="checkout-coupon-feedback" class="promo-feedback" style="display: none;"></div>
+          
+          <div class="applied-coupon-card" id="checkout-applied-coupon-card" style="display: none;">
+            <div class="applied-coupon-info">
+              <span class="applied-coupon-badge">🏷️ <strong id="checkout-applied-coupon-code">FESTIVE10</strong></span>
+              <span class="applied-coupon-saving" id="checkout-applied-coupon-saving">₹200.00 OFF applied</span>
+            </div>
+            <button type="button" class="btn-remove-coupon" id="checkout-remove-coupon-btn" title="Remove coupon">✕ Remove</button>
+          </div>
+        </div>
+
+        <!-- Checkout Wallet Redemption Box (Feature 5) -->
+        <div class="checkout-wallet-box" id="checkout-wallet-box">
+          <label class="checkout-wallet-toggle-card" for="checkout-wallet-checkbox">
+            <div class="checkout-wallet-left">
+              <input type="checkbox" id="checkout-wallet-checkbox" class="checkout-wallet-checkbox" checked />
+              <div class="checkout-wallet-meta">
+                <span class="checkout-wallet-name">👛 Use MiniStore Wallet Balance</span>
+                <span class="checkout-wallet-balance-hint">Available: <strong id="checkout-wallet-available-text">₹0.00</strong> <span class="wallet-policy-chip">• Max 50% per order</span></span>
+              </div>
+            </div>
+            <span class="checkout-wallet-saving-badge" id="checkout-wallet-deduction-badge">-₹0.00</span>
+          </label>
+          <div class="checkout-wallet-rewards-teaser" id="checkout-wallet-rewards-teaser">
+            <span>🪙 Earn approx. <strong id="checkout-coins-reward-text">+25 SuperCoins</strong> (5% cashback) on this order!</span>
+          </div>
+        </div>
+
         <div class="checkout-total-card">
           <div class="cart-summary-row">
+            <span class="summary-label">Items Subtotal:</span>
+            <span class="summary-total" id="checkout-subtotal-amount">₹0.00</span>
+          </div>
+          <div class="cart-summary-row promo-discount-row" id="checkout-discount-row" style="display: none;">
+            <span class="summary-label">🏷️ Coupon Discount (<span id="checkout-discount-code-badge"></span>):</span>
+            <span class="summary-total discount-text" id="checkout-discount-amount">-₹0.00</span>
+          </div>
+          <div class="cart-summary-row wallet-discount-row" id="checkout-wallet-discount-row" style="display: none;">
+            <span class="summary-label">👛 MiniStore Wallet Applied:</span>
+            <span class="summary-total discount-text" id="checkout-wallet-discount-amount">-₹0.00</span>
+          </div>
+          <div class="cart-summary-row total-highlight-row">
             <span class="summary-label">Grand Total:</span>
             <span class="summary-total" id="checkout-total-amount">₹0.00</span>
           </div>
@@ -826,8 +1030,20 @@
             <span class="receipt-label">Delivery Address:</span>
             <span class="receipt-value" id="success-shipping-address">---</span>
           </div>
+          <div class="receipt-row" id="receipt-coupon-row" style="display: none;">
+            <span class="receipt-label">Coupon Discount:</span>
+            <span class="receipt-value" id="success-coupon-info" style="color: #10b981; font-weight: 600;">-₹0.00</span>
+          </div>
+          <div class="receipt-row" id="receipt-wallet-row" style="display: none;">
+            <span class="receipt-label">Wallet Balance Applied:</span>
+            <span class="receipt-value" id="success-wallet-deduction" style="color: #10b981; font-weight: 600;">-₹0.00</span>
+          </div>
+          <div class="receipt-row" id="receipt-coins-row">
+            <span class="receipt-label">SuperCoins Reward:</span>
+            <span class="receipt-value" id="success-coins-earned" style="color: #f59e0b; font-weight: 700;">+25 SuperCoins (5% Cashback)</span>
+          </div>
           <div class="receipt-row">
-            <span class="receipt-label">Total Amount:</span>
+            <span class="receipt-label">Total Amount Paid:</span>
             <span class="receipt-value font-bold" id="success-order-total">₹0.00</span>
           </div>
         </div>
@@ -1037,8 +1253,11 @@
       <!-- Admin Navigation Tabs -->
       <div class="admin-nav-tabs">
         <button type="button" class="admin-tab active" id="admin-tab-overview">📊 Overview</button>
+        <button type="button" class="admin-tab" id="admin-tab-sellers">🏬 Merchants <span class="admin-badge-count" id="admin-pending-sellers-count" style="display: none;">0</span></button>
+        <button type="button" class="admin-tab" id="admin-tab-sales">⚡ Live Sales &amp; Campaigns</button>
+        <button type="button" class="admin-tab" id="admin-tab-coupons">🏷️ Coupons</button>
         <button type="button" class="admin-tab" id="admin-tab-products">📦 Products</button>
-        <button type="button" class="admin-tab" id="admin-tab-orders">📋 Orders</button>
+        <button type="button" class="admin-tab" id="admin-tab-orders">📋 Orders <span class="admin-badge-count" id="admin-pending-orders-count" style="display: none;">0</span></button>
         <button type="button" class="admin-tab" id="admin-tab-reviews">⭐ Reviews</button>
         <button type="button" class="admin-tab" id="admin-tab-analytics">📈 Analytics</button>
       </div>
@@ -1049,39 +1268,67 @@
       <!-- Section 1: Dashboard Overview -->
       <div class="admin-section" id="admin-overview-section">
         <div class="stats-grid" id="admin-stats-grid">
-          <div class="stat-card">
+          <div class="stat-card" id="card-overview-users">
             <div class="stat-icon">👥</div>
             <div class="stat-content">
               <span class="stat-label">Total Users</span>
               <span class="stat-value" id="stat-total-users">-</span>
             </div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="card-overview-products" style="cursor: pointer;" title="Manage Products">
             <div class="stat-icon">🛍️</div>
             <div class="stat-content">
               <span class="stat-label">Total Products</span>
               <span class="stat-value" id="stat-total-products">-</span>
             </div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" id="card-overview-orders" style="cursor: pointer;" title="Manage Orders">
             <div class="stat-icon">📦</div>
             <div class="stat-content">
               <span class="stat-label">Total Orders</span>
               <span class="stat-value" id="stat-total-orders">-</span>
             </div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card highlight" id="card-overview-pending-orders" style="cursor: pointer;" title="View Pending Orders">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-content">
+              <span class="stat-label">Pending Orders</span>
+              <span class="stat-value" id="stat-pending-orders">-</span>
+            </div>
+          </div>
+          <div class="stat-card highlight-orange" id="card-pending-merchants" style="cursor: pointer;" title="Review Merchant Applications">
+            <div class="stat-icon">🏬</div>
+            <div class="stat-content">
+              <span class="stat-label">Pending Merchants</span>
+              <span class="stat-value" id="stat-pending-sellers">0</span>
+            </div>
+          </div>
+          <div class="stat-card" id="card-overview-reviews" style="cursor: pointer;" title="Moderate Customer Reviews">
             <div class="stat-icon">⭐</div>
             <div class="stat-content">
               <span class="stat-label">Total Reviews</span>
               <span class="stat-value" id="stat-total-reviews">-</span>
             </div>
           </div>
-          <div class="stat-card highlight">
-            <div class="stat-icon">⏳</div>
-            <div class="stat-content">
-              <span class="stat-label">Pending Orders</span>
-              <span class="stat-value" id="stat-pending-orders">-</span>
+        </div>
+
+        <!-- Live Running Sale Overview Spotlight -->
+        <div class="admin-sale-overview-card" id="admin-sale-overview-card">
+          <div class="admin-sale-overview-header">
+            <div class="admin-sale-overview-title-wrap">
+              <span class="sale-status-dot-wrap">
+                <span class="sale-status-dot" id="overview-sale-dot"></span>
+                <span class="sale-status-text" id="overview-sale-status-badge">LIVE NOW</span>
+              </span>
+              <h4 class="admin-sale-overview-title" id="overview-sale-title">The Grand Festival Mega Sale</h4>
+              <p class="admin-sale-overview-subtitle" id="overview-sale-subtitle">Heavy Festive Discounts Active across 27 Catalog Deals</p>
+            </div>
+            <div class="admin-sale-overview-actions">
+              <div class="overview-timer-box">
+                <span class="overview-timer-label">Time Remaining:</span>
+                <span class="overview-timer-val" id="overview-sale-timer">--d --h --m</span>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="overview-manage-sale-btn">⚡ Manage Sale &amp; Extend</button>
             </div>
           </div>
         </div>
@@ -1481,6 +1728,262 @@
           </div>
         </div>
       </div>
+
+      <!-- Section 6: Live Sales & Marketing Campaigns Management -->
+      <div class="admin-section" id="admin-sales-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">Live Sales &amp; Promotional Campaigns</h3>
+            <p class="admin-subdesc">Monitor the running festival sale, extend countdown windows, or end campaigns in real-time across the storefront.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="refresh-sales-btn" title="Refresh campaign data">↻ Refresh</button>
+        </div>
+
+        <!-- Live Campaign Status & Instant Control Card -->
+        <div class="admin-sales-main-card">
+          <div class="sales-card-top-row">
+            <div class="sales-status-badge-container">
+              <span class="live-pulse-badge" id="admin-sale-badge">
+                <span class="pulse-circle" id="admin-sale-pulse"></span>
+                <span id="admin-sale-badge-text">LIVE SALE ACTIVE</span>
+              </span>
+              <span class="sale-type-pill" id="admin-sale-type-pill">FESTIVAL SPECIAL</span>
+            </div>
+            <div class="sale-time-pill" id="admin-sale-end-display">Ends in: Calculating...</div>
+          </div>
+
+          <div class="sales-card-info">
+            <h3 class="sales-campaign-heading" id="admin-sale-name">The Grand Festival Mega Sale</h3>
+            <p class="sales-campaign-tagline" id="admin-sale-tagline">Festive Deals Live! Up to 60% OFF on Top Picks</p>
+            <p class="sales-campaign-description" id="admin-sale-desc">Heavy festive discounts up to 60% OFF on 27 top products across Electronics, Accessories &amp; Home Essentials.</p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="sales-quick-controls">
+            <div class="sales-controls-label">⚡ Live Sale Controls:</div>
+            <div class="sales-btn-group">
+              <button type="button" class="btn btn-success btn-sm" id="btn-extend-sale-24h" title="Add 24 hours to sale end date">
+                ⏳ Extend +24 Hours
+              </button>
+              <button type="button" class="btn btn-success btn-sm" id="btn-extend-sale-48h" title="Add 48 hours to sale end date">
+                ⏳ Extend +48 Hours
+              </button>
+              <button type="button" class="btn btn-success btn-sm" id="btn-extend-sale-7d" title="Add 7 days to sale end date">
+                ⏳ Extend +7 Days
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-end-sale-now" title="End the sale immediately and restore regular prices">
+                🛑 End Sale Now
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-resume-sale-now" style="display: none;" title="Resume and reactivate this sale">
+                🚀 Resume Sale
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaign Configuration & Settings Form -->
+        <div class="admin-sales-settings-grid">
+          <div class="admin-card-inner">
+            <h4 class="settings-subheading">⚙️ Campaign Configuration</h4>
+            <form id="admin-sale-form" class="admin-sale-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="sale-input-name" class="form-label">Campaign Name *</label>
+                  <input type="text" id="sale-input-name" class="form-input" required placeholder="e.g. The Grand Festival Mega Sale" />
+                </div>
+                <div class="form-group">
+                  <label for="sale-input-badge" class="form-label">Banner Badge Text</label>
+                  <input type="text" id="sale-input-badge" class="form-input" placeholder="e.g. DIWALI SPECIAL" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sale-input-tagline" class="form-label">Headline / Tagline</label>
+                <input type="text" id="sale-input-tagline" class="form-input" placeholder="e.g. Festive Deals Live! Up to 60% OFF" />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="sale-input-end-date" class="form-label">Custom End Date &amp; Time *</label>
+                  <input type="datetime-local" id="sale-input-end-date" class="form-input" required />
+                </div>
+                <div class="form-group">
+                  <label for="sale-input-coupon" class="form-label">Promotional Coupon Code</label>
+                  <input type="text" id="sale-input-coupon" class="form-input" placeholder="e.g. FESTIVE10" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sale-input-desc" class="form-label">Deal Description</label>
+                <textarea id="sale-input-desc" class="form-input" rows="2" placeholder="Describe the discounts and special offers..."></textarea>
+              </div>
+
+              <div class="form-actions" style="margin-top: 16px;">
+                <button type="submit" class="btn btn-primary" id="btn-save-sale-settings">💾 Save Campaign Settings</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Active Deal Products Overview -->
+          <div class="admin-card-inner">
+            <h4 class="settings-subheading">🎁 Discounted Deal Products (<span id="admin-deals-count">27</span>)</h4>
+            <p class="admin-subdesc" style="margin-bottom: 12px;">These catalog products receive live festive price cuts when the sale is active:</p>
+            <div class="deals-chip-list" id="admin-deals-chip-list">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Activity / Audit History -->
+            <h4 class="settings-subheading" style="margin-top: 24px;">📜 Campaign Audit Trail</h4>
+            <div class="sales-history-timeline" id="admin-sales-history">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Coupons & Discounts Management -->
+      <div class="admin-section" id="admin-coupons-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">Coupon &amp; Promotional Code Management</h3>
+            <p class="admin-subdesc">Create, activate, set usage caps, and manage promo coupons for customer checkouts.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-primary btn-sm" id="admin-new-coupon-btn">➕ New Coupon</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="refresh-coupons-btn" title="Refresh coupon list">↻ Refresh</button>
+          </div>
+        </div>
+
+        <!-- Create Coupon Inline Drawer / Card -->
+        <div class="admin-coupon-creator-card" id="admin-coupon-creator" style="display: none;">
+          <div class="creator-header">
+            <h4 class="creator-title">✨ Create a New Promo Coupon</h4>
+            <button type="button" class="btn-close-creator" id="close-coupon-creator-btn">✕</button>
+          </div>
+          <form id="admin-create-coupon-form" class="admin-coupon-form-grid">
+            <div class="form-group">
+              <label for="new-coupon-code" class="form-label">Coupon Code <span class="required">*</span></label>
+              <input type="text" id="new-coupon-code" class="form-input" placeholder="e.g. FLASH25" required uppercase style="text-transform: uppercase; font-weight: 700;">
+            </div>
+            <div class="form-group">
+              <label for="new-coupon-type" class="form-label">Discount Type <span class="required">*</span></label>
+              <select id="new-coupon-type" class="form-input">
+                <option value="FLAT">Flat ₹ Discount</option>
+                <option value="PERCENTAGE">Percentage (%) Discount</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="new-coupon-value" class="form-label">Discount Value <span class="required">*</span></label>
+              <input type="number" id="new-coupon-value" class="form-input" placeholder="e.g. 200 (or 20 for %)" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="new-coupon-min-order" class="form-label">Min. Order Value (₹)</label>
+              <input type="number" id="new-coupon-min-order" class="form-input" placeholder="e.g. 499 (0 for no min)" min="0" value="0">
+            </div>
+            <div class="form-group">
+              <label for="new-coupon-max-discount" class="form-label">Max Discount Cap (₹) (Optional)</label>
+              <input type="number" id="new-coupon-max-discount" class="form-input" placeholder="e.g. 500 cap for %" min="0">
+            </div>
+            <div class="form-group">
+              <label for="new-coupon-usage-limit" class="form-label">Usage Cap (Redemptions)</label>
+              <input type="number" id="new-coupon-usage-limit" class="form-input" placeholder="e.g. 500 (blank = unlimited)" min="1">
+            </div>
+            <div class="form-group">
+              <label for="new-coupon-expiry" class="form-label">Expiry Date <span class="required">*</span></label>
+              <input type="date" id="new-coupon-expiry" class="form-input" required>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="new-coupon-desc" class="form-label">Offer Description / Subtitle</label>
+              <input type="text" id="new-coupon-desc" class="form-input" placeholder="e.g. Extra 25% off on electronic gadgets!">
+            </div>
+            <div class="form-actions-row" style="grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="cancel-create-coupon-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm" id="submit-create-coupon-btn">Save &amp; Activate Coupon</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Coupons Table Container -->
+        <div class="admin-table-container">
+          <table class="admin-table" id="admin-coupons-table">
+            <thead>
+              <tr>
+                <th>Coupon Code</th>
+                <th>Discount</th>
+                <th>Min. Order</th>
+                <th>Usage / Cap</th>
+                <th>Expires</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-coupons-tbody">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section: Merchant Verification & Approvals (Admin) -->
+      <div class="admin-section" id="admin-sellers-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">Merchant Applications &amp; Verification</h3>
+            <p class="admin-subdesc">Review business documents (PAN, Address, GSTIN) and approve or reject seller onboarding.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="refresh-sellers-btn" title="Refresh seller list">↻ Refresh</button>
+          </div>
+        </div>
+
+        <!-- Seller Overview Metric Chips -->
+        <div class="seller-metrics-row">
+          <div class="seller-metric-chip total">
+            <span class="metric-label">Total Registered</span>
+            <strong class="metric-num" id="admin-sellers-total-num">0</strong>
+          </div>
+          <div class="seller-metric-chip pending">
+            <span class="metric-label">Pending Review</span>
+            <strong class="metric-num" id="admin-sellers-pending-num">0</strong>
+          </div>
+          <div class="seller-metric-chip verified">
+            <span class="metric-label">Verified Merchants</span>
+            <strong class="metric-num" id="admin-sellers-verified-num">0</strong>
+          </div>
+          <div class="seller-metric-chip rejected">
+            <span class="metric-label">Rejected</span>
+            <strong class="metric-num" id="admin-sellers-rejected-num">0</strong>
+          </div>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div class="admin-filter-bar">
+          <div class="filter-pill-group" id="seller-filter-pills">
+            <button type="button" class="filter-pill is-active" data-seller-filter="all">All Merchants</button>
+            <button type="button" class="filter-pill" data-seller-filter="pending">⏳ Pending Review</button>
+            <button type="button" class="filter-pill" data-seller-filter="verified">✅ Verified</button>
+            <button type="button" class="filter-pill" data-seller-filter="rejected">❌ Rejected</button>
+          </div>
+        </div>
+
+        <!-- Sellers Table / List -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-sellers-table">
+            <thead>
+              <tr>
+                <th>Business Name &amp; Owner</th>
+                <th>Contact &amp; Address</th>
+                <th>Tax &amp; ID Details</th>
+                <th>Status</th>
+                <th class="text-right">Verification Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-sellers-tbody">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1816,34 +2319,71 @@
             <span class="tracking-order-id" id="track-result-id">Order #</span>
             <div class="tracking-date" id="track-result-date">Placed: -</div>
           </div>
-          <div class="tracking-header-badges">
-            <span class="status-badge" id="track-result-status">Pending</span>
-            <span class="payment-method-pill" id="track-result-payment">UPI</span>
-            <span class="payment-status-badge" id="track-result-payment-status">Pending</span>
+          <div class="tracking-header-actions">
+            <button type="button" class="btn track-view-invoice-btn" id="track-view-invoice-btn" title="Open Official Tax Invoice & Receipt">
+              📄 View Tax Invoice
+            </button>
+            <div class="tracking-header-badges">
+              <span class="status-badge" id="track-result-status">Pending</span>
+              <span class="payment-method-pill" id="track-result-payment">UPI</span>
+              <span class="payment-status-badge" id="track-result-payment-status">Pending</span>
+            </div>
           </div>
         </div>
 
-        <!-- Visual Progress Stepper -->
-        <div class="tracking-stepper" id="track-stepper">
-          <div class="stepper-step" id="step-placed">
-            <div class="stepper-dot">✓</div>
-            <span class="stepper-label">Placed</span>
+        <!-- Carrier & Delivery Estimate Highlight Bar -->
+        <div class="tracking-courier-banner">
+          <div class="courier-banner-item">
+            <span class="courier-banner-label">🚚 Logistics Partner</span>
+            <span class="courier-banner-val" id="track-result-carrier">MiniStore Express</span>
           </div>
-          <div class="stepper-line" id="line-1"></div>
-          <div class="stepper-step" id="step-processing">
-            <div class="stepper-dot">⚡</div>
-            <span class="stepper-label">Processing</span>
+          <div class="courier-banner-item">
+            <span class="courier-banner-label">📦 Tracking / AWB No.</span>
+            <div class="courier-awb-wrap">
+              <span class="courier-awb-code" id="track-result-awb">MS-TRK-000000</span>
+              <button type="button" class="btn-copy-icon" id="track-copy-awb-btn" title="Copy tracking number" aria-label="Copy tracking number">📋</button>
+            </div>
           </div>
-          <div class="stepper-line" id="line-2"></div>
-          <div class="stepper-step" id="step-shipped">
-            <div class="stepper-dot">🚚</div>
-            <span class="stepper-label">Shipped</span>
+          <div class="courier-banner-item">
+            <span class="courier-banner-label">📅 Estimated Delivery</span>
+            <span class="courier-banner-val text-success" id="track-result-eta">3-4 Business Days</span>
           </div>
-          <div class="stepper-line" id="line-3"></div>
-          <div class="stepper-step" id="step-delivered">
-            <div class="stepper-dot">📍</div>
-            <span class="stepper-label">Delivered</span>
+        </div>
+
+        <!-- Visual 5-Stage Stepper -->
+        <div class="tracking-stepper-wrap">
+          <div class="tracking-stepper" id="track-stepper">
+            <div class="stepper-step" id="step-placed">
+              <div class="stepper-dot">✓</div>
+              <span class="stepper-label">Placed</span>
+            </div>
+            <div class="stepper-line" id="line-1"></div>
+            <div class="stepper-step" id="step-processing">
+              <div class="stepper-dot">⚡</div>
+              <span class="stepper-label">Processing</span>
+            </div>
+            <div class="stepper-line" id="line-2"></div>
+            <div class="stepper-step" id="step-shipped">
+              <div class="stepper-dot">🚚</div>
+              <span class="stepper-label">Shipped</span>
+            </div>
+            <div class="stepper-line" id="line-3"></div>
+            <div class="stepper-step" id="step-out-for-delivery">
+              <div class="stepper-dot">🛵</div>
+              <span class="stepper-label">Out for Delivery</span>
+            </div>
+            <div class="stepper-line" id="line-4"></div>
+            <div class="stepper-step" id="step-delivered">
+              <div class="stepper-dot">📍</div>
+              <span class="stepper-label">Delivered</span>
+            </div>
           </div>
+        </div>
+
+        <!-- Real-Time Activity Log Timeline -->
+        <div class="tracking-section-label">Fulfillment &amp; Transit Activity</div>
+        <div class="tracking-timeline-box" id="track-result-timeline">
+          <!-- Timeline nodes injected dynamically -->
         </div>
 
         <!-- Items Summary List -->
@@ -1865,6 +2405,159 @@
         <button type="button" class="btn btn-secondary btn-sm" id="track-view-all-orders-btn">
           <span>📋 View Full Order History</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Branded Printable Invoice Modal -->
+  <div class="modal-backdrop" id="invoice-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="invoice-modal-title">
+    <div class="modal-container invoice-modal-container">
+      <div class="invoice-modal-top-bar no-print">
+        <div class="invoice-top-title-group">
+          <span class="badge-indigo pill-xs">📄 Official Tax Receipt</span>
+          <h4 id="invoice-modal-title">Tax Invoice &amp; Customer Receipt</h4>
+        </div>
+        <div class="invoice-top-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="invoice-print-btn">
+            🖨️ Print / Download PDF
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="invoice-close-btn" aria-label="Close invoice">
+            ✕ Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Invoice Document Sheet -->
+      <div class="invoice-paper" id="printable-invoice-content">
+        <!-- Invoice Header -->
+        <header class="invoice-doc-header">
+          <div class="inv-brand-col">
+            <div class="inv-brand-logo">
+              <span class="inv-logo-icon">🛍️</span>
+              <span class="inv-logo-text">Mini<strong>Store</strong></span>
+            </div>
+            <div class="inv-seller-info">
+              <strong>MiniStore India Retail Pvt. Ltd.</strong><br>
+              Cyber Hub Tower 4, DLF Phase 2, Gurugram, HR 122002<br>
+              <span>GSTIN: <strong>07AAAAA0000A1Z5</strong></span> · <span>CIN: U51909HR2022PTC099881</span><br>
+              <span>Support: support@ministore.in · +91 1800-200-9988</span>
+            </div>
+          </div>
+          <div class="inv-meta-col">
+            <div class="inv-badge-type">TAX INVOICE</div>
+            <div class="inv-meta-grid">
+              <div class="inv-meta-row">
+                <span class="inv-meta-lbl">Invoice No:</span>
+                <strong class="inv-meta-val" id="inv-num">INV-202610-1001</strong>
+              </div>
+              <div class="inv-meta-row">
+                <span class="inv-meta-lbl">Invoice Date:</span>
+                <span class="inv-meta-val" id="inv-date">-</span>
+              </div>
+              <div class="inv-meta-row">
+                <span class="inv-meta-lbl">Order ID:</span>
+                <span class="inv-meta-val code-font" id="inv-order-id">-</span>
+              </div>
+              <div class="inv-meta-row">
+                <span class="inv-meta-lbl">Order Date:</span>
+                <span class="inv-meta-val" id="inv-order-date">-</span>
+              </div>
+              <div class="inv-meta-row">
+                <span class="inv-meta-lbl">Payment Mode:</span>
+                <span class="inv-meta-val" id="inv-pay-mode">UPI</span>
+              </div>
+              <div class="inv-meta-row">
+                <span class="inv-meta-lbl">Payment Status:</span>
+                <strong class="inv-meta-val text-success" id="inv-pay-status">Paid</strong>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <hr class="inv-divider">
+
+        <!-- Addresses Section -->
+        <div class="inv-addresses-grid">
+          <div class="inv-address-card">
+            <div class="inv-address-title">📍 Billed &amp; Shipped To:</div>
+            <div class="inv-address-body" id="inv-ship-address">
+              <strong>Customer Name</strong><br>
+              Phone: +91 9876543210<br>
+              Address Line 1, City, State - 110001, India
+            </div>
+          </div>
+          <div class="inv-address-card">
+            <div class="inv-address-title">🏢 Dispatch Warehouse:</div>
+            <div class="inv-address-body">
+              <strong>MiniStore Central Express Hub #04</strong><br>
+              Logistics Park, Bhiwandi Highway, Thane, MH - 421302<br>
+              Carrier: <span id="inv-carrier">MiniStore Express</span> · AWB: <span id="inv-awb">MS-TRK-000000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th style="width: 45px; text-align: center;">#</th>
+              <th>Item Description</th>
+              <th style="width: 100px; text-align: right;">Unit Price</th>
+              <th style="width: 60px; text-align: center;">Qty</th>
+              <th style="width: 110px; text-align: right;">Net Amount</th>
+            </tr>
+          </thead>
+          <tbody id="inv-items-body">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+
+        <!-- Totals & Calculations -->
+        <div class="inv-summary-section">
+          <div class="inv-notes-box">
+            <div class="inv-notes-title">Terms &amp; Important Notes:</div>
+            <ul class="inv-notes-list">
+              <li>All goods sold are backed by standard 7-day hassle-free replacement guarantee.</li>
+              <li>This is a computer-generated tax invoice and requires no physical ink signature.</li>
+              <li>Goods and Services Tax (GST) is included in the net invoice prices.</li>
+            </ul>
+          </div>
+          <div class="inv-totals-box">
+            <div class="inv-tot-row">
+              <span>Subtotal:</span>
+              <strong id="inv-subtotal">₹0</strong>
+            </div>
+            <div class="inv-tot-row text-success" id="inv-discount-row" style="display: none;">
+              <span>Discount / Promo:</span>
+              <strong id="inv-discount">-₹0</strong>
+            </div>
+            <div class="inv-tot-row">
+              <span>Delivery / Shipping Fee:</span>
+              <strong class="text-success">FREE</strong>
+            </div>
+            <hr class="inv-subdivider">
+            <div class="inv-tot-row inv-grand-total">
+              <span>Grand Total:</span>
+              <strong id="inv-grand-total">₹0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invoice Footer & Seal -->
+        <footer class="inv-doc-footer">
+          <div class="inv-footer-auth">
+            <div class="inv-seal-badge">
+              <span>✓ DIGITALLY VERIFIED</span>
+              <small>MiniStore System</small>
+            </div>
+            <div class="inv-sign-label">Authorized Signatory for MiniStore India</div>
+          </div>
+          <div class="inv-footer-barcode">
+            <div class="barcode-mock">||| | |||| | ||||| || |||| ||| |||||</div>
+            <small>Thank you for shopping with MiniStore!</small>
+          </div>
+        </footer>
       </div>
     </div>
   </div>
@@ -2241,6 +2934,204 @@
 
       <div class="info-modal-footer">
         <button type="button" class="btn btn-primary" id="security-modal-ok-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MiniStore Wallet & Loyalty Coins Modal (Feature 5) -->
+  <div class="modal-backdrop" id="wallet-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wallet-modal-title">
+    <div class="modal-container wallet-modal-container">
+      <button class="modal-close-icon" id="wallet-close-btn" aria-label="Close wallet modal">✕</button>
+
+      <div class="wallet-modal-header">
+        <div class="wallet-title-wrap">
+          <span class="wallet-header-icon">👛</span>
+          <div>
+            <h2 class="wallet-modal-title" id="wallet-modal-title">MiniStore Wallet &amp; SuperCoins</h2>
+            <p class="wallet-modal-subtitle">Instant 1-click checkout, 100% usable balance &amp; 5% cashback rewards</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unauthenticated State -->
+      <div class="modal-state" id="wallet-unauth-state" style="display: none;">
+        <div class="empty-icon">🔒</div>
+        <h3 class="empty-title">Log in to Access Your Wallet</h3>
+        <p class="state-text">Join MiniStore today and get ₹150 welcome wallet cash + 50 SuperCoins instantly!</p>
+        <button class="btn btn-primary" id="wallet-login-prompt-btn">Log In / Register</button>
+      </div>
+
+      <!-- Wallet Content -->
+      <div class="wallet-content" id="wallet-content">
+        <!-- Balance Highlights Cards -->
+        <div class="wallet-cards-grid">
+          <div class="wallet-card-balance">
+            <div class="wallet-card-label">AVAILABLE WALLET CASH</div>
+            <div class="wallet-card-value" id="wallet-modal-balance-display">₹0.00</div>
+            <div class="wallet-card-perk">✓ Use up to 50% per order • No expiry</div>
+          </div>
+          <div class="wallet-card-coins">
+            <div class="wallet-card-label">SUPERCOINS BALANCE</div>
+            <div class="wallet-card-value" id="wallet-modal-coins-display">🪙 50</div>
+            <div class="wallet-card-perk" id="wallet-coins-worth-text">Worth ₹25.00 (Redeemable anytime)</div>
+          </div>
+        </div>
+
+        <!-- Wallet Action Tabs / Panels -->
+        <div class="wallet-actions-container">
+          <!-- Add Money Section with Payment Gateway -->
+          <div class="wallet-action-box">
+            <h4 class="wallet-action-title">💳 Secure Wallet Recharge</h4>
+            <p class="wallet-action-desc">Recharge via UPI, Cards, or Net Banking with 256-bit bank encryption. Get 10% bonus coins on every recharge!</p>
+            <div class="wallet-quick-amounts">
+              <button type="button" class="btn-wallet-quick" data-amount="100">+ ₹100</button>
+              <button type="button" class="btn-wallet-quick" data-amount="200">+ ₹200</button>
+              <button type="button" class="btn-wallet-quick" data-amount="500">+ ₹500</button>
+              <button type="button" class="btn-wallet-quick" data-amount="1000">+ ₹1,000</button>
+            </div>
+            <div class="wallet-topup-input-group">
+              <span class="currency-prefix">₹</span>
+              <input type="number" id="wallet-topup-input" class="wallet-input" placeholder="Enter amount (min ₹10)" min="10" max="50000" />
+              <button type="button" id="wallet-topup-submit-btn" class="btn btn-primary btn-sm">Proceed to Pay &amp; Recharge</button>
+            </div>
+            <div id="wallet-topup-alert" class="wallet-alert" style="display: none;"></div>
+          </div>
+
+          <!-- Redeem Coins Section -->
+          <div class="wallet-action-box">
+            <h4 class="wallet-action-title">🪙 Redeem SuperCoins to Cash</h4>
+            <p class="wallet-action-desc">2 SuperCoins = ₹1.00 Direct Wallet Cash. Convert your loyalty coins anytime!</p>
+            <div class="wallet-redeem-row">
+              <div class="coins-convert-info">
+                <span>Select coins to redeem:</span>
+                <select id="wallet-coins-select" class="wallet-select">
+                  <option value="20">20 Coins (₹10.00)</option>
+                  <option value="40">40 Coins (₹20.00)</option>
+                  <option value="50">50 Coins (₹25.00)</option>
+                  <option value="100">100 Coins (₹50.00)</option>
+                </select>
+              </div>
+              <button type="button" id="wallet-redeem-submit-btn" class="btn btn-secondary btn-sm">Convert Now</button>
+            </div>
+            <div id="wallet-redeem-alert" class="wallet-alert" style="display: none;"></div>
+          </div>
+        </div>
+
+        <!-- Loyalty Rewards Banner -->
+        <div class="wallet-reward-banner">
+          <span class="reward-icon">🎁</span>
+          <div class="reward-text">
+            <strong>5% Cashback on Every Order:</strong> You earn 5% of order value back in SuperCoins on every purchase delivered to your doorstep!
+          </div>
+        </div>
+
+        <!-- Transactions History -->
+        <div class="wallet-history-section">
+          <div class="wallet-history-header">
+            <h4 class="wallet-action-title">📜 Wallet &amp; Rewards Activity</h4>
+            <span class="wallet-txn-count" id="wallet-txn-count-badge">0 Transactions</span>
+          </div>
+          <div class="wallet-transactions-list" id="wallet-transactions-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secure Payment Gateway Modal for Wallet Recharge (Prevents unverified free top-ups) -->
+  <div class="modal-backdrop" id="wallet-gateway-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wallet-gateway-title">
+    <div class="modal-container wallet-gateway-container">
+      <button class="modal-close-icon" id="wallet-gateway-close-btn" aria-label="Cancel and close payment gateway">✕</button>
+
+      <div class="gateway-header">
+        <div class="gateway-lock-badge">🔒 256-Bit SSL Bank Encrypted</div>
+        <h3 class="gateway-title" id="wallet-gateway-title">MiniStore Secure Checkout</h3>
+        <p class="gateway-subtitle">Authenticating with Reserve Bank &amp; NPCI payment network</p>
+      </div>
+
+      <!-- Payment Summary Bar -->
+      <div class="gateway-summary-bar">
+        <div>
+          <span class="gateway-summary-label">Recharge Amount:</span>
+          <span class="gateway-summary-value" id="gateway-amount-display">₹1,000.00</span>
+        </div>
+        <span class="gateway-bonus-chip">+10% Bonus Coins</span>
+      </div>
+
+      <!-- Payment Method Tabs -->
+      <div class="gateway-methods-nav">
+        <button type="button" class="gateway-method-tab is-active" id="tab-gateway-upi" data-method="UPI">
+          <span class="tab-icon">⚡</span> UPI / QR
+        </button>
+        <button type="button" class="gateway-method-tab" id="tab-gateway-card" data-method="CARD">
+          <span class="tab-icon">💳</span> Card
+        </button>
+        <button type="button" class="gateway-method-tab" id="tab-gateway-nb" data-method="NETBANKING">
+          <span class="tab-icon">🏦</span> NetBanking
+        </button>
+      </div>
+
+      <!-- Method Panels -->
+      <div class="gateway-body">
+        <!-- UPI Panel -->
+        <div class="gateway-panel" id="gateway-panel-upi">
+          <label class="gateway-field-label">Select UPI App or Enter Virtual Payment Address (VPA)</label>
+          <div class="gateway-upi-apps">
+            <button type="button" class="upi-app-btn is-selected" data-app="GPay" data-vpa="user@okhdfcbank">Google Pay</button>
+            <button type="button" class="upi-app-btn" data-app="PhonePe" data-vpa="user@ybl">PhonePe</button>
+            <button type="button" class="upi-app-btn" data-app="Paytm" data-vpa="user@paytm">Paytm</button>
+            <button type="button" class="upi-app-btn" data-app="BHIM" data-vpa="user@upi">BHIM UPI</button>
+          </div>
+          <div class="gateway-input-group">
+            <input type="text" id="gateway-upi-id" class="gateway-input" placeholder="e.g. mobile@okhdfcbank" value="user@okhdfcbank" />
+          </div>
+          <p class="gateway-hint">✓ Instant payment authorization via NPCI Unified Payments Interface</p>
+        </div>
+
+        <!-- Card Panel -->
+        <div class="gateway-panel" id="gateway-panel-card" style="display: none;">
+          <label class="gateway-field-label">Credit / Debit Card Details</label>
+          <div class="gateway-input-group">
+            <input type="text" id="gateway-card-number" class="gateway-input" placeholder="Card Number (4532 •••• •••• 8821)" maxlength="19" value="4532 8901 2345 6789" />
+          </div>
+          <div class="gateway-card-row">
+            <input type="text" id="gateway-card-expiry" class="gateway-input" placeholder="MM/YY" maxlength="5" value="12/28" />
+            <input type="password" id="gateway-card-cvv" class="gateway-input" placeholder="CVV" maxlength="4" value="882" />
+          </div>
+          <p class="gateway-hint">🔒 Supports Visa, Mastercard, RuPay &amp; Maestro</p>
+        </div>
+
+        <!-- NetBanking Panel -->
+        <div class="gateway-panel" id="gateway-panel-netbanking" style="display: none;">
+          <label class="gateway-field-label">Select Your Bank</label>
+          <select id="gateway-bank-select" class="gateway-input">
+            <option value="HDFC">HDFC Bank</option>
+            <option value="SBI">State Bank of India</option>
+            <option value="ICICI">ICICI Bank</option>
+            <option value="AXIS">Axis Bank</option>
+            <option value="KOTAK">Kotak Mahindra Bank</option>
+          </select>
+          <p class="gateway-hint">✓ Connects to bank 128-bit SSL encrypted net banking gateway</p>
+        </div>
+
+        <!-- Processing State Overlay -->
+        <div class="gateway-processing-view" id="gateway-processing-view" style="display: none;">
+          <div class="gateway-spinner"></div>
+          <h4 class="gateway-processing-title" id="gateway-processing-status">Processing Payment...</h4>
+          <p class="gateway-processing-desc">Connecting to payment gateway. Please do not refresh or close.</p>
+        </div>
+
+        <div id="gateway-error-alert" class="wallet-alert alert-error" style="display: none;"></div>
+
+        <!-- Pay Action Button -->
+        <button type="button" class="btn btn-primary gateway-pay-btn" id="gateway-confirm-pay-btn">
+          🔒 Pay <span id="gateway-pay-amount-label">₹1,000.00</span> Securely
+        </button>
+      </div>
+
+      <div class="gateway-footer">
+        <span>🛡️ MiniStore Secure Pay • 100% RBI Compliant • PCI-DSS Certified</span>
       </div>
     </div>
   </div>

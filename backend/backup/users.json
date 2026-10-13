@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "6ac86506668ee6698db13969",
+    "name": "User",
+    "email": "user@gmail.com",
+    "password": "$2b$10$eYtqSkgFQGK7OFbfn.g.LeOPipu8XAeF0rxby57kGPmlKXVmhFS2.",
+    "role": "customer",
+    "avatar": "",
+    "phone": "",
+    "createdAt": "2026-10-09T03:52:38.043Z",
+    "updatedAt": "2026-10-09T03:52:38.043Z",
+    "__v": 0
+  }
+]

@@ -59,6 +59,7 @@ const categoryQuickLinks = document.getElementById('category-quick-links');
 const categoryFilterSearch = document.getElementById('category-filter-search');
 const categoryClearFilterBtn = document.getElementById('category-clear-filter-btn');
 const categorySortSelect = document.getElementById('category-sort-select');
+const categoryItemsCountDisplay = document.getElementById('category-items-count-display');
 const categoryFilterSummary = document.getElementById('category-filter-summary');
 const categoryFilterSummaryText = document.getElementById('category-filter-summary-text');
 const categoryResetFilterBtn = document.getElementById('category-reset-filter-btn');
@@ -451,6 +452,10 @@ function updateCategoryHeaderUI() {
     const totalCount = rawCategoryProducts.length;
     categoryProductCount.textContent = `${totalCount} ${totalCount === 1 ? 'product' : 'products'} found`;
   }
+  if (categoryItemsCountDisplay) {
+    const totalCount = rawCategoryProducts.length;
+    categoryItemsCountDisplay.textContent = `${totalCount} ${totalCount === 1 ? 'product' : 'products'} available`;
+  }
 }
 
 function renderQuickCategoryLinks() {
@@ -467,7 +472,10 @@ function renderQuickCategoryLinks() {
     const link = document.createElement('a');
     link.href = `category.html?name=${encodeURIComponent(cat)}`;
     link.className = `category-quick-pill ${isActive ? 'is-active' : ''}`;
-    link.innerHTML = `<span>${meta.icon}</span> <span>${escapeHtml(cat)}</span>`;
+    if (isActive) {
+      link.setAttribute('aria-current', 'page');
+    }
+    link.innerHTML = `<span class="pill-icon" aria-hidden="true">${meta.icon}</span><span class="pill-label">${escapeHtml(cat)}</span>`;
     categoryQuickLinks.appendChild(link);
   });
 }
@@ -492,6 +500,14 @@ function applyFiltersAndSort() {
 
   // Sorting
   switch (currentSort) {
+    case 'trending':
+      list.sort((a, b) => {
+        const scoreB = ((b.totalReviews || (b.reviews ? b.reviews.length : 0)) * 10) + ((Number(b.averageRating) || 0) * 5);
+        const scoreA = ((a.totalReviews || (a.reviews ? a.reviews.length : 0)) * 10) + ((Number(a.averageRating) || 0) * 5);
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        return (Number(b.stock) || 0) - (Number(a.stock) || 0);
+      });
+      break;
     case 'price-asc':
       list.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
       break;
@@ -512,6 +528,11 @@ function applyFiltersAndSort() {
 
   displayedProducts = list;
   currentPage = 1;
+
+  if (categoryItemsCountDisplay) {
+    const totalCount = displayedProducts.length;
+    categoryItemsCountDisplay.textContent = `${totalCount} ${totalCount === 1 ? 'product' : 'products'} available`;
+  }
 
   // Filter summary row visibility
   if (categoryFilterSummary && categoryFilterSummaryText) {
@@ -686,7 +707,7 @@ function renderPaginationControls(totalItems, totalPages) {
     for (let p = 1; p <= totalPages; p++) {
       const pageBtn = document.createElement('button');
       pageBtn.type = 'button';
-      pageBtn.className = `pagination-page-btn ${p === currentPage ? 'is-active' : ''}`;
+      pageBtn.className = `pagination-page-btn ${p === currentPage ? 'is-active active' : ''}`;
       pageBtn.textContent = p;
       pageBtn.setAttribute('aria-label', `Go to page ${p}`);
       pageBtn.addEventListener('click', () => {
@@ -927,8 +948,10 @@ function renderCartContent(cart) {
     items.forEach(item => {
       const prod = item.product || {};
       const qty = item.quantity || 1;
-      const price = Number(prod.price) || 0;
-      const subtotal = price * qty;
+      const unitPrice = item.unitPrice !== undefined ? item.unitPrice : (item.price !== undefined ? item.price : (Number(prod.price) || 0));
+      const regularPrice = item.regularPrice || Number(prod.price) || unitPrice;
+      const isDiscounted = item.isFestiveDiscount || (unitPrice < regularPrice);
+      const subtotal = item.subtotal !== undefined ? item.subtotal : (unitPrice * qty);
       totalAmt += subtotal;
 
       const itemEl = document.createElement('div');
@@ -937,7 +960,10 @@ function renderCartContent(cart) {
         <img src="${formatProductImageUrl(prod.image)}" alt="${escapeHtml(prod.name || 'Product')}" class="cart-item-thumb" />
         <div class="cart-item-info">
           <div class="cart-item-title">${escapeHtml(prod.name || 'Product')}</div>
-          <div class="cart-item-meta">${currencyFormatter.format(price)} × ${qty} = <strong>${currencyFormatter.format(subtotal)}</strong></div>
+          <div class="cart-item-meta">
+            <span style="font-weight: 700; color: ${isDiscounted ? '#10b981' : 'inherit'};">${currencyFormatter.format(unitPrice)}</span> × ${qty} = <strong>${currencyFormatter.format(subtotal)}</strong>
+            ${isDiscounted ? `<span style="text-decoration: line-through; color: var(--color-text-muted); font-size: 0.8em; margin-left: 6px;">${currencyFormatter.format(regularPrice)}</span> <span style="color: #10b981; font-size: 0.72rem; font-weight: 700; background: rgba(16, 185, 129, 0.12); padding: 1px 5px; border-radius: 4px;">Festive Deal</span>` : ''}
+          </div>
         </div>
         <button class="cart-item-remove-btn" data-id="${escapeHtml(prod._id || item._id)}" title="Remove item" aria-label="Remove item">✕</button>
       `;
