@@ -8,6 +8,7 @@ const Coupon = require('../models/Coupon');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 const analyticsRoutes = require('./analyticsRoutes');
+const { sendOrderStatusEmail } = require('../config/mailer');
 
 // All admin routes require JWT authentication + Admin role authorization
 router.use(authMiddleware, adminMiddleware);
@@ -193,11 +194,26 @@ router.put('/orders/:id/status', async (req, res) => {
     const updatedOrder = await order.save();
     await updatedOrder.populate('user', 'name email');
 
+    // Transactional Email: Shipping / Delivery Status Notification (Requirement 3)
+    if (previousStatus !== status && (status === 'Shipped' || status === 'Delivered')) {
+      (async () => {
+        try {
+          const recipient = updatedOrder.user?.email || updatedOrder.shippingAddress?.email;
+          if (recipient) {
+            await sendOrderStatusEmail(updatedOrder, status, recipient);
+          }
+        } catch (mailErr) {
+          console.warn('Status notification email error:', mailErr.message);
+        }
+      })();
+    }
+
     res.status(200).json({
       success: true,
       message: 'Order status updated successfully',
       data: updatedOrder
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,

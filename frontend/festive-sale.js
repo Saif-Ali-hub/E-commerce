@@ -4,7 +4,9 @@
  * countdown timer, coupon copying, cart & wishlist integration.
  */
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = (typeof window !== 'undefined' && window.location.origin && window.location.origin.startsWith('http'))
+  ? `${window.location.origin}/api`
+  : 'http://localhost:5000/api';
 
 // State
 let rawProducts = [];
@@ -1684,6 +1686,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updateAuthUI();
   initFestiveCountdown();
+  if (typeof window.initFestiveFirecrackers === 'function') {
+    window.initFestiveFirecrackers('festive-page-firecrackers-canvas', 'festive-page-hero');
+  }
   initEventListeners();
   readUrlParams();
   fetchFestiveDeals();

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MiniStore Merchant Portal — Manage inventory, fulfill orders, and track revenue with real-time analytics.">
+  <title>Merchant Portal | MiniStore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <style>
+    /* Seller Portal Custom Styles */
+    .seller-page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--color-bg, #f8fafc);
+      color: var(--color-text-main, #0f172a);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .seller-header {
+      background: var(--color-surface, #ffffff);
+      border-bottom: 1px solid var(--color-border, #e2e8f0);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .seller-header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .seller-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .seller-brand-text {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--color-primary, #2563eb);
+      letter-spacing: -0.5px;
+    }
+
+    .seller-portal-badge {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .seller-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .seller-hero-card {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .seller-hero-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .seller-hero-subtitle {
+      font-size: 0.92rem;
+      opacity: 0.9;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .seller-verify-pill {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #a7f3d0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .seller-tabs-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--color-border, #e2e8f0);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .seller-tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--color-text-muted, #64748b);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .seller-tab-btn:hover {
+      background: var(--color-surface-hover, #f1f5f9);
+      color: var(--color-text-main, #0f172a);
+    }
+
+    .seller-tab-btn.active {
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--color-surface, #ffffff);
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+
+    .kpi-icon-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .kpi-val {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--color-text-main, #0f172a);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .kpi-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--color-text-muted, #64748b);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .seller-card {
+      background: var(--color-surface, #ffffff);
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .seller-table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--color-border, #e2e8f0);
+      background: var(--color-surface, #ffffff);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .seller-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .seller-table th {
+      background: var(--color-surface-sunken, #f8fafc);
+      padding: 12px 16px;
+      font-weight: 600;
+      color: var(--color-text-muted, #64748b);
+      border-bottom: 1px solid var(--color-border, #e2e8f0);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    .seller-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--color-border, #e2e8f0);
+      color: var(--color-text-main, #1e293b);
+      vertical-align: middle;
+    }
+
+    .seller-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .seller-table tr:hover {
+      background-color: var(--color-surface-hover, rgba(0,0,0,0.015));
+    }
+
+    .stock-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .stock-in {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+    }
+
+    .stock-low {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+    }
+
+    .stock-out {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .status-pending { background: #fef3c7; color: #b45309; }
+    .status-processing { background: #e0f2fe; color: #0369a1; }
+    .status-shipped { background: #e0e7ff; color: #4338ca; }
+    .status-delivered { background: #dcfce7; color: #15803d; }
+    .status-cancelled { background: #fee2e2; color: #b91c1c; }
+
+    /* Modals */
+    .seller-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .seller-modal-container {
+      background: var(--color-surface, #ffffff);
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      color: var(--color-text-main, #0f172a);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    /* ============================================================
+       Dark Mode Explicit Overrides & High-Contrast Polish
+       ============================================================ */
+    [data-theme="dark"] .seller-page-wrapper {
+      background-color: var(--color-bg, #0b0f19);
+      color: var(--color-text-main, #f8fafc);
+    }
+
+    [data-theme="dark"] .seller-header {
+      background: var(--color-surface, #131b2e);
+      border-bottom-color: var(--color-border, #1e293b);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dark"] .seller-brand-text {
+      color: #60a5fa;
+    }
+
+    [data-theme="dark"] .seller-hero-card {
+      background: linear-gradient(135deg, #172554, #1d4ed8);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    [data-theme="dark"] .seller-tabs-bar {
+      border-bottom-color: var(--color-border, #1e293b);
+    }
+
+    [data-theme="dark"] .seller-tab-btn {
+      color: var(--color-text-muted, #94a3b8);
+    }
+
+    [data-theme="dark"] .seller-tab-btn:hover {
+      background: var(--color-surface-hover, #1e293b);
+      color: var(--color-text-main, #f8fafc);
+    }
+
+    [data-theme="dark"] .seller-tab-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    [data-theme="dark"] .kpi-card {
+      background: var(--color-surface, #131b2e);
+      border-color: var(--color-border, #1e293b);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="dark"] .kpi-card:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      border-color: #334155;
+    }
+
+    [data-theme="dark"] .kpi-val {
+      color: var(--color-text-main, #f8fafc);
+    }
+
+    [data-theme="dark"] .kpi-label {
+      color: var(--color-text-muted, #94a3b8);
+    }
+
+    [data-theme="dark"] .seller-card {
+      background: var(--color-surface, #131b2e);
+      border-color: var(--color-border, #1e293b);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-theme="dark"] .seller-table-wrap {
+      border-color: var(--color-border, #1e293b);
+      background: var(--color-surface, #131b2e);
+    }
+
+    [data-theme="dark"] .seller-table th {
+      background: #111827;
+      color: var(--color-text-muted, #94a3b8);
+      border-bottom-color: var(--color-border, #1e293b);
+    }
+
+    [data-theme="dark"] .seller-table td {
+      border-bottom-color: var(--color-border, #1e293b);
+      color: var(--color-text-main, #f8fafc);
+    }
+
+    [data-theme="dark"] .seller-table tr:hover {
+      background-color: rgba(255, 255, 255, 0.035);
+    }
+
+    [data-theme="dark"] .stock-in {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    [data-theme="dark"] .stock-low {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+
+    [data-theme="dark"] .stock-out {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    [data-theme="dark"] .status-pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    [data-theme="dark"] .status-processing {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    [data-theme="dark"] .status-shipped {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    [data-theme="dark"] .status-delivered {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    [data-theme="dark"] .status-cancelled {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    [data-theme="dark"] .seller-modal-container {
+      background: #131b2e;
+      border-color: #1e293b;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      color: #f8fafc;
+    }
+
+    [data-theme="dark"] .seller-modal-container .form-input {
+      background-color: #0b0f19;
+      border-color: #1e293b;
+      color: #f8fafc;
+    }
+
+    [data-theme="dark"] .seller-modal-container .form-input:focus {
+      border-color: #3b82f6;
+      background-color: #111827;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+
+    [data-theme="dark"] select.form-input option {
+      background-color: #131b2e;
+      color: #f8fafc;
+    }
+
+    [data-theme="dark"] .form-label {
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="seller-page-wrapper">
+    <!-- Header -->
+    <header class="seller-header">
+      <div class="seller-header-inner">
+        <a href="seller-dashboard.html" class="seller-brand-wrap">
+          <span class="seller-brand-text">MiniStore</span>
+          <span class="seller-portal-badge">Merchant Portal</span>
+        </a>
+
+        <div class="seller-nav-actions">
+          <a href="index.html" class="btn btn-secondary btn-sm" id="back-to-store-btn" style="text-decoration: none;">
+            ← Storefront
+          </a>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode" type="button">
+            <span class="theme-toggle-icon" id="theme-toggle-icon" aria-hidden="true">🌙</span>
+          </button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: #2563eb; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;" id="seller-avatar-initial">
+              M
+            </div>
+            <span id="seller-header-name" style="font-weight: 600; font-size: 0.88rem; color: var(--color-text-main);">Merchant</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="seller-logout-btn">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="container" style="max-width: 1400px; padding: 24px 20px; flex: 1;">
+      <!-- Hero Welcome Card -->
+      <div class="seller-hero-card">
+        <div>
+          <h1 class="seller-hero-title" id="seller-hero-name">Merchant Dashboard</h1>
+          <p class="seller-hero-subtitle">
+            <span class="seller-verify-pill" id="seller-verify-pill">✓ Verified Merchant</span>
+            <span id="seller-business-name-display">• Multi-Tenant Workspace</span>
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-secondary btn-sm" id="refresh-dashboard-btn" style="background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);">
+            🔄 Refresh Data
+          </button>
+          <button class="btn btn-primary btn-sm" id="hero-add-product-btn" style="background: #ffffff; color: #1e3a8a; font-weight: 700;">
+            + List New Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="seller-tabs-bar" role="tablist">
+        <button class="seller-tab-btn active" id="tab-overview" role="tab" data-tab="overview">
+          📊 Overview &amp; Analytics
+        </button>
+        <button class="seller-tab-btn" id="tab-products" role="tab" data-tab="products">
+          📦 My Products
+        </button>
+        <button class="seller-tab-btn" id="tab-orders" role="tab" data-tab="orders">
+          🚚 Order Fulfillment
+        </button>
+        <button class="seller-tab-btn" id="tab-earnings" role="tab" data-tab="earnings">
+          💰 Earnings &amp; Payouts
+        </button>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="seller-alert-box" style="display: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;"></div>
+
+      <!-- TAB 1: OVERVIEW & ANALYTICS -->
+      <section id="section-overview">
+        <!-- KPI Cards Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">₹</div>
+            <div class="kpi-val" id="kpi-total-sales">₹0.00</div>
+            <div class="kpi-label">Gross Revenue</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">📦</div>
+            <div class="kpi-val" id="kpi-units-sold">0</div>
+            <div class="kpi-label">Units Sold</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">🏷️</div>
+            <div class="kpi-val" id="kpi-active-products">0</div>
+            <div class="kpi-label">Active Listings</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">⚠️</div>
+            <div class="kpi-val" id="kpi-low-stock">0</div>
+            <div class="kpi-label">Low Stock Alerts</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">🚚</div>
+            <div class="kpi-val" id="kpi-pending-orders">0</div>
+            <div class="kpi-label">Waiting Dispatch</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-wrap" style="background: rgba(13, 148, 136, 0.1); color: #0d9488;">💳</div>
+            <div class="kpi-val" id="kpi-net-payout">₹0.00</div>
+            <div class="kpi-label">Net Settlement (90%)</div>
+          </div>
+        </div>
+
+        <!-- Recent Orders Feed -->
+        <div class="seller-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700;">Recent Order Feed</h3>
+            <button class="btn btn-secondary btn-sm" id="view-all-orders-btn">View All Orders →</button>
+          </div>
+          <div class="seller-table-wrap">
+            <table class="seller-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Your Items</th>
+                  <th>Your Subtotal</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                </tr>
+              </thead>
+              <tbody id="overview-orders-tbody">
+                <tr><td colspan="7" style="text-align: center; color: #64748b; padding: 24px;">Loading order metrics...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: MY PRODUCTS -->
+      <section id="section-products" style="display: none;">
+        <div class="seller-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
+              <input type="text" id="product-search-input" placeholder="Search your catalog (name, SKU)..." class="form-input" style="max-width: 280px;" />
+              <select id="product-category-select" class="form-input" style="max-width: 180px;">
+                <option value="All">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Home & Living">Home &amp; Living</option>
+                <option value="Beauty">Beauty</option>
+                <option value="Fitness">Fitness</option>
+              </select>
+              <select id="product-stock-select" class="form-input" style="max-width: 160px;">
+                <option value="all">All Stock Levels</option>
+                <option value="low">Low Stock (< 5)</option>
+                <option value="out">Out of Stock</option>
+                <option value="in">Healthy Stock (5+)</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="open-add-product-btn">+ Add New Product</button>
+          </div>
+
+          <div class="seller-table-wrap">
+            <table class="seller-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Image</th>
+                  <th>Product Details</th>
+                  <th>Category</th>
+                  <th>Price (₹)</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-tbody">
+                <tr><td colspan="7" style="text-align: center; color: #64748b; padding: 24px;">Loading product catalog...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: ORDER FULFILLMENT -->
+      <section id="section-orders" style="display: none;">
+        <div class="seller-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700;">Merchant Order Fulfillment</h3>
+              <p style="margin: 4px 0 0 0; font-size: 0.84rem; color: var(--color-text-muted);">
+                Orders sliced to display only your merchandise. Dispatch items to trigger automated customer notifications.
+              </p>
+            </div>
+          </div>
+
+          <div class="seller-table-wrap">
+            <table class="seller-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Shipping Address</th>
+                  <th>Your Items</th>
+                  <th>Fulfillment Total</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <tr><td colspan="7" style="text-align: center; color: #64748b; padding: 24px;">Loading incoming orders...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: EARNINGS & PAYOUTS -->
+      <section id="section-earnings" style="display: none;">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-val" id="earnings-gross-sales">₹0.00</div>
+            <div class="kpi-label">Gross Merchant Sales</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="earnings-platform-fee" style="color: #ef4444;">₹0.00</div>
+            <div class="kpi-label">Platform Fee (10%)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-val" id="earnings-net-settlement" style="color: #10b981;">₹0.00</div>
+            <div class="kpi-label">Net Payable Amount (90%)</div>
+          </div>
+        </div>
+
+        <div class="seller-card">
+          <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.15rem; font-weight: 700;">Settlement Ledger</h3>
+          <div class="seller-table-wrap">
+            <table class="seller-table">
+              <thead>
+                <tr>
+                  <th>Order Ref</th>
+                  <th>Date</th>
+                  <th>Gross Amount</th>
+                  <th>Commission (10%)</th>
+                  <th>Net Merchant Payout (90%)</th>
+                  <th>Payment Status</th>
+                </tr>
+              </thead>
+              <tbody id="earnings-tbody">
+                <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 24px;">Loading settlements...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- 1. Quick Edit Product Modal -->
+    <div id="quick-edit-modal" class="seller-modal-backdrop" style="display: none;">
+      <div class="seller-modal-container">
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem;">Quick Edit Inventory</h3>
+        <form id="quick-edit-form">
+          <input type="hidden" id="edit-product-id" />
+          <div class="form-group">
+            <label class="form-label">Product Name</label>
+            <input type="text" id="edit-product-name" class="form-input" required />
+          </div>
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Price (₹)</label>
+              <input type="number" id="edit-product-price" class="form-input" required min="0" step="0.01" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock Units</label>
+              <input type="number" id="edit-product-stock" class="form-input" required min="0" />
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label class="form-label">Product Variants (Optional JSON)</label>
+            <textarea id="edit-product-variants" class="form-input" rows="2" placeholder='[{"variantId":"v1","title":"Size M","price":999,"stock":10}]'></textarea>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" id="close-quick-edit-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="save-quick-edit-btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. Add New Product Modal -->
+    <div id="add-product-modal" class="seller-modal-backdrop" style="display: none;">
+      <div class="seller-modal-container">
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem;">List New Product</h3>
+        <form id="add-product-form">
+          <div class="form-group">
+            <label class="form-label">Product Title / Name <span class="required">*</span></label>
+            <input type="text" id="add-product-name" class="form-input" required placeholder="e.g. Ergonomic Bluetooth Mouse" />
+          </div>
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Category <span class="required">*</span></label>
+              <select id="add-product-category" class="form-input" required>
+                <option value="Electronics">Electronics</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Home & Living">Home &amp; Living</option>
+                <option value="Beauty">Beauty</option>
+                <option value="Fitness">Fitness</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Brand / Manufacturer</label>
+              <input type="text" id="add-product-brand" class="form-input" placeholder="Your Brand" />
+            </div>
+          </div>
+          <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Price (₹) <span class="required">*</span></label>
+              <input type="number" id="add-product-price" class="form-input" required min="1" step="0.01" placeholder="999" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Initial Stock <span class="required">*</span></label>
+              <input type="number" id="add-product-stock" class="form-input" required min="1" placeholder="25" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Image URL</label>
+            <input type="url" id="add-product-image" class="form-input" placeholder="https://images.unsplash.com/..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="add-product-description" class="form-input" rows="3" placeholder="Key specs and benefits..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Product Variants (Optional JSON)</label>
+            <textarea id="add-product-variants" class="form-input" rows="2" placeholder='[{"variantId":"v1","title":"Size M","price":999,"stock":10}]'></textarea>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" id="close-add-product-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="save-add-product-btn">Publish Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. Mark as Dispatched Modal -->
+    <div id="dispatch-modal" class="seller-modal-backdrop" style="display: none;">
+      <div class="seller-modal-container">
+        <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 1.25rem;">🚚 Mark Order Dispatched</h3>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 16px;">
+          Update fulfillment tracking. An automated dispatch notification email with tracking info will be sent to the customer.
+        </p>
+        <form id="dispatch-form">
+          <input type="hidden" id="dispatch-order-id" />
+          <div class="form-group">
+            <label class="form-label">Courier Partner</label>
+            <select id="dispatch-carrier" class="form-input">
+              <option value="MiniStore Express">MiniStore Express (Internal Fleet)</option>
+              <option value="BlueDart">BlueDart Express</option>
+              <option value="Delhivery">Delhivery</option>
+              <option value="DTDC">DTDC Couriers</option>
+              <option value="FedEx">FedEx India</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tracking Number / AWB</label>
+            <input type="text" id="dispatch-tracking-no" class="form-input" required placeholder="MS-TRK-XXXXXX" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fulfillment Notes (Optional)</label>
+            <input type="text" id="dispatch-notes" class="form-input" placeholder="Handed over to delivery executive" />
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" id="close-dispatch-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="confirm-dispatch-btn">Dispatch &amp; Notify Customer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="seller-dashboard.js"></script>
+</body>
+
+</html>

@@ -215,6 +215,8 @@ const successPaymentNote = document.getElementById('success-payment-note');
 const successOrderDate = document.getElementById('success-order-date');
 const receiptCouponRow = document.getElementById('receipt-coupon-row');
 const successCouponInfo = document.getElementById('success-coupon-info');
+const receiptTrackingRow = document.getElementById('receipt-tracking-row');
+const successTrackingId = document.getElementById('success-tracking-id');
 
 // DOM Elements - Promo / Coupon in Cart
 const cartPromoSection = document.getElementById('cart-promo-section');
@@ -344,6 +346,21 @@ const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const authErrorAlert = document.getElementById('auth-error-alert');
 
+// DOM Elements - Forgot & Reset Password
+const authTabs = document.querySelector('.auth-tabs');
+const forgotPasswordTriggerBtn = document.getElementById('forgot-password-trigger-btn');
+const forgotPasswordView = document.getElementById('forgot-password-view');
+const forgotPasswordStep1Form = document.getElementById('forgot-password-step1-form');
+const forgotPasswordStep2Form = document.getElementById('forgot-password-step2-form');
+const forgotEmailInput = document.getElementById('forgot-email');
+const forgotEmailSentDisplay = document.getElementById('forgot-email-sent-display');
+const sendOtpBtn = document.getElementById('send-otp-btn');
+const resetOtpInput = document.getElementById('reset-otp-input');
+const resetNewPassword = document.getElementById('reset-new-password');
+const resetConfirmPassword = document.getElementById('reset-confirm-password');
+const submitResetPasswordBtn = document.getElementById('submit-reset-password-btn');
+const backToLoginBtn = document.getElementById('back-to-login-btn');
+
 // DOM Elements - Seller Registration
 const regIsSeller = document.getElementById('reg-is-seller');
 const sellerFieldsWrap = document.getElementById('seller-fields-wrap');
@@ -354,8 +371,9 @@ const regBusinessPan = document.getElementById('reg-business-pan');
 const regBusinessGstin = document.getElementById('reg-business-gstin');
 const regSubmitBtn = document.getElementById('reg-submit-btn');
 
-// DOM Elements - Admin Dashboard
+// DOM Elements - Admin & Merchant Dashboard
 const navAdminBtn = document.getElementById('nav-admin-btn');
+const navSellerBtn = document.getElementById('nav-seller-btn');
 const adminModal = document.getElementById('admin-modal');
 const adminCloseBtn = document.getElementById('admin-close-btn');
 const refreshAdminBtn = document.getElementById('refresh-admin-btn');
@@ -1144,6 +1162,12 @@ function updateAuthUI() {
     if (navAdminBtn) {
       navAdminBtn.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
     }
+    if (navSellerBtn) {
+      const isVerifiedMerchant = Boolean(
+        user.sellerDetails && user.sellerDetails.verificationStatus === 'verified'
+      );
+      navSellerBtn.style.display = (isVerifiedMerchant || user.role === 'admin') ? 'inline-flex' : 'none';
+    }
     fetchUserWallet();
 
     // Restore cached lightweight badge/state from localStorage without making API calls
@@ -1175,6 +1199,7 @@ function updateAuthUI() {
     if (navOrdersBtn) navOrdersBtn.style.display = 'none';
     if (navWalletBtn) navWalletBtn.style.display = 'none';
     if (navAdminBtn) navAdminBtn.style.display = 'none';
+    if (navSellerBtn) navSellerBtn.style.display = 'none';
     if (adminModal) adminModal.style.display = 'none';
     if (addressModal) addressModal.style.display = 'none';
     if (walletModal) walletModal.style.display = 'none';
@@ -1199,6 +1224,9 @@ function openAuthModal(initialTab = 'login', customNotice = '') {
   authModal.style.display = 'flex';
   authErrorAlert.style.display = customNotice ? 'block' : 'none';
   authErrorAlert.textContent = customNotice || '';
+
+  if (authTabs) authTabs.style.display = 'flex';
+  if (forgotPasswordView) forgotPasswordView.style.display = 'none';
 
   if (initialTab === 'register') {
     tabRegisterBtn.classList.add('active');
@@ -1234,6 +1262,16 @@ function closeAuthModal() {
     loginForm.reset();
     registerForm.reset();
     toggleSellerRegistration(false);
+    if (authTabs) authTabs.style.display = 'flex';
+    if (forgotPasswordView) forgotPasswordView.style.display = 'none';
+    if (forgotPasswordStep1Form) {
+      forgotPasswordStep1Form.reset();
+      forgotPasswordStep1Form.style.display = 'block';
+    }
+    if (forgotPasswordStep2Form) {
+      forgotPasswordStep2Form.reset();
+      forgotPasswordStep2Form.style.display = 'none';
+    }
   });
 }
 
@@ -3428,9 +3466,10 @@ function renderCartContent() {
     calculatedGrandTotal += subtotal;
     totalItemCount += item.quantity;
 
+    const varId = item.selectedVariant?.variantId || null;
     const itemCard = document.createElement('div');
     itemCard.className = 'cart-item-card';
-    itemCard.id = `cart-item-${product._id}`;
+    itemCard.id = varId ? `cart-item-${product._id}-${varId}` : `cart-item-${product._id}`;
 
     const isAtMaxStock = item.quantity >= product.stock;
 
@@ -3444,6 +3483,7 @@ function renderCartContent() {
       <div class="cart-item-info">
         <span class="cart-item-category">${escapeHtml(product.category)}</span>
         <h4 class="cart-item-name">${escapeHtml(product.name)}</h4>
+        ${item.selectedVariant && item.selectedVariant.title ? `<div class="cart-item-variant" style="font-size: 0.8rem; color: var(--color-primary, #2563eb); font-weight: 600; margin-top: 2px;">Variant: ${escapeHtml(item.selectedVariant.title)}</div>` : ''}
         <div class="cart-item-price-wrap" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0;">
           <span class="cart-item-unit-price" style="font-weight: 700; color: ${isDiscounted ? '#10b981' : 'var(--color-text-muted)'}; font-size: 0.95rem;">${currencyFormatter.format(unitPrice)} each</span>
           ${isDiscounted ? `<span style="text-decoration: line-through; color: var(--color-text-muted); font-size: 0.82rem;">${currencyFormatter.format(regularPrice)}</span>` : ''}
@@ -3482,22 +3522,22 @@ function renderCartContent() {
     const decBtn = itemCard.querySelector('.btn-dec');
     decBtn.addEventListener('click', () => {
       if (item.quantity > 1) {
-        updateCartItemQuantity(product._id, item.quantity - 1);
+        updateCartItemQuantity(product._id, item.quantity - 1, varId);
       } else {
-        removeCartItem(product._id);
+        removeCartItem(product._id, varId);
       }
     });
 
     const incBtn = itemCard.querySelector('.btn-inc');
     if (!isAtMaxStock) {
       incBtn.addEventListener('click', () => {
-        updateCartItemQuantity(product._id, item.quantity + 1);
+        updateCartItemQuantity(product._id, item.quantity + 1, varId);
       });
     }
 
     const removeBtn = itemCard.querySelector('.cart-item-remove-btn');
     removeBtn.addEventListener('click', () => {
-      removeCartItem(product._id);
+      removeCartItem(product._id, varId);
     });
 
     cartItemsList.appendChild(itemCard);
@@ -3521,7 +3561,7 @@ async function addToCart(productId, quantity = 1, sourceImg = null) {
   let visualElement = sourceImg;
   if (!visualElement && productId) {
     visualElement = document.getElementById(`product-${productId}`)?.querySelector('.card-image') ||
-                    document.querySelector('.modal-image');
+      document.querySelector('.modal-image');
   }
   if (visualElement) {
     playFlyToCartAnimation(visualElement);
@@ -3568,18 +3608,21 @@ async function addToCart(productId, quantity = 1, sourceImg = null) {
   }
 }
 
-async function updateCartItemQuantity(productId, newQuantity) {
+async function updateCartItemQuantity(productId, newQuantity, variantId = null) {
   const token = getAuthToken();
   if (!token) return;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/cart/${productId}`, {
+    const url = variantId
+      ? `${API_BASE_URL}/cart/${productId}?variantId=${encodeURIComponent(variantId)}`
+      : `${API_BASE_URL}/cart/${productId}`;
+    const response = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ quantity: newQuantity })
+      body: JSON.stringify({ quantity: newQuantity, ...(variantId ? { variantId } : {}) })
     });
 
     const result = await response.json();
@@ -3598,17 +3641,20 @@ async function updateCartItemQuantity(productId, newQuantity) {
   }
 }
 
-async function removeCartItem(productId) {
+async function removeCartItem(productId, variantId = null) {
   const token = getAuthToken();
   if (!token) return;
 
-  const itemElem = document.getElementById(`cart-item-${productId}`);
+  const itemElem = document.getElementById(variantId ? `cart-item-${productId}-${variantId}` : `cart-item-${productId}`);
   if (itemElem) {
     itemElem.classList.add('cart-item-removing');
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/cart/${productId}`, {
+    const url = variantId
+      ? `${API_BASE_URL}/cart/${productId}?variantId=${encodeURIComponent(variantId)}`
+      : `${API_BASE_URL}/cart/${productId}`;
+    const response = await fetch(url, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`
@@ -4162,6 +4208,7 @@ function formatPaymentMethodName(method) {
   if (!method) return 'Not Specified';
   switch (method) {
     case 'WALLET': return 'MiniStore Wallet (1-Click Instant)';
+    case 'RAZORPAY': return 'Razorpay (Cards / UPI / NetBanking)';
     case 'UPI': return 'UPI';
     case 'COD': return 'Cash on Delivery';
     case 'NET_BANKING': return 'Net Banking';
@@ -4179,6 +4226,8 @@ function formatPaymentNote(method) {
   switch (method) {
     case 'WALLET':
       return '👛 Paid in full using MiniStore Wallet. Zero cash collection required on delivery.';
+    case 'RAZORPAY':
+      return '💳 Payment successfully verified and captured via Razorpay.';
     case 'COD':
       return '💵 Order placed successfully. Payment will be collected on delivery.';
     case 'UPI':
@@ -4191,7 +4240,7 @@ function formatPaymentNote(method) {
 }
 
 function selectPaymentMethod(method) {
-  const validMethods = ['UPI', 'COD', 'NET_BANKING', 'WALLET'];
+  const validMethods = ['UPI', 'COD', 'NET_BANKING', 'WALLET', 'RAZORPAY'];
   if (!validMethods.includes(method)) return;
 
   selectedPaymentMethod = method;
@@ -4216,6 +4265,7 @@ function selectPaymentMethod(method) {
     }
   });
 }
+
 
 // ============================================================
 // Checkout & Order Placement
@@ -4276,6 +4326,7 @@ async function openCheckoutModal() {
     row.innerHTML = `
       <div class="checkout-item-info">
         <span class="checkout-item-name">${escapeHtml(product.name)} ${isDiscounted ? '<span style="color: #10b981; font-size: 0.74rem; font-weight: 700; margin-left: 4px;">(Festive Deal)</span>' : ''}</span>
+        ${item.selectedVariant && item.selectedVariant.title ? `<div class="checkout-item-variant" style="font-size: 0.76rem; color: var(--color-primary, #2563eb); font-weight: 600; margin-top: 1px;">Variant: ${escapeHtml(item.selectedVariant.title)}</div>` : ''}
         <span class="checkout-item-math">${currencyFormatter.format(unitPrice)} × ${item.quantity} ${isDiscounted ? `<span style="text-decoration: line-through; color: var(--color-text-muted); font-size: 0.8em; margin-left: 4px;">(${currencyFormatter.format(regularPrice)})</span>` : ''}</span>
       </div>
       <span class="checkout-item-subtotal">${currencyFormatter.format(subtotal)}</span>
@@ -4322,8 +4373,8 @@ async function placeOrder() {
   }
 
   // Validate payment method is selected
-  const validMethods = ['UPI', 'COD', 'NET_BANKING', 'WALLET'];
-  
+  const validMethods = ['UPI', 'COD', 'NET_BANKING', 'WALLET', 'RAZORPAY'];
+
   // Calculate if wallet fully covers payable amount
   const cartSub = calculateCartSubtotalAmount();
   const cDisc = appliedCoupon ? (appliedCoupon.discountAmount || 0) : 0;
@@ -4382,87 +4433,127 @@ async function placeOrder() {
 
     const order = result.data;
 
-    // Reset local cart
-    currentCart = null;
-    isCartLoaded = false;
-    updateCartCountBadge(0);
+    // Razorpay Integration Flow (Requirement 3 & 4)
+    if (finalPayment === 'RAZORPAY' && (order.totalAmount || 0) > 0) {
+      placeOrderBtn.textContent = 'Initiating Razorpay...';
+      try {
+        const rzpCreateRes = await fetch(`${API_BASE_URL}/payment/create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            orderId: order._id,
+            amount: order.totalAmount,
+            currency: 'INR',
+            receipt: `rcpt_${order._id.slice(-8)}`
+          })
+        });
 
-    // Populate success receipt
-    successOrderId.textContent = `#${order.orderId || order._id}`;
-    successOrderStatus.textContent = order.status || 'Pending';
-    successOrderTotal.textContent = currencyFormatter.format(order.totalAmount);
+        const rzpData = await rzpCreateRes.json();
 
-    if (order.coupon && order.coupon.code) {
-      if (receiptCouponRow) {
-        receiptCouponRow.style.display = 'flex';
-        successCouponInfo.textContent = `-${currencyFormatter.format(order.discountAmount || order.coupon.discountAmount)} (${order.coupon.code})`;
-      }
-    } else {
-      if (receiptCouponRow) receiptCouponRow.style.display = 'none';
-    }
-    appliedCoupon = null; // reset coupon after successful order
-
-    // Wallet deduction row on receipt (Feature 5)
-    if (order.walletDiscount && order.walletDiscount > 0) {
-      if (receiptWalletRow) {
-        receiptWalletRow.style.display = 'flex';
-        if (successWalletDeduction) {
-          successWalletDeduction.textContent = `-${currencyFormatter.format(order.walletDiscount)}`;
+        if (!rzpCreateRes.ok || !rzpData.success) {
+          checkoutErrorAlert.textContent = rzpData.message || 'Failed to create Razorpay payment order.';
+          checkoutErrorAlert.style.display = 'block';
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.textContent = '✓ Place Order Now';
+          return;
         }
+
+        if (typeof window.Razorpay === 'function') {
+          const options = {
+            key: rzpData.keyId,
+            amount: rzpData.order.amount,
+            currency: rzpData.order.currency || 'INR',
+            name: 'MiniStore',
+            description: `Order #${order.orderId || order._id}`,
+            order_id: rzpData.order.id,
+            handler: async function (rzpResponse) {
+              placeOrderBtn.disabled = true;
+              placeOrderBtn.textContent = 'Verifying Signature...';
+              try {
+                const verifyRes = await fetch(`${API_BASE_URL}/payment/verify`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    razorpay_order_id: rzpResponse.razorpay_order_id,
+                    razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                    razorpay_signature: rzpResponse.razorpay_signature,
+                    orderId: order._id
+                  })
+                });
+
+                const verifyData = await verifyRes.json();
+                if (verifyRes.ok && verifyData.success) {
+                  renderOrderSuccess(verifyData.order || order, rzpResponse.razorpay_payment_id);
+                } else {
+                  checkoutErrorAlert.textContent = verifyData.message || 'Payment signature verification failed.';
+                  checkoutErrorAlert.style.display = 'block';
+                  placeOrderBtn.disabled = false;
+                  placeOrderBtn.textContent = '✓ Place Order Now';
+                  showToast('Payment verification failed.');
+                }
+              } catch (vErr) {
+                console.error('Payment verification failed:', vErr);
+                checkoutErrorAlert.textContent = 'Network error while verifying payment.';
+                checkoutErrorAlert.style.display = 'block';
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = '✓ Place Order Now';
+              }
+            },
+            prefill: {
+              name: order.shippingAddress?.fullName || '',
+              contact: order.shippingAddress?.phone || ''
+            },
+            theme: {
+              color: '#2563eb'
+            },
+            modal: {
+              ondismiss: function () {
+                // Concurrency & Safety (Requirement 4):
+                // Modal closed or cancelled - Clean recovery without stranding stock
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = '✓ Place Order Now';
+                showToast('Payment window closed. Stock remains unreserved.');
+              }
+            }
+          };
+
+          const rzpInstance = new window.Razorpay(options);
+          rzpInstance.on('payment.failed', function (failResp) {
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.textContent = '✓ Place Order Now';
+            const reason = failResp.error?.description || 'Transaction declined';
+            checkoutErrorAlert.textContent = `Payment failed: ${reason}`;
+            checkoutErrorAlert.style.display = 'block';
+            showToast(`Payment declined: ${reason}`);
+          });
+          rzpInstance.open();
+          return;
+        } else {
+          // Razorpay SDK script not available
+          checkoutErrorAlert.textContent = 'Razorpay SDK is not loaded. Please disable ad-blockers or check your connection.';
+          checkoutErrorAlert.style.display = 'block';
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.textContent = '✓ Place Order Now';
+          return;
+        }
+      } catch (gateErr) {
+        console.error('Razorpay gateway error:', gateErr);
+        checkoutErrorAlert.textContent = 'Could not contact payment gateway. Please try again.';
+        checkoutErrorAlert.style.display = 'block';
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.textContent = '✓ Place Order Now';
+        return;
       }
-    } else {
-      if (receiptWalletRow) receiptWalletRow.style.display = 'none';
     }
 
-    // SuperCoins cashback earned on receipt (Feature 5)
-    if (receiptCoinsRow) {
-      receiptCoinsRow.style.display = 'flex';
-      if (successCoinsEarned) {
-        successCoinsEarned.textContent = `+${order.coinsEarned || 25} SuperCoins (5% Cashback)`;
-      }
-    }
-
-    // Refresh wallet balance
-    fetchUserWallet();
-    appliedCoupon = null; // reset coupon after successful order
-
-    if (successPaymentMethod) {
-      successPaymentMethod.textContent = formatPaymentMethodName(order.paymentMethod || selectedPaymentMethod);
-    }
-    if (successPaymentStatus) {
-      successPaymentStatus.className = `payment-status-badge badge-${(order.paymentStatus || 'Pending').toLowerCase()}`;
-      successPaymentStatus.textContent = order.paymentStatus || 'Pending';
-    }
-    if (successPaymentNote) {
-      successPaymentNote.textContent = formatPaymentNote(order.paymentMethod || selectedPaymentMethod);
-    }
-    if (successOrderDate) {
-      successOrderDate.textContent = new Date(order.createdAt || Date.now()).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-
-    // Populate shipping snapshot
-    if (successShippingAddress && order.shippingAddress) {
-      const snap = order.shippingAddress;
-      successShippingAddress.innerHTML = `
-        <strong>${escapeHtml(snap.fullName)}</strong> · 📞 ${escapeHtml(snap.phone)}<br>
-        ${escapeHtml(snap.addressLine1)}${snap.addressLine2 ? ', ' + escapeHtml(snap.addressLine2) : ''}<br>
-        ${escapeHtml(snap.city)}, ${escapeHtml(snap.state)} - ${escapeHtml(snap.postalCode)}, ${escapeHtml(snap.country || 'India')}
-      `;
-    }
-
-    checkoutReviewView.style.display = 'none';
-    checkoutSuccessView.style.display = 'flex';
-
-    showToast('🎉 Order placed successfully!');
-
-    // Refresh products catalog to reflect reduced stock on cards
-    fetchProducts();
+    // Default immediate rendering for COD, WALLET, or zero-total orders
+    renderOrderSuccess(order);
   } catch (err) {
     console.error('Order creation error:', err);
     checkoutErrorAlert.textContent = 'Network error while placing order.';
@@ -4470,6 +4561,99 @@ async function placeOrder() {
     placeOrderBtn.disabled = false;
     placeOrderBtn.textContent = '✓ Place Order Now';
   }
+}
+
+// Render Order Confirmation with Tracking ID (Requirement 3)
+function renderOrderSuccess(order, paymentId) {
+  // Reset local cart
+  currentCart = null;
+  isCartLoaded = false;
+  updateCartCountBadge(0);
+
+  // Populate success receipt
+  successOrderId.textContent = `#${order.orderId || order._id}`;
+  successOrderStatus.textContent = order.status || 'Pending';
+  successOrderTotal.textContent = currencyFormatter.format(order.totalAmount);
+
+  // Populate tracking ID (Requirement 3)
+  const trackingNumber = order.tracking?.trackingNumber || (order._id ? `MS-TRK-${order._id.toString().slice(-6).toUpperCase()}` : 'MS-TRK-PENDING');
+  if (receiptTrackingRow && successTrackingId) {
+    receiptTrackingRow.style.display = 'flex';
+    successTrackingId.textContent = trackingNumber;
+  }
+
+  if (order.coupon && order.coupon.code) {
+    if (receiptCouponRow) {
+      receiptCouponRow.style.display = 'flex';
+      successCouponInfo.textContent = `-${currencyFormatter.format(order.discountAmount || order.coupon.discountAmount)} (${order.coupon.code})`;
+    }
+  } else {
+    if (receiptCouponRow) receiptCouponRow.style.display = 'none';
+  }
+  appliedCoupon = null; // reset coupon after successful order
+
+  // Wallet deduction row on receipt (Feature 5)
+  if (order.walletDiscount && order.walletDiscount > 0) {
+    if (receiptWalletRow) {
+      receiptWalletRow.style.display = 'flex';
+      if (successWalletDeduction) {
+        successWalletDeduction.textContent = `-${currencyFormatter.format(order.walletDiscount)}`;
+      }
+    }
+  } else {
+    if (receiptWalletRow) receiptWalletRow.style.display = 'none';
+  }
+
+  // SuperCoins cashback earned on receipt (Feature 5)
+  if (receiptCoinsRow) {
+    receiptCoinsRow.style.display = 'flex';
+    if (successCoinsEarned) {
+      successCoinsEarned.textContent = `+${order.coinsEarned || 25} SuperCoins (5% Cashback)`;
+    }
+  }
+
+  // Refresh wallet balance
+  fetchUserWallet();
+  appliedCoupon = null;
+
+  if (successPaymentMethod) {
+    successPaymentMethod.textContent = formatPaymentMethodName(order.paymentMethod || selectedPaymentMethod);
+  }
+  if (successPaymentStatus) {
+    const payStatus = order.paymentStatus || (order.paymentMethod === 'RAZORPAY' && paymentId ? 'Paid' : 'Pending');
+    successPaymentStatus.className = `payment-status-badge badge-${payStatus.toLowerCase()}`;
+    successPaymentStatus.textContent = payStatus;
+  }
+  if (successPaymentNote) {
+    successPaymentNote.textContent = formatPaymentNote(order.paymentMethod || selectedPaymentMethod);
+  }
+  if (successOrderDate) {
+    successOrderDate.textContent = new Date(order.createdAt || Date.now()).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  // Populate shipping snapshot
+  if (successShippingAddress && order.shippingAddress) {
+    const snap = order.shippingAddress;
+    successShippingAddress.innerHTML = `
+      <strong>${escapeHtml(snap.fullName)}</strong> · 📞 ${escapeHtml(snap.phone)}<br>
+      ${escapeHtml(snap.addressLine1)}${snap.addressLine2 ? ', ' + escapeHtml(snap.addressLine2) : ''}<br>
+      ${escapeHtml(snap.city)}, ${escapeHtml(snap.state)} - ${escapeHtml(snap.postalCode)}, ${escapeHtml(snap.country || 'India')}
+    `;
+  }
+
+  checkoutReviewView.style.display = 'none';
+  checkoutSuccessView.style.display = 'flex';
+
+  showToast('🎉 Order placed successfully!');
+
+  // Refresh products catalog to reflect reduced stock on cards
+  fetchProducts();
 }
 
 // ============================================================
@@ -4774,7 +4958,7 @@ function saveRecentSearch(query) {
     const existing = getRecentSearches();
     const updated = [clean, ...existing.filter(q => q.toLowerCase() !== clean.toLowerCase())].slice(0, 8);
     localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(updated));
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function removeRecentSearch(query) {
@@ -4783,14 +4967,14 @@ function removeRecentSearch(query) {
     const updated = existing.filter(q => q.toLowerCase() !== query.toLowerCase());
     localStorage.setItem(RECENT_SEARCHES_STORAGE_KEY, JSON.stringify(updated));
     renderRecentSearchesDropdown();
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function clearAllRecentSearches() {
   try {
     localStorage.removeItem(RECENT_SEARCHES_STORAGE_KEY);
     renderRecentSearchesDropdown();
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function closeSuggestionsDropdown() {
@@ -5437,13 +5621,14 @@ document.querySelectorAll('.checkout-payment-card').forEach(card => {
   });
 });
 
-document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+document.querySelectorAll('input[name="payment_method"], input[name="checkoutPaymentMethod"]').forEach(radio => {
   radio.addEventListener('change', (e) => {
     if (e.target.checked) {
       selectPaymentMethod(e.target.value);
     }
   });
 });
+
 
 // My Orders Modal Actions
 if (navOrdersBtn) navOrdersBtn.addEventListener('click', openOrdersModal);
@@ -5876,6 +6061,187 @@ if (registerForm) {
   });
 }
 
+// Forgot & Reset Password Handlers
+function showForgotPasswordView() {
+  if (authTabs) authTabs.style.display = 'none';
+  if (loginForm) loginForm.style.display = 'none';
+  if (registerForm) registerForm.style.display = 'none';
+  if (authErrorAlert) {
+    authErrorAlert.style.display = 'none';
+    authErrorAlert.textContent = '';
+  }
+  if (forgotPasswordView) forgotPasswordView.style.display = 'flex';
+  if (forgotPasswordStep1Form) forgotPasswordStep1Form.style.display = 'block';
+  if (forgotPasswordStep2Form) forgotPasswordStep2Form.style.display = 'none';
+
+  const loginEmailVal = document.getElementById('login-email') ? document.getElementById('login-email').value.trim() : '';
+  if (forgotEmailInput && loginEmailVal) {
+    forgotEmailInput.value = loginEmailVal;
+  }
+  if (forgotEmailInput) {
+    setTimeout(() => forgotEmailInput.focus(), 50);
+  }
+}
+
+function showLoginViewFromForgot() {
+  if (authTabs) authTabs.style.display = 'flex';
+  if (forgotPasswordView) forgotPasswordView.style.display = 'none';
+  if (loginForm) loginForm.style.display = 'flex';
+  if (tabLoginBtn) tabLoginBtn.classList.add('active');
+  if (tabRegisterBtn) tabRegisterBtn.classList.remove('active');
+  if (authErrorAlert) {
+    authErrorAlert.style.display = 'none';
+    authErrorAlert.textContent = '';
+  }
+}
+
+if (forgotPasswordTriggerBtn) {
+  forgotPasswordTriggerBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showForgotPasswordView();
+  });
+}
+
+if (backToLoginBtn) {
+  backToLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLoginViewFromForgot();
+  });
+}
+
+if (forgotPasswordStep1Form) {
+  forgotPasswordStep1Form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (authErrorAlert) authErrorAlert.style.display = 'none';
+
+    const email = forgotEmailInput ? forgotEmailInput.value.trim() : '';
+    if (!email) return;
+
+    const originalBtnText = sendOtpBtn ? sendOtpBtn.textContent : 'Send Verification Code';
+    try {
+      if (sendOtpBtn) {
+        sendOtpBtn.disabled = true;
+        sendOtpBtn.textContent = 'Sending code...';
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok && result.success) {
+        if (forgotEmailSentDisplay) forgotEmailSentDisplay.textContent = email;
+        forgotPasswordStep1Form.style.display = 'none';
+        forgotPasswordStep2Form.style.display = 'block';
+        if (resetOtpInput) {
+          resetOtpInput.value = '';
+          setTimeout(() => resetOtpInput.focus(), 50);
+        }
+        showToast('Verification code sent to your email!', 'success');
+      } else {
+        if (authErrorAlert) {
+          authErrorAlert.textContent = result.message || 'Failed to send verification code. Please check the email address.';
+          authErrorAlert.style.display = 'block';
+        }
+      }
+    } catch (err) {
+      console.error('Forgot password error:', err);
+      if (authErrorAlert) {
+        authErrorAlert.textContent = 'Unable to reach backend server. Please try again.';
+        authErrorAlert.style.display = 'block';
+      }
+    } finally {
+      if (sendOtpBtn) {
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.textContent = originalBtnText;
+      }
+    }
+  });
+}
+
+if (forgotPasswordStep2Form) {
+  forgotPasswordStep2Form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (authErrorAlert) authErrorAlert.style.display = 'none';
+
+    const email = forgotEmailInput ? forgotEmailInput.value.trim() : '';
+    const otp = resetOtpInput ? resetOtpInput.value.trim() : '';
+    const newPassword = resetNewPassword ? resetNewPassword.value : '';
+    const confirmPassword = resetConfirmPassword ? resetConfirmPassword.value : '';
+
+    if (!otp || otp.length !== 6) {
+      if (authErrorAlert) {
+        authErrorAlert.textContent = 'Please enter a valid 6-digit verification code.';
+        authErrorAlert.style.display = 'block';
+      }
+      return;
+    }
+
+    if (newPassword.length < 8 || !/(?=.*[a-zA-Z])(?=.*[0-9])/.test(newPassword)) {
+      if (authErrorAlert) {
+        authErrorAlert.textContent = 'Password must be at least 8 characters long and contain both letters and numbers.';
+        authErrorAlert.style.display = 'block';
+      }
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      if (authErrorAlert) {
+        authErrorAlert.textContent = 'Passwords do not match. Please re-enter.';
+        authErrorAlert.style.display = 'block';
+      }
+      return;
+    }
+
+    const originalBtnText = submitResetPasswordBtn ? submitResetPasswordBtn.textContent : 'Update Password';
+    try {
+      if (submitResetPasswordBtn) {
+        submitResetPasswordBtn.disabled = true;
+        submitResetPasswordBtn.textContent = 'Updating password...';
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword })
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (response.ok && result.success) {
+        showToast('Password updated successfully! Please log in.', 'success');
+        showLoginViewFromForgot();
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        if (loginEmailInput) loginEmailInput.value = email;
+        if (loginPasswordInput) {
+          loginPasswordInput.value = '';
+          loginPasswordInput.focus();
+        }
+      } else {
+        if (authErrorAlert) {
+          authErrorAlert.textContent = result.message || 'Failed to update password. Code may have expired.';
+          authErrorAlert.style.display = 'block';
+        }
+      }
+    } catch (err) {
+      console.error('Reset password error:', err);
+      if (authErrorAlert) {
+        authErrorAlert.textContent = 'Unable to reach backend server. Please try again.';
+        authErrorAlert.style.display = 'block';
+      }
+    } finally {
+      if (submitResetPasswordBtn) {
+        submitResetPasswordBtn.disabled = false;
+        submitResetPasswordBtn.textContent = originalBtnText;
+      }
+    }
+  });
+}
+
 // Global Keyboard (Escape closes active modal)
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -6033,7 +6399,7 @@ async function fetchAdminStats() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   } catch (err) {
     if (adminAlertBox) {
       adminAlertBox.textContent = 'Network error fetching dashboard metrics';
@@ -6106,7 +6472,7 @@ function renderAdminProductsTable(products) {
       const prodId = btn.dataset.id;
       const product = products.find(p => p._id === prodId);
       const prodName = product ? product.name : 'this product';
-      
+
       if (!confirm(`Are you sure you want to delete "${prodName}"?`)) return;
 
       await deleteProduct(prodId);
@@ -6707,8 +7073,8 @@ function renderOrderStatusBreakdown(orderStatus) {
   statusBreakdownList.innerHTML = breakdown.map(item => {
     const badgeClass = item.status === 'Delivered' ? 'in-stock'
       : item.status === 'Cancelled' ? 'out-of-stock'
-      : item.status === 'Pending' ? 'low-stock'
-      : 'in-stock';
+        : item.status === 'Pending' ? 'low-stock'
+          : 'in-stock';
     const fillClass = `fill-${item.status.toLowerCase()}`;
 
     return `
@@ -6743,8 +7109,8 @@ function renderPaymentAnalytics(paymentAnalytics) {
   paymentAnalyticsList.innerHTML = methods.map(m => {
     const icon = m.method === 'UPI' ? '⚡'
       : m.method === 'COD' ? '🚚'
-      : m.method === 'NET_BANKING' ? '🏦'
-      : '📦';
+        : m.method === 'NET_BANKING' ? '🏦'
+          : '📦';
 
     return `
       <div class="payment-method-row">
@@ -6790,8 +7156,8 @@ function renderTopProducts(products) {
   topProductsList.innerHTML = `
     <div class="ranked-analytics-list">
       ${products.map((p, index) => {
-        const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-        return `
+    const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+    return `
           <div class="ranked-analytics-item">
             <div class="ranked-item-left">
               <span class="rank-badge ${rankClass}">#${index + 1}</span>
@@ -6803,7 +7169,7 @@ function renderTopProducts(products) {
             </div>
           </div>
         `;
-      }).join('')}
+  }).join('')}
     </div>
   `;
 }
@@ -6824,8 +7190,8 @@ function renderCategorySales(categories) {
   categorySalesList.innerHTML = `
     <div class="ranked-analytics-list">
       ${categories.map((c, index) => {
-        const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-        return `
+    const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+    return `
           <div class="ranked-analytics-item">
             <div class="ranked-item-left">
               <span class="rank-badge ${rankClass}">#${index + 1}</span>
@@ -6837,7 +7203,7 @@ function renderCategorySales(categories) {
             </div>
           </div>
         `;
-      }).join('')}
+  }).join('')}
     </div>
   `;
 }
@@ -6860,8 +7226,8 @@ function renderAnalyticsRecentOrders(orders) {
 
     const statusBadgeClass = order.orderStatus === 'Delivered' ? 'in-stock'
       : order.orderStatus === 'Cancelled' ? 'out-of-stock'
-      : order.orderStatus === 'Pending' ? 'low-stock'
-      : 'in-stock';
+        : order.orderStatus === 'Pending' ? 'low-stock'
+          : 'in-stock';
 
     return `
       <tr>
@@ -7789,7 +8155,7 @@ function initFestivalSaleBanner() {
         }
       }
     })
-    .catch(() => {});
+    .catch(() => { });
 
   function updateCountdown() {
     const now = Date.now();
@@ -7846,6 +8212,11 @@ function initFestivalSaleBanner() {
         showToast('Code: FESTIVE10 (Flat ₹200 off)');
       }
     });
+  }
+
+  // 3. Initialize Festive Blasting Firecrackers Background
+  if (typeof window.initFestiveFirecrackers === 'function') {
+    window.initFestiveFirecrackers('festive-firecrackers-canvas', 'festival-sale-banner');
   }
 }
 
@@ -8301,7 +8672,7 @@ function initFooterFunctionality() {
   let currentTrackedOrder = null;
 
   // Global helper to open tracking for a specific order
-  window.openTrackingForOrder = async function(orderId) {
+  window.openTrackingForOrder = async function (orderId) {
     if (!orderTrackingModal) return;
     openFooterModal(orderTrackingModal);
     if (trackingInput) {
@@ -8501,14 +8872,14 @@ function initFooterFunctionality() {
       let historyEvents = (order.tracking && Array.isArray(order.tracking.history) && order.tracking.history.length > 0)
         ? order.tracking.history
         : [
-            {
-              status: 'Placed',
-              title: 'Order Placed & Confirmed',
-              description: 'Order details verified and sent to fulfillment center.',
-              location: 'Central Fulfillment Hub, Mumbai',
-              timestamp: order.createdAt
-            }
-          ];
+          {
+            status: 'Placed',
+            title: 'Order Placed & Confirmed',
+            description: 'Order details verified and sent to fulfillment center.',
+            location: 'Central Fulfillment Hub, Mumbai',
+            timestamp: order.createdAt
+          }
+        ];
 
       // Sort newest first
       const sortedEvents = [...historyEvents].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -8602,7 +8973,7 @@ function initFooterFunctionality() {
   const invoicePrintBtn = document.getElementById('invoice-print-btn');
   const invoiceCloseBtn = document.getElementById('invoice-close-btn');
 
-  window.openInvoiceModal = function(order) {
+  window.openInvoiceModal = function (order) {
     if (!invoiceModal || !order) return;
 
     const invNumEl = document.getElementById('inv-num');
@@ -8709,7 +9080,7 @@ function initFooterFunctionality() {
     openFooterModal(invoiceModal);
   };
 
-  window.closeInvoiceModal = function() {
+  window.closeInvoiceModal = function () {
     if (invoiceModal) closeFooterModal(invoiceModal);
   };
 
@@ -9142,92 +9513,130 @@ function closeWalletGatewayModal() {
 
 async function executeGatewayRecharge() {
   const token = getAuthToken();
-  if (!token) return;
+  if (!token) {
+    showToast('Please log in to recharge your wallet.');
+    return;
+  }
 
   const procView = document.getElementById('gateway-processing-view');
   const procStatus = document.getElementById('gateway-processing-status');
   const errAlert = document.getElementById('gateway-error-alert');
   const payBtn = document.getElementById('gateway-confirm-pay-btn');
+  const topupBtn = document.getElementById('wallet-topup-submit-btn');
 
   if (errAlert) errAlert.style.display = 'none';
-
-  // Input validation based on payment method
-  if (currentGatewayPaymentMethod === 'UPI') {
-    const upiInput = document.getElementById('gateway-upi-id');
-    const vpa = upiInput ? upiInput.value.trim() : '';
-    if (!vpa || !vpa.includes('@')) {
-      if (errAlert) {
-        errAlert.textContent = 'Please enter a valid UPI Virtual Payment Address (e.g. user@okhdfcbank).';
-        errAlert.style.display = 'block';
-      }
-      return;
-    }
-  } else if (currentGatewayPaymentMethod === 'CARD') {
-    const cardInput = document.getElementById('gateway-card-number');
-    const cNum = cardInput ? cardInput.value.replace(/\s+/g, '') : '';
-    if (!cNum || cNum.length < 15) {
-      if (errAlert) {
-        errAlert.textContent = 'Please enter a valid 16-digit debit/credit card number.';
-        errAlert.style.display = 'block';
-      }
-      return;
-    }
-  }
 
   // Show processing animation
   if (procView) procView.style.display = 'flex';
   if (payBtn) payBtn.disabled = true;
+  if (topupBtn) topupBtn.disabled = true;
 
-  if (procStatus) procStatus.textContent = 'Connecting to Secure Banking Gateway...';
-
-  await new Promise(r => setTimeout(r, 700));
-  if (procStatus) procStatus.textContent = `Authorizing ₹${pendingGatewayTopupAmount.toFixed(2)} with ${currentGatewayPaymentMethod} Network...`;
-
-  await new Promise(r => setTimeout(r, 800));
-  if (procStatus) procStatus.textContent = 'Payment Authorized! Verifying transaction token...';
-
-  const gatewayTxnId = `TXN_GATEWAY_${currentGatewayPaymentMethod}_${Date.now()}`;
+  if (procStatus) procStatus.textContent = 'Connecting to Secure Razorpay Gateway...';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/wallet/add-money`, {
+    const res = await fetch(`${API_BASE_URL}/wallet/create-recharge-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
-        amount: pendingGatewayTopupAmount,
-        paymentMethod: currentGatewayPaymentMethod,
-        gatewayTxnId: gatewayTxnId
+        amount: pendingGatewayTopupAmount
       })
     });
-    const result = await res.json();
+    const rzpData = await res.json();
 
-    if (!res.ok || !result.success) {
+    if (!res.ok || !rzpData.success) {
       if (procView) procView.style.display = 'none';
       if (payBtn) payBtn.disabled = false;
+      if (topupBtn) topupBtn.disabled = false;
       if (errAlert) {
-        errAlert.textContent = result.message || 'Payment verification failed.';
+        errAlert.textContent = rzpData.message || 'Failed to initialize payment gateway.';
         errAlert.style.display = 'block';
       }
       return;
     }
 
-    if (procStatus) procStatus.textContent = '✓ Payment Verified & Approved!';
-    userWallet = result.data;
-    updateWalletUI();
-    renderWalletTransactions(userWallet.transactions || []);
-    if (walletTopupInput) walletTopupInput.value = '';
-
-    await new Promise(r => setTimeout(r, 600));
+    // Hide intermediate gateway modal so Razorpay modal takes the screen cleanly
     closeWalletGatewayModal();
     if (procView) procView.style.display = 'none';
-    if (payBtn) payBtn.disabled = false;
 
-    showToast(`✓ Payment of ₹${pendingGatewayTopupAmount.toFixed(2)} verified & credited to wallet!`);
+    if (typeof window.Razorpay === 'function') {
+      const upiPrefillInput = document.getElementById('gateway-upi-id');
+      const vpa = upiPrefillInput ? upiPrefillInput.value.trim() : '';
+
+      const options = {
+        key: rzpData.keyId,
+        amount: rzpData.order.amount,
+        currency: rzpData.order.currency || 'INR',
+        name: 'MiniStore Wallet',
+        description: `Wallet Recharge of ₹${pendingGatewayTopupAmount.toFixed(2)} (+10% Bonus Coins)`,
+        order_id: rzpData.order.id,
+        prefill: {
+          name: (currentUser && currentUser.name) || '',
+          email: (currentUser && currentUser.email) || '',
+          contact: (currentUser && currentUser.phone) || '',
+          vpa: vpa || undefined
+        },
+        theme: {
+          color: '#10b981'
+        },
+        handler: async function (rzpResponse) {
+          showToast('Payment received! Verifying bank signature...');
+          try {
+            const verifyRes = await fetch(`${API_BASE_URL}/wallet/verify-recharge`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                amount: pendingGatewayTopupAmount,
+                razorpay_order_id: rzpResponse.razorpay_order_id,
+                razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                razorpay_signature: rzpResponse.razorpay_signature
+              })
+            });
+
+            const verifyResult = await verifyRes.json();
+            if (verifyRes.ok && verifyResult.success) {
+              userWallet = verifyResult.data;
+              updateWalletUI();
+              renderWalletTransactions(userWallet.transactions || []);
+              if (walletTopupInput) walletTopupInput.value = '';
+              showToast(`✓ Payment of ₹${pendingGatewayTopupAmount.toFixed(2)} verified! Funds added to your wallet.`);
+            } else {
+              showToast(verifyResult.message || 'Payment signature verification failed.');
+            }
+          } catch (vErr) {
+            console.error('Wallet recharge verification error:', vErr);
+            showToast('Network error while verifying payment.');
+          } finally {
+            if (payBtn) payBtn.disabled = false;
+            if (topupBtn) topupBtn.disabled = false;
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            // Security: Modal closed without paying -> ZERO money added to wallet!
+            if (payBtn) payBtn.disabled = false;
+            if (topupBtn) topupBtn.disabled = false;
+            showToast('Recharge cancelled. No money was deducted or added to your wallet.');
+          }
+        }
+      };
+
+      const rzpInstance = new window.Razorpay(options);
+      rzpInstance.open();
+    } else {
+      showToast('Razorpay SDK not loaded. Please refresh the page.');
+      if (payBtn) payBtn.disabled = false;
+      if (topupBtn) topupBtn.disabled = false;
+    }
   } catch (err) {
     if (procView) procView.style.display = 'none';
     if (payBtn) payBtn.disabled = false;
+    if (topupBtn) topupBtn.disabled = false;
     if (errAlert) {
       errAlert.textContent = 'Network error communicating with payment gateway.';
       errAlert.style.display = 'block';

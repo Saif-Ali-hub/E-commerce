@@ -15,6 +15,8 @@ const contactRoutes = require('./routes/contactRoutes');
 const saleRoutes = require('./routes/saleRoutes');
 const couponRoutes = require('./routes/couponRoutes');
 const walletRoutes = require('./routes/walletRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const sellerRoutes = require('./routes/sellerRoutes');
 const { imageRouter, streamImageHandler } = require('./routes/imageRoutes');
 
 // Load environment variables from backend/.env and project root .env
@@ -25,7 +27,11 @@ const app = express();
 
 // Standard middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
 // 1. GridFS / MongoDB Image Streaming for /images/:filename and /api/images/:filename
 app.get('/images/:filename', streamImageHandler);
@@ -63,6 +69,8 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/sales', saleRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api/seller', sellerRoutes);
 
 // Server port
 const PORT = process.env.PORT || 5000;

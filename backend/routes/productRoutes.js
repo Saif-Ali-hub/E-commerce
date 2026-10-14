@@ -12,12 +12,69 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // Helper function to recalculate product rating and review count
 const recalculateProductRating = (product) => {
+  if (!product.reviews || !Array.isArray(product.reviews)) {
+    product.reviews = [];
+  }
   product.totalReviews = product.reviews.length;
   if (product.totalReviews === 0) {
     product.averageRating = 0;
+    product.ratings = 0;
   } else {
-    const sum = product.reviews.reduce((acc, r) => acc + r.rating, 0);
-    product.averageRating = Math.round((sum / product.totalReviews) * 10) / 10;
+    const sum = product.reviews.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+    const avg = Math.round((sum / product.totalReviews) * 10) / 10;
+    product.averageRating = avg;
+    product.ratings = avg;
+  }
+};
+
+/**
+ * Seller or Admin Authorization Middleware
+ * Allows access only to:
+ * - Admin users: user.role === 'admin'
+ * - Verified sellers: user.sellerDetails.verificationStatus === 'verified'
+ * Rejects unauthenticated users, normal customers, and unverified sellers.
+ * Strictly queries MongoDB; never trusts role or verification status in request bodies.
+ */
+const sellerOrAdminMiddleware = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Access denied. Authentication required.'
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Access denied. User account not found.'
+      });
+    }
+
+    const isAdmin = user.role === 'admin';
+    const isVerifiedSeller = Boolean(
+      user.sellerDetails && user.sellerDetails.verificationStatus === 'verified'
+    );
+
+    if (!isAdmin && !isVerifiedSeller) {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden. Admin or verified seller privileges required.'
+      });
+    }
+
+    if (isAdmin) {
+      req.admin = user;
+    }
+    req.userDoc = user;
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server error verifying authorization',
+      error: error.message
+    });
   }
 };
 
@@ -26,14 +83,29 @@ const recalculateProductRating = (product) => {
 // ============================================================
 router.get('/', async (req, res) => {
   try {
-    const { page, limit, category, search, all } = req.query;
+    const {
+      page,
+      limit,
+      category,
+      search,
+      all,
+      minPrice,
+      maxPrice,
+      rating,
+      inStock,
+      sortBy,
+      sort
+    } = req.query;
 
-    const filter = {};
+    const andConditions = [];
+    const baseConditions = [];
 
     // Category filter
     if (category && category.trim() !== '' && category.toLowerCase() !== 'all') {
       const escapedCat = category.trim().replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-      filter.category = new RegExp('^' + escapedCat + '$', 'i');
+      const catRegex = new RegExp('^' + escapedCat + '$', 'i');
+      andConditions.push({ category: catRegex });
+      baseConditions.push({ category: catRegex });
     }
 
     // Search filter
@@ -44,32 +116,100 @@ router.get('/', async (req, res) => {
 
       if (escapedTokens.length > 1) {
         // Multi-word search: all words must be found across name/description/category
-        filter.$and = escapedTokens.map((token) => {
+        const searchConds = escapedTokens.map((token) => {
           const regex = new RegExp(token, 'i');
           const conditions = [
             { name: regex },
             { description: regex }
           ];
-          if (!filter.category) {
+          if (!category || category.toLowerCase() === 'all') {
             conditions.push({ category: regex });
           }
           return { $or: conditions };
         });
+        andConditions.push(...searchConds);
+        baseConditions.push(...searchConds);
       } else if (escapedTokens.length === 1) {
         const searchRegex = new RegExp(escapedTokens[0], 'i');
-        const searchConditions = [
+        const conditions = [
           { name: searchRegex },
           { description: searchRegex }
         ];
-        if (!filter.category) {
-          searchConditions.push({ category: searchRegex });
+        if (!category || category.toLowerCase() === 'all') {
+          conditions.push({ category: searchRegex });
         }
-        filter.$or = searchConditions;
+        andConditions.push({ $or: conditions });
+        baseConditions.push({ $or: conditions });
       }
     }
 
-    // Determine pagination: enabled if page/limit/category/search specified and all !== 'true'
-    const hasPaginationOrFilter = page !== undefined || limit !== undefined || category !== undefined || search !== undefined;
+    // Price range filter
+    const priceCondition = {};
+    if (minPrice !== undefined && minPrice !== '' && !isNaN(Number(minPrice))) {
+      priceCondition.$gte = Number(minPrice);
+    }
+    if (maxPrice !== undefined && maxPrice !== '' && !isNaN(Number(maxPrice))) {
+      priceCondition.$lte = Number(maxPrice);
+    }
+    if (Object.keys(priceCondition).length > 0) {
+      andConditions.push({ price: priceCondition });
+    }
+
+    // Customer review rating filter
+    if (rating !== undefined && rating !== '' && !isNaN(Number(rating))) {
+      const minRating = Number(rating);
+      andConditions.push({
+        $or: [
+          { averageRating: { $gte: minRating } },
+          { ratings: { $gte: minRating } }
+        ]
+      });
+    }
+
+    // In-stock availability filter
+    if (inStock !== undefined && inStock !== '') {
+      const isInStockOnly = inStock === 'true' || inStock === true || inStock === '1';
+      if (isInStockOnly) {
+        andConditions.push({
+          stock: { $gt: 0 },
+          inStock: true
+        });
+      }
+    }
+
+    const filter = andConditions.length > 0 ? { $and: andConditions } : {};
+    const baseFilter = baseConditions.length > 0 ? { $and: baseConditions } : {};
+
+    // Sorting order
+    let sortOption = { createdAt: -1 };
+    const effectiveSort = (sortBy || sort || '').toLowerCase().trim();
+    if (effectiveSort === 'price_asc' || effectiveSort === 'price-asc') {
+      sortOption = { price: 1 };
+    } else if (effectiveSort === 'price_desc' || effectiveSort === 'price-desc') {
+      sortOption = { price: -1 };
+    } else if (effectiveSort === 'rating_desc' || effectiveSort === 'rating') {
+      sortOption = { averageRating: -1, ratings: -1, totalReviews: -1 };
+    } else if (effectiveSort === 'newest') {
+      sortOption = { createdAt: -1 };
+    } else if (effectiveSort === 'popular' || effectiveSort === 'trending') {
+      sortOption = { averageRating: -1, totalReviews: -1, stock: -1 };
+    } else {
+      // featured / default
+      sortOption = { createdAt: -1 };
+    }
+
+    // Determine pagination: enabled if page/limit/category/search/filters specified and all !== 'true'
+    const hasPaginationOrFilter =
+      page !== undefined ||
+      limit !== undefined ||
+      category !== undefined ||
+      search !== undefined ||
+      minPrice !== undefined ||
+      maxPrice !== undefined ||
+      rating !== undefined ||
+      inStock !== undefined ||
+      sortBy !== undefined ||
+      sort !== undefined;
     const isPaginated = hasPaginationOrFilter && all !== 'true';
 
     const totalProducts = await Product.countDocuments(filter);
@@ -84,21 +224,97 @@ router.get('/', async (req, res) => {
       const skip = (pageNum - 1) * limitNum;
 
       products = await Product.find(filter)
-        .sort({ createdAt: -1 })
+        .sort(sortOption)
         .skip(skip)
         .limit(limitNum);
     } else {
       pageNum = 1;
       limitNum = totalProducts || 1;
-      products = await Product.find(filter).sort({ createdAt: -1 });
+      products = await Product.find(filter).sort(sortOption);
     }
 
     const totalPages = Math.max(1, Math.ceil(totalProducts / limitNum));
     const allCategories = await Product.distinct('category');
 
+    // Facet metadata calculation
+    let facetAggregation;
+    if (andConditions.length > 0) {
+      facetAggregation = await Product.aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: null,
+            minPrice: { $min: '$price' },
+            maxPrice: { $max: '$price' },
+            inStockCount: {
+              $sum: {
+                $cond: [{ $and: [{ $gt: ['$stock', 0] }, { $eq: ['$inStock', true] }] }, 1, 0]
+              }
+            }
+          }
+        }
+      ]);
+    } else {
+      facetAggregation = await Product.aggregate([
+        {
+          $group: {
+            _id: null,
+            minPrice: { $min: '$price' },
+            maxPrice: { $max: '$price' },
+            inStockCount: {
+              $sum: {
+                $cond: [{ $and: [{ $gt: ['$stock', 0] }, { $eq: ['$inStock', true] }] }, 1, 0]
+              }
+            }
+          }
+        }
+      ]);
+    }
+
+    const facetStats = (facetAggregation && facetAggregation[0]) || {
+      minPrice: 0,
+      maxPrice: 0,
+      inStockCount: 0
+    };
+
+    // Calculate scope bounds (category or global bounds before price/rating/stock filters)
+    let scopeMinPrice = facetStats.minPrice || 0;
+    let scopeMaxPrice = facetStats.maxPrice || 0;
+    if (baseConditions.length > 0) {
+      const scopeAggregation = await Product.aggregate([
+        { $match: baseFilter },
+        {
+          $group: {
+            _id: null,
+            minPrice: { $min: '$price' },
+            maxPrice: { $max: '$price' },
+            inStockCount: {
+              $sum: {
+                $cond: [{ $and: [{ $gt: ['$stock', 0] }, { $eq: ['$inStock', true] }] }, 1, 0]
+              }
+            }
+          }
+        }
+      ]);
+      if (scopeAggregation && scopeAggregation[0]) {
+        scopeMinPrice = scopeAggregation[0].minPrice || 0;
+        scopeMaxPrice = scopeAggregation[0].maxPrice || 0;
+      }
+    }
+
+    const facets = {
+      minPrice: facetStats.minPrice !== null && facetStats.minPrice !== undefined ? facetStats.minPrice : 0,
+      maxPrice: facetStats.maxPrice !== null && facetStats.maxPrice !== undefined ? facetStats.maxPrice : 0,
+      inStockCount: facetStats.inStockCount || 0,
+      scopeMinPrice: scopeMinPrice,
+      scopeMaxPrice: scopeMaxPrice
+    };
+
     res.status(200).json({
       success: true,
+      total: totalProducts,
       count: products.length,
+      facets: facets,
       data: products,
       products: products,
       pagination: {
@@ -141,8 +357,9 @@ router.get('/categories', async (req, res) => {
 
 // ============================================================
 // 1c. GET /api/products/suggestions - Lightweight search suggestions
+// Alias: GET /api/products/search/autocomplete
 // ============================================================
-router.get('/suggestions', async (req, res) => {
+const handleProductSuggestions = async (req, res) => {
   try {
     const rawQuery = (req.query.q || req.query.search || '');
     // Normalize query: trim and collapse multiple consecutive whitespace characters
@@ -241,7 +458,10 @@ router.get('/suggestions', async (req, res) => {
       message: 'Failed to retrieve product suggestions'
     });
   }
-});
+};
+
+router.get('/suggestions', handleProductSuggestions);
+router.get('/search/autocomplete', handleProductSuggestions);
 
 // ============================================================
 // 2. GET /api/products/:id - Retrieve a single product by ID
@@ -379,9 +599,9 @@ router.get('/:id/related', async (req, res) => {
 });
 
 // ============================================================
-// 3. POST /api/products - Create a new product (Admin only)
+// 3. POST /api/products - Create a new product (Admin or Verified Seller)
 // ============================================================
-router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/', authMiddleware, sellerOrAdminMiddleware, async (req, res) => {
   try {
     const {
       name,
@@ -397,7 +617,8 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       image,
       images,
       features,
-      specifications
+      specifications,
+      variants
     } = req.body;
 
     const product = new Product({
@@ -414,7 +635,8 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       image,
       images: Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []),
       features: Array.isArray(features) ? features : [],
-      specifications: specifications || {}
+      specifications: specifications || {},
+      variants: Array.isArray(variants) ? variants : []
     });
 
     const savedProduct = await product.save();
@@ -442,9 +664,9 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// 4. PUT /api/products/:id - Update an existing product by ID (Admin only)
+// 4. PUT /api/products/:id - Update an existing product by ID (Admin or Verified Seller)
 // ============================================================
-router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
+router.put('/:id', authMiddleware, sellerOrAdminMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -538,9 +760,9 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// 6. POST /api/products/:id/review - Add a review for a product
+// 6. POST /api/products/:id/review & /api/products/:id/reviews - Add a review
 // ============================================================
-router.post('/:id/review', authMiddleware, async (req, res) => {
+const handleAddReview = async (req, res) => {
   try {
     const { id } = req.params;
     const { rating, comment } = req.body;
@@ -594,7 +816,7 @@ router.post('/:id/review', authMiddleware, async (req, res) => {
 
     // Check duplicate review from this user
     const alreadyReviewed = product.reviews.some(
-      (r) => r.user.toString() === req.user.id.toString()
+      (r) => r.user && r.user.toString() === req.user.id.toString()
     );
     if (alreadyReviewed) {
       return res.status(400).json({
@@ -642,12 +864,15 @@ router.post('/:id/review', authMiddleware, async (req, res) => {
       error: error.message
     });
   }
-});
+};
+
+router.post('/:id/review', authMiddleware, handleAddReview);
+router.post('/:id/reviews', authMiddleware, handleAddReview);
 
 // ============================================================
-// 7. PUT /api/products/:id/review - Edit customer's own review
+// 7. PUT /api/products/:id/review & /api/products/:id/reviews - Edit customer's own review
 // ============================================================
-router.put('/:id/review', authMiddleware, async (req, res) => {
+const handleUpdateReview = async (req, res) => {
   try {
     const { id } = req.params;
     const { rating, comment } = req.body;
@@ -700,7 +925,7 @@ router.put('/:id/review', authMiddleware, async (req, res) => {
     }
 
     const review = product.reviews.find(
-      (r) => r.user.toString() === req.user.id.toString()
+      (r) => r.user && r.user.toString() === req.user.id.toString()
     );
 
     if (!review) {
@@ -711,9 +936,14 @@ router.put('/:id/review', authMiddleware, async (req, res) => {
     }
 
     const user = await User.findById(req.user.id);
-    if (user) {
-      review.userName = user.name;
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authenticated user not found'
+      });
     }
+
+    review.userName = user.name;
 
     review.rating = numRating;
     review.comment = trimmedComment;
@@ -741,12 +971,15 @@ router.put('/:id/review', authMiddleware, async (req, res) => {
       error: error.message
     });
   }
-});
+};
+
+router.put('/:id/review', authMiddleware, handleUpdateReview);
+router.put('/:id/reviews', authMiddleware, handleUpdateReview);
 
 // ============================================================
-// 8. DELETE /api/products/:id/review - Delete customer's own review
+// 8. DELETE /api/products/:id/review & /api/products/:id/reviews - Delete customer's own review
 // ============================================================
-router.delete('/:id/review', authMiddleware, async (req, res) => {
+const handleDeleteReview = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -765,8 +998,16 @@ router.delete('/:id/review', authMiddleware, async (req, res) => {
       });
     }
 
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authenticated user not found'
+      });
+    }
+
     const reviewIndex = product.reviews.findIndex(
-      (r) => r.user.toString() === req.user.id.toString()
+      (r) => r.user && r.user.toString() === req.user.id.toString()
     );
 
     if (reviewIndex === -1) {
@@ -792,6 +1033,338 @@ router.delete('/:id/review', authMiddleware, async (req, res) => {
       error: error.message
     });
   }
+};
+
+router.delete('/:id/review', authMiddleware, handleDeleteReview);
+router.delete('/:id/reviews', authMiddleware, handleDeleteReview);
+
+// ============================================================
+// 9. Product Q&A Subsystem (Customer Questions & Answers)
+// ============================================================
+
+// 9a. GET /api/products/:id/questions - Retrieve product questions & answers
+router.get('/:id/questions', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    const product = await Product.findById(id).select('name questions');
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    const questions = Array.isArray(product.questions) ? product.questions : [];
+    // Sort questions: newest first
+    const sortedQuestions = [...questions].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // For each question, sort answers: verified seller/admin first, then by upvotes descending, then newest
+    sortedQuestions.forEach(q => {
+      if (Array.isArray(q.answers)) {
+        q.answers.sort((a, b) => {
+          const aPriority = (a.isVerifiedSeller || a.userRole === 'admin' || a.userRole === 'seller') ? 1 : 0;
+          const bPriority = (b.isVerifiedSeller || b.userRole === 'admin' || b.userRole === 'seller') ? 1 : 0;
+          if (bPriority !== aPriority) return bPriority - aPriority;
+          if ((b.upvotes || 0) !== (a.upvotes || 0)) return (b.upvotes || 0) - (a.upvotes || 0);
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      count: sortedQuestions.length,
+      data: sortedQuestions
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving product questions',
+      error: error.message
+    });
+  }
 });
+
+// 9b. POST /api/products/:id/questions - Submit a new question
+router.post('/:id/questions', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { questionText } = req.body;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    if (!questionText || typeof questionText !== 'string' || !questionText.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Question text is required'
+      });
+    }
+
+    const trimmedQuestion = questionText.trim();
+    if (trimmedQuestion.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Question must be at least 3 characters long'
+      });
+    }
+
+    if (trimmedQuestion.length > 500) {
+      return res.status(400).json({
+        success: false,
+        message: 'Question cannot exceed 500 characters'
+      });
+    }
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    if (!Array.isArray(product.questions)) {
+      product.questions = [];
+    }
+
+    const newQuestion = {
+      questionId: new mongoose.Types.ObjectId().toString(),
+      user: user._id,
+      userName: user.name || 'Customer',
+      questionText: trimmedQuestion,
+      createdAt: new Date(),
+      answers: []
+    };
+
+    product.questions.push(newQuestion);
+    await product.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Question posted successfully',
+      data: newQuestion
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error posting question',
+      error: error.message
+    });
+  }
+});
+
+// 9c. POST /api/products/:id/questions/:questionId/answers - Submit an answer to a question
+router.post('/:id/questions/:questionId/answers', authMiddleware, async (req, res) => {
+  try {
+    const { id, questionId } = req.params;
+    const { answerText } = req.body;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    if (!answerText || typeof answerText !== 'string' || !answerText.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Answer text is required'
+      });
+    }
+
+    const trimmedAnswer = answerText.trim();
+    if (trimmedAnswer.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Answer must be at least 2 characters long'
+      });
+    }
+
+    if (trimmedAnswer.length > 1000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Answer cannot exceed 1000 characters'
+      });
+    }
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    if (!Array.isArray(product.questions)) {
+      product.questions = [];
+    }
+
+    const question = product.questions.find(
+      q => q.questionId === questionId || String(q._id) === questionId
+    );
+
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found'
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    const isAdmin = user.role === 'admin';
+    const isVerifiedSeller = Boolean(
+      user.role === 'seller' || (user.sellerDetails && user.sellerDetails.verificationStatus === 'verified')
+    );
+
+    let userRole = 'customer';
+    if (isAdmin) {
+      userRole = 'admin';
+    } else if (isVerifiedSeller) {
+      userRole = 'seller';
+    }
+
+    if (!Array.isArray(question.answers)) {
+      question.answers = [];
+    }
+
+    const newAnswer = {
+      answerId: new mongoose.Types.ObjectId().toString(),
+      user: user._id,
+      userName: user.name || 'User',
+      userRole: userRole,
+      isVerifiedSeller: isVerifiedSeller || isAdmin,
+      answerText: trimmedAnswer,
+      createdAt: new Date(),
+      upvotes: 0,
+      upvotedBy: []
+    };
+
+    question.answers.push(newAnswer);
+    await product.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Answer submitted successfully',
+      data: newAnswer
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error submitting answer',
+      error: error.message
+    });
+  }
+});
+
+// 9d. POST & PUT /api/products/:id/questions/:questionId/answers/:answerId/upvote - Upvote / toggle helpful vote
+const handleUpvoteAnswer = async (req, res) => {
+  try {
+    const { id, questionId, answerId } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    const question = (product.questions || []).find(
+      q => q.questionId === questionId || String(q._id) === questionId
+    );
+
+    if (!question) {
+      return res.status(404).json({
+        success: false,
+        message: 'Question not found'
+      });
+    }
+
+    const answer = (question.answers || []).find(
+      a => a.answerId === answerId || String(a._id) === answerId
+    );
+
+    if (!answer) {
+      return res.status(404).json({
+        success: false,
+        message: 'Answer not found'
+      });
+    }
+
+    if (!Array.isArray(answer.upvotedBy)) {
+      answer.upvotedBy = [];
+    }
+
+    const userIdStr = String(req.user.id);
+    const existingIndex = answer.upvotedBy.findIndex(uId => String(uId) === userIdStr);
+    let hasUpvoted = false;
+
+    if (existingIndex !== -1) {
+      // Toggle off
+      answer.upvotedBy.splice(existingIndex, 1);
+      answer.upvotes = Math.max(0, (answer.upvotes || 1) - 1);
+      hasUpvoted = false;
+    } else {
+      // Toggle on
+      answer.upvotedBy.push(req.user.id);
+      answer.upvotes = (answer.upvotes || 0) + 1;
+      hasUpvoted = true;
+    }
+
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      message: hasUpvoted ? 'Answer upvoted successfully' : 'Upvote removed',
+      upvotes: answer.upvotes,
+      hasUpvoted: hasUpvoted,
+      answerId: answer.answerId
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error updating upvote',
+      error: error.message
+    });
+  }
+};
+
+router.post('/:id/questions/:questionId/answers/:answerId/upvote', authMiddleware, handleUpvoteAnswer);
+router.put('/:id/questions/:questionId/answers/:answerId/upvote', authMiddleware, handleUpvoteAnswer);
 
 module.exports = router;

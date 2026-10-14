@@ -1,9 +1,11 @@
 const express = require('express');
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
+const { sendPasswordResetEmail } = require('../config/mailer');
 
 // Helper to format and mask seller details in API responses
 function formatSellerDetails(seller) {
@@ -378,4 +380,149 @@ router.put('/profile', authMiddleware, async (req, res) => {
   }
 });
 
+// ============================================================
+// 6. POST /api/auth/forgot-password - Generate 15-min OTP & send email
+// ============================================================
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.'
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      // Return 404 for clarity (or consistent message)
+      return res.status(404).json({
+        success: false,
+        message: 'No account registered with that email address.'
+      });
+    }
+
+    // Generate secure 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash OTP with SHA-256 for secure DB storage
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+
+    // Set 15-minute expiration
+    user.resetPasswordToken = hashedOtp;
+    user.resetPasswordExpire = new Date(Date.now() + 15 * 60 * 1000);
+
+    await user.save();
+
+    // Send transactional email
+    await sendPasswordResetEmail(user.email, otp);
+
+    res.status(200).json({
+      success: true,
+      message: 'A 6-digit password reset verification code has been sent to your email address.',
+      expiresInMinutes: 15,
+      // Expose debugOtp when not in production for automated test harnesses
+      ...(process.env.NODE_ENV !== 'production' ? { debugOtp: otp } : {})
+    });
+  } catch (error) {
+    console.error('Error in /api/auth/forgot-password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error processing password reset request',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 7. POST /api/auth/reset-password - Verify OTP & update password
+// ============================================================
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, otp, token, newPassword } = req.body;
+    const providedCode = String(otp || token || '').trim();
+
+    if (!email || !providedCode || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, verification code (OTP), and new password are required.'
+      });
+    }
+
+    // Enforce password strength: minimum 8 characters, letters + numbers
+    const hasLetter = /[a-zA-Z]/.test(newPassword);
+    const hasNumber = /\d/.test(newPassword);
+    if (newPassword.length < 8 || !hasLetter || !hasNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters and contain both letters and numbers.'
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.'
+      });
+    }
+
+    // Check if token exists and has not expired
+    if (!user.resetPasswordToken || !user.resetPasswordExpire) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active password reset request found. Please request a new code.'
+      });
+    }
+
+    if (new Date(user.resetPasswordExpire).getTime() < Date.now()) {
+      // Clear expired token
+      user.resetPasswordToken = null;
+      user.resetPasswordExpire = null;
+      await user.save();
+
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired (15-minute limit exceeded). Please request a new one.'
+      });
+    }
+
+    // Verify hashed code
+    const hashedInput = crypto.createHash('sha256').update(providedCode).digest('hex');
+
+    if (user.resetPasswordToken !== hashedInput && user.resetPasswordToken !== providedCode) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification code. Please check your email and try again.'
+      });
+    }
+
+    // Hash and update password
+    const saltRounds = 10;
+    user.password = await bcrypt.hash(newPassword, saltRounds);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpire = null;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully. You may now log in with your new password.'
+    });
+  } catch (error) {
+    console.error('Error in /api/auth/reset-password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error resetting password',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
+

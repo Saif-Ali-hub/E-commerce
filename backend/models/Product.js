@@ -34,6 +34,109 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+// Optional Product Variant Schema (Size, Color, Storage, SKU, price/stock overrides)
+const variantSchema = new mongoose.Schema(
+  {
+    variantId: { type: String, required: true },
+    sku: { type: String, trim: true },
+    title: { type: String, trim: true }, // e.g. "Space Grey / 128GB" or "Navy Blue / M"
+    attributes: {
+      size: { type: String, trim: true },
+      color: { type: String, trim: true },
+      storage: { type: String, trim: true }
+    },
+    price: { type: Number, required: true, min: [0, 'Variant price cannot be negative'] },
+    stock: { type: Number, default: 0, min: [0, 'Variant stock cannot be negative'] },
+    image: { type: String, trim: true }
+  },
+  { _id: false }
+);
+
+// Product Q&A: Answer Subdocument Schema
+const answerSchema = new mongoose.Schema(
+  {
+    answerId: {
+      type: String,
+      default: () => new mongoose.Types.ObjectId().toString()
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'User ID is required']
+    },
+    userName: {
+      type: String,
+      required: [true, 'User name is required'],
+      trim: true
+    },
+    userRole: {
+      type: String,
+      enum: ['admin', 'seller', 'customer'],
+      default: 'customer'
+    },
+    isVerifiedSeller: {
+      type: Boolean,
+      default: false
+    },
+    answerText: {
+      type: String,
+      required: [true, 'Answer text is required'],
+      trim: true,
+      maxlength: [1000, 'Answer cannot exceed 1000 characters']
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    upvotes: {
+      type: Number,
+      default: 0
+    },
+    upvotedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ]
+  },
+  { _id: false }
+);
+
+// Product Q&A: Question Subdocument Schema
+const questionSchema = new mongoose.Schema(
+  {
+    questionId: {
+      type: String,
+      default: () => new mongoose.Types.ObjectId().toString()
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'User ID is required']
+    },
+    userName: {
+      type: String,
+      required: [true, 'User name is required'],
+      trim: true
+    },
+    questionText: {
+      type: String,
+      required: [true, 'Question text is required'],
+      trim: true,
+      maxlength: [500, 'Question cannot exceed 500 characters']
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    answers: {
+      type: [answerSchema],
+      default: []
+    }
+  },
+  { _id: false }
+);
+
 const productSchema = new mongoose.Schema(
   {
     name: {
@@ -114,6 +217,22 @@ const productSchema = new mongoose.Schema(
       of: String,
       default: () => ({})
     },
+    // Merchant / Multi-Tenant Isolation
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    },
+    sellerName: {
+      type: String,
+      trim: true,
+      default: 'MiniStore'
+    },
+    // Optional Product Variants (Size, Color, Storage, SKU, price/stock overrides)
+    variants: {
+      type: [variantSchema],
+      default: []
+    },
     // Legacy fields preserved from existing E-commerce database
     ratings: {
       type: Number,
@@ -124,6 +243,11 @@ const productSchema = new mongoose.Schema(
       default: []
     },
     reviews: [reviewSchema],
+    // Customer Questions & Answers Subsystem
+    questions: {
+      type: [questionSchema],
+      default: []
+    },
     averageRating: {
       type: Number,
       default: 0,

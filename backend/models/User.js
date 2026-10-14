@@ -12,6 +12,14 @@ const cartItemSchema = new mongoose.Schema(
       required: [true, 'Quantity is required'],
       min: [1, 'Quantity must be at least 1'],
       default: 1
+    },
+    // Optional selected variant snapshot
+    selectedVariant: {
+      variantId: { type: String, default: null },
+      sku: { type: String, default: null },
+      title: { type: String, default: null },
+      price: { type: Number, default: null },
+      attributes: { type: mongoose.Schema.Types.Mixed, default: null }
     }
   },
   { _id: false }
@@ -151,17 +159,28 @@ const userSchema = new mongoose.Schema(
           default: Date.now
         }
       }
-    ]
+    ],
+    // Secure Password Reset (Feature)
+    resetPasswordToken: {
+      type: String,
+      default: null
+    },
+    resetPasswordExpire: {
+      type: Date,
+      default: null
+    }
   },
   {
     timestamps: true
   }
 );
 
-// Defense-in-depth: Never return password hash in public JSON conversions and mask sensitive PAN
+// Defense-in-depth: Never return password hash or reset tokens in public JSON conversions and mask sensitive PAN
 userSchema.set('toJSON', {
   transform: function (doc, ret) {
     delete ret.password;
+    delete ret.resetPasswordToken;
+    delete ret.resetPasswordExpire;
     delete ret.__v;
     if (ret.sellerDetails && ret.sellerDetails.pan) {
       const p = ret.sellerDetails.pan;
@@ -170,6 +189,7 @@ userSchema.set('toJSON', {
     return ret;
   }
 });
+
 
 const User = mongoose.model('User', userSchema);
 

@@ -42,8 +42,20 @@ let currentCategoryName = '';
 let availableCategories = [];
 let currentPage = 1;
 const itemsPerPage = 12;
+let totalProductsCount = 0;
 let currentSort = 'featured';
 let inCategoryQuery = '';
+let currentMinPrice = '';
+let currentMaxPrice = '';
+let currentRating = '';
+let currentInStock = false;
+let currentFacets = {
+  minPrice: 0,
+  maxPrice: 0,
+  inStockCount: 0,
+  scopeMinPrice: 0,
+  scopeMaxPrice: 0
+};
 
 let wishlistProductIds = new Set();
 let currentCart = null;
@@ -77,6 +89,25 @@ const categoryPaginationContainer = document.getElementById('category-pagination
 const categoryPrevPageBtn = document.getElementById('category-prev-page-btn');
 const categoryNextPageBtn = document.getElementById('category-next-page-btn');
 const categoryPaginationPages = document.getElementById('category-pagination-pages');
+
+// Faceted Filter DOM Elements
+const filterMinPriceInput = document.getElementById('filter-min-price');
+const filterMaxPriceInput = document.getElementById('filter-max-price');
+const filterPriceApplyBtn = document.getElementById('filter-price-apply-btn');
+const filterInStockCheckbox = document.getElementById('filter-in-stock-checkbox');
+const filterInStockBadge = document.getElementById('filter-in-stock-badge');
+const filterPriceScopeHint = document.getElementById('filter-price-scope-hint');
+const filterClearAllBtn = document.getElementById('filter-clear-all-btn');
+const btnClearActiveFilters = document.getElementById('btn-clear-active-filters');
+const categoryActiveFiltersBar = document.getElementById('category-active-filters-bar');
+const activeFiltersPills = document.getElementById('active-filters-pills');
+const mobileFilterTriggerBtn = document.getElementById('mobile-filter-trigger-btn');
+const mobileFilterActiveCount = document.getElementById('mobile-filter-active-count');
+const filterDrawerCloseBtn = document.getElementById('filter-drawer-close-btn');
+const filterDrawerBackdrop = document.getElementById('filter-drawer-backdrop');
+const filterDrawerApplyBtn = document.getElementById('filter-drawer-apply-btn');
+const categoryFilterSidebar = document.getElementById('category-filter-sidebar');
+const filterCategoriesList = document.getElementById('filter-categories-list');
 
 // Navigation & Modals
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
@@ -379,42 +410,243 @@ function logoutUser() {
 }
 
 // ============================================================
+// URL Query Parameter Sync & Filter State
+// ============================================================
+
+function readFiltersFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const catParam = urlParams.get('category') || urlParams.get('name') || '';
+  if (catParam) currentCategoryName = catParam.trim();
+
+  currentMinPrice = urlParams.get('minPrice') || '';
+  currentMaxPrice = urlParams.get('maxPrice') || '';
+  currentRating = urlParams.get('rating') || '';
+  currentInStock = urlParams.get('inStock') === 'true';
+  currentSort = urlParams.get('sortBy') || urlParams.get('sort') || 'featured';
+  inCategoryQuery = urlParams.get('search') || urlParams.get('q') || '';
+  const p = parseInt(urlParams.get('page') || '1', 10);
+  currentPage = (!isNaN(p) && p > 0) ? p : 1;
+}
+
+function syncFiltersToURL(pushHistory = false) {
+  const params = new URLSearchParams();
+  if (currentCategoryName) params.set('category', currentCategoryName);
+  if (currentMinPrice) params.set('minPrice', currentMinPrice);
+  if (currentMaxPrice) params.set('maxPrice', currentMaxPrice);
+  if (currentRating) params.set('rating', currentRating);
+  if (currentInStock) params.set('inStock', 'true');
+  if (currentSort && currentSort !== 'featured') params.set('sortBy', currentSort);
+  if (inCategoryQuery) params.set('search', inCategoryQuery);
+  if (currentPage > 1) params.set('page', String(currentPage));
+
+  const queryStr = params.toString();
+  const newUrl = window.location.pathname + (queryStr ? '?' + queryStr : '');
+
+  if (pushHistory) {
+    window.history.pushState(null, '', newUrl);
+  } else {
+    window.history.replaceState(null, '', newUrl);
+  }
+}
+
+function syncUIWithFilterState() {
+  if (filterMinPriceInput) filterMinPriceInput.value = currentMinPrice;
+  if (filterMaxPriceInput) filterMaxPriceInput.value = currentMaxPrice;
+
+  const ratingRadios = document.querySelectorAll('input[name="filter-rating-radio"]');
+  ratingRadios.forEach(radio => {
+    radio.checked = radio.value === String(currentRating);
+  });
+
+  if (filterInStockCheckbox) filterInStockCheckbox.checked = currentInStock;
+  if (categorySortSelect) categorySortSelect.value = currentSort || 'featured';
+  if (categoryFilterSearch) categoryFilterSearch.value = inCategoryQuery;
+
+  updatePriceChipsState();
+  renderActiveFilterTags();
+}
+
+function updatePriceChipsState() {
+  const chips = document.querySelectorAll('.price-chip');
+  chips.forEach(chip => {
+    const min = chip.dataset.min || '';
+    const max = chip.dataset.max || '';
+    if (min === String(currentMinPrice) && max === String(currentMaxPrice)) {
+      chip.classList.add('is-active');
+    } else {
+      chip.classList.remove('is-active');
+    }
+  });
+}
+
+function renderActiveFilterTags() {
+  if (!categoryActiveFiltersBar || !activeFiltersPills) return;
+  activeFiltersPills.innerHTML = '';
+  let activeCount = 0;
+
+  if (currentMinPrice || currentMaxPrice) {
+    activeCount++;
+    let label = '';
+    if (currentMinPrice && currentMaxPrice) {
+      label = `Price: ₹${currentMinPrice} - ₹${currentMaxPrice}`;
+    } else if (currentMinPrice) {
+      label = `Price: ≥ ₹${currentMinPrice}`;
+    } else {
+      label = `Price: ≤ ₹${currentMaxPrice}`;
+    }
+    const tag = createFilterTag(label, () => {
+      currentMinPrice = '';
+      currentMaxPrice = '';
+      currentPage = 1;
+      syncFiltersToURL(true);
+      syncUIWithFilterState();
+      fetchCategoryPageData();
+    });
+    activeFiltersPills.appendChild(tag);
+  }
+
+  if (currentRating) {
+    activeCount++;
+    const tag = createFilterTag(`Rating: ${currentRating}★ & above`, () => {
+      currentRating = '';
+      currentPage = 1;
+      syncFiltersToURL(true);
+      syncUIWithFilterState();
+      fetchCategoryPageData();
+    });
+    activeFiltersPills.appendChild(tag);
+  }
+
+  if (currentInStock) {
+    activeCount++;
+    const tag = createFilterTag('In Stock Only', () => {
+      currentInStock = false;
+      currentPage = 1;
+      syncFiltersToURL(true);
+      syncUIWithFilterState();
+      fetchCategoryPageData();
+    });
+    activeFiltersPills.appendChild(tag);
+  }
+
+  if (inCategoryQuery) {
+    activeCount++;
+    const tag = createFilterTag(`Search: "${inCategoryQuery}"`, () => {
+      inCategoryQuery = '';
+      currentPage = 1;
+      syncFiltersToURL(true);
+      syncUIWithFilterState();
+      fetchCategoryPageData();
+    });
+    activeFiltersPills.appendChild(tag);
+  }
+
+  if (activeCount > 0) {
+    categoryActiveFiltersBar.style.display = 'flex';
+  } else {
+    categoryActiveFiltersBar.style.display = 'none';
+  }
+
+  if (mobileFilterActiveCount) {
+    if (activeCount > 0) {
+      mobileFilterActiveCount.textContent = activeCount;
+      mobileFilterActiveCount.style.display = 'inline-flex';
+    } else {
+      mobileFilterActiveCount.style.display = 'none';
+    }
+  }
+}
+
+function createFilterTag(text, onRemove) {
+  const tag = document.createElement('span');
+  tag.className = 'active-filter-tag';
+  tag.innerHTML = `<span>${escapeHtml(text)}</span>`;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'active-filter-tag-close';
+  btn.setAttribute('aria-label', `Remove ${text}`);
+  btn.innerHTML = '✕';
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    onRemove();
+  });
+  tag.appendChild(btn);
+  return tag;
+}
+
+function clearAllFilters() {
+  currentMinPrice = '';
+  currentMaxPrice = '';
+  currentRating = '';
+  currentInStock = false;
+  inCategoryQuery = '';
+  currentPage = 1;
+  syncFiltersToURL(true);
+  syncUIWithFilterState();
+  fetchCategoryPageData();
+}
+
+function openMobileDrawer() {
+  if (categoryFilterSidebar) categoryFilterSidebar.classList.add('is-open');
+  if (filterDrawerBackdrop) filterDrawerBackdrop.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileDrawer() {
+  if (categoryFilterSidebar) categoryFilterSidebar.classList.remove('is-open');
+  if (filterDrawerBackdrop) filterDrawerBackdrop.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ============================================================
 // Category Products Fetching & Data Flow
 // ============================================================
 
 async function fetchCategoryPageData() {
   showLoadingState();
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const catParam = urlParams.get('name') || urlParams.get('category') || '';
-  currentCategoryName = catParam.trim();
-
   try {
-    // 1. Fetch available categories from existing backend API
-    const catRes = await fetch(`${API_BASE_URL}/products/categories`);
-    if (catRes.ok) {
-      const catData = await catRes.json();
-      if (catData.success && Array.isArray(catData.data)) {
-        availableCategories = catData.data;
+    // 1. Fetch available categories from existing backend API if not yet loaded
+    if (availableCategories.length === 0) {
+      const catRes = await fetch(`${API_BASE_URL}/products/categories`);
+      if (catRes.ok) {
+        const catData = await catRes.json();
+        if (catData.success && Array.isArray(catData.data)) {
+          availableCategories = catData.data;
+        }
       }
     }
 
-    // If no category specified in URL, pick the first available or default to Electronics
+    // Read filters from current URL query parameters on initial boot or popstate
     if (!currentCategoryName && availableCategories.length > 0) {
       currentCategoryName = availableCategories[0];
+      syncFiltersToURL(false);
     }
 
-    // 2. Fetch ALL products for this category from backend
-    // Route accepts category parameter and all=true to return full list
-    const apiUrl = currentCategoryName
-      ? `${API_BASE_URL}/products?category=${encodeURIComponent(currentCategoryName)}&all=true`
-      : `${API_BASE_URL}/products?all=true`;
+    // 2. Fetch products with faceted filter query parameters
+    const queryParams = new URLSearchParams();
+    if (currentCategoryName && currentCategoryName.toLowerCase() !== 'all') {
+      queryParams.set('category', currentCategoryName);
+    }
+    if (currentMinPrice) queryParams.set('minPrice', currentMinPrice);
+    if (currentMaxPrice) queryParams.set('maxPrice', currentMaxPrice);
+    if (currentRating) queryParams.set('rating', currentRating);
+    if (currentInStock) queryParams.set('inStock', 'true');
+    if (currentSort) queryParams.set('sortBy', currentSort);
+    if (inCategoryQuery) queryParams.set('search', inCategoryQuery);
+    queryParams.set('page', String(currentPage));
+    queryParams.set('limit', String(itemsPerPage));
 
-    const res = await fetch(apiUrl);
+    const res = await fetch(`${API_BASE_URL}/products?${queryParams.toString()}`);
     if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
 
     const data = await res.json();
     rawCategoryProducts = (data.success && Array.isArray(data.data)) ? data.data : [];
+    displayedProducts = rawCategoryProducts;
+    totalProductsCount = data.total !== undefined ? data.total : (data.pagination ? data.pagination.totalProducts : rawCategoryProducts.length);
+    if (data.facets) {
+      currentFacets = data.facets;
+    }
 
     // If category wasn't explicit, detect from products or fallback
     if (!currentCategoryName && rawCategoryProducts.length > 0) {
@@ -423,7 +655,10 @@ async function fetchCategoryPageData() {
 
     updateCategoryHeaderUI();
     renderQuickCategoryLinks();
-    applyFiltersAndSort();
+    renderSidebarCategoryList();
+    updateFacetUI();
+    syncUIWithFilterState();
+    renderProducts(data.pagination);
   } catch (err) {
     console.error('Failed to load category products:', err);
     showErrorState(err.message);
@@ -449,12 +684,10 @@ function updateCategoryHeaderUI() {
     categoryPageSubtitle.textContent = meta.subtitle;
   }
   if (categoryProductCount) {
-    const totalCount = rawCategoryProducts.length;
-    categoryProductCount.textContent = `${totalCount} ${totalCount === 1 ? 'product' : 'products'} found`;
+    categoryProductCount.textContent = `${totalProductsCount} ${totalProductsCount === 1 ? 'product' : 'products'} found`;
   }
   if (categoryItemsCountDisplay) {
-    const totalCount = rawCategoryProducts.length;
-    categoryItemsCountDisplay.textContent = `${totalCount} ${totalCount === 1 ? 'product' : 'products'} available`;
+    categoryItemsCountDisplay.textContent = `${totalProductsCount} ${totalProductsCount === 1 ? 'product' : 'products'} found`;
   }
 }
 
@@ -470,84 +703,74 @@ function renderQuickCategoryLinks() {
     const isActive = cat.toLowerCase() === currentCategoryName.toLowerCase();
     const meta = getCategoryMeta(cat);
     const link = document.createElement('a');
-    link.href = `category.html?name=${encodeURIComponent(cat)}`;
+    link.href = `category.html?category=${encodeURIComponent(cat)}`;
     link.className = `category-quick-pill ${isActive ? 'is-active' : ''}`;
     if (isActive) {
       link.setAttribute('aria-current', 'page');
     }
     link.innerHTML = `<span class="pill-icon" aria-hidden="true">${meta.icon}</span><span class="pill-label">${escapeHtml(cat)}</span>`;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      currentCategoryName = cat;
+      currentPage = 1;
+      syncFiltersToURL(true);
+      fetchCategoryPageData();
+    });
     categoryQuickLinks.appendChild(link);
   });
 }
 
-// ============================================================
-// In-Category Filter, Search, Sort & Pagination
-// ============================================================
+function renderSidebarCategoryList() {
+  const container = document.getElementById('filter-categories-list');
+  if (!container) return;
+  if (!availableCategories || availableCategories.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
 
-function applyFiltersAndSort() {
-  let list = [...rawCategoryProducts];
-
-  // In-category search filter
-  if (inCategoryQuery) {
-    const q = inCategoryQuery.toLowerCase().trim();
-    list = list.filter(prod => {
-      const name = (prod.name || '').toLowerCase();
-      const desc = (prod.description || '').toLowerCase();
-      const cat = (prod.category || '').toLowerCase();
-      return name.includes(q) || desc.includes(q) || cat.includes(q);
+  container.innerHTML = '';
+  availableCategories.forEach(cat => {
+    const isActive = cat.toLowerCase() === currentCategoryName.toLowerCase();
+    const meta = getCategoryMeta(cat);
+    const item = document.createElement('a');
+    item.href = `category.html?category=${encodeURIComponent(cat)}`;
+    item.className = `filter-category-item ${isActive ? 'is-active' : ''}`;
+    item.innerHTML = `
+      <span style="display: flex; align-items: center; gap: 8px;">
+        <span>${meta.icon}</span>
+        <span>${escapeHtml(cat)}</span>
+      </span>
+      ${isActive ? '<span style="font-size: 0.75rem; color: var(--color-primary);">●</span>' : ''}
+    `;
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      currentCategoryName = cat;
+      currentPage = 1;
+      syncFiltersToURL(true);
+      closeMobileDrawer();
+      fetchCategoryPageData();
     });
-  }
-
-  // Sorting
-  switch (currentSort) {
-    case 'trending':
-      list.sort((a, b) => {
-        const scoreB = ((b.totalReviews || (b.reviews ? b.reviews.length : 0)) * 10) + ((Number(b.averageRating) || 0) * 5);
-        const scoreA = ((a.totalReviews || (a.reviews ? a.reviews.length : 0)) * 10) + ((Number(a.averageRating) || 0) * 5);
-        if (scoreB !== scoreA) return scoreB - scoreA;
-        return (Number(b.stock) || 0) - (Number(a.stock) || 0);
-      });
-      break;
-    case 'price-asc':
-      list.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-      break;
-    case 'price-desc':
-      list.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
-      break;
-    case 'rating':
-      list.sort((a, b) => (Number(b.averageRating) || 0) - (Number(a.averageRating) || 0));
-      break;
-    case 'newest':
-      list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-      break;
-    case 'featured':
-    default:
-      // Default order as returned by backend
-      break;
-  }
-
-  displayedProducts = list;
-  currentPage = 1;
-
-  if (categoryItemsCountDisplay) {
-    const totalCount = displayedProducts.length;
-    categoryItemsCountDisplay.textContent = `${totalCount} ${totalCount === 1 ? 'product' : 'products'} available`;
-  }
-
-  // Filter summary row visibility
-  if (categoryFilterSummary && categoryFilterSummaryText) {
-    if (inCategoryQuery) {
-      categoryFilterSummary.style.display = 'flex';
-      categoryFilterSummaryText.textContent = `Filtered by "${inCategoryQuery}" (${displayedProducts.length} results)`;
-    } else {
-      categoryFilterSummary.style.display = 'none';
-    }
-  }
-
-  renderProducts();
+    container.appendChild(item);
+  });
 }
 
-function renderProducts() {
+function updateFacetUI() {
+  const inStockBadge = document.getElementById('filter-in-stock-badge');
+  if (inStockBadge) {
+    inStockBadge.textContent = currentFacets.inStockCount !== undefined ? currentFacets.inStockCount : '0';
+  }
+
+  const priceHint = document.getElementById('filter-price-scope-hint');
+  if (priceHint) {
+    const min = currentFacets.scopeMinPrice || currentFacets.minPrice || 0;
+    const max = currentFacets.scopeMaxPrice || currentFacets.maxPrice || 0;
+    if (max > 0) {
+      priceHint.textContent = `₹${min.toLocaleString('en-IN')} - ₹${max.toLocaleString('en-IN')}`;
+    }
+  }
+}
+
+function renderProducts(pagination) {
   if (!categoryProductsGrid) return;
 
   hideAllStates();
@@ -560,20 +783,15 @@ function renderProducts() {
   categoryProductsGrid.style.display = 'grid';
   categoryProductsGrid.innerHTML = '';
 
-  // Pagination slice
-  const totalItems = displayedProducts.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const pageItems = displayedProducts.slice(startIndex, endIndex);
-
-  pageItems.forEach((product, idx) => {
+  displayedProducts.forEach((product, idx) => {
     const card = createCategoryProductCard(product, idx);
     categoryProductsGrid.appendChild(card);
   });
 
-  renderPaginationControls(totalItems, totalPages);
+  const totalPages = pagination ? pagination.totalPages : Math.ceil(totalProductsCount / itemsPerPage);
+  renderPaginationControls(totalProductsCount, totalPages);
 }
+
 
 function createCategoryProductCard(product, index = 0) {
   const card = document.createElement('article');
@@ -1293,7 +1511,9 @@ function initEventListeners() {
       if (categoryClearFilterBtn) {
         categoryClearFilterBtn.style.display = inCategoryQuery ? 'inline-flex' : 'none';
       }
-      applyFiltersAndSort();
+      currentPage = 1;
+      syncFiltersToURL(true);
+      fetchCategoryPageData();
     });
   }
 
@@ -1302,33 +1522,102 @@ function initEventListeners() {
       if (categoryFilterSearch) categoryFilterSearch.value = '';
       inCategoryQuery = '';
       categoryClearFilterBtn.style.display = 'none';
-      applyFiltersAndSort();
+      currentPage = 1;
+      syncFiltersToURL(true);
+      fetchCategoryPageData();
     });
   }
 
-  if (categoryResetFilterBtn) {
-    categoryResetFilterBtn.addEventListener('click', () => {
-      if (categoryFilterSearch) categoryFilterSearch.value = '';
-      inCategoryQuery = '';
-      if (categoryClearFilterBtn) categoryClearFilterBtn.style.display = 'none';
-      applyFiltersAndSort();
+  // Price range filters
+  if (filterPriceApplyBtn) {
+    filterPriceApplyBtn.addEventListener('click', () => {
+      currentMinPrice = filterMinPriceInput ? filterMinPriceInput.value.trim() : '';
+      currentMaxPrice = filterMaxPriceInput ? filterMaxPriceInput.value.trim() : '';
+      currentPage = 1;
+      syncFiltersToURL(true);
+      closeMobileDrawer();
+      fetchCategoryPageData();
     });
   }
 
-  if (categoryEmptyResetBtn) {
-    categoryEmptyResetBtn.addEventListener('click', () => {
-      if (categoryFilterSearch) categoryFilterSearch.value = '';
-      inCategoryQuery = '';
-      if (categoryClearFilterBtn) categoryClearFilterBtn.style.display = 'none';
-      applyFiltersAndSort();
+  if (filterMinPriceInput) {
+    filterMinPriceInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') filterPriceApplyBtn?.click();
     });
   }
+
+  if (filterMaxPriceInput) {
+    filterMaxPriceInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') filterPriceApplyBtn?.click();
+    });
+  }
+
+  // Price quick preset chips
+  const priceChips = document.querySelectorAll('.price-chip');
+  priceChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const min = chip.dataset.min || '';
+      const max = chip.dataset.max || '';
+      if (currentMinPrice === min && currentMaxPrice === max) {
+        currentMinPrice = '';
+        currentMaxPrice = '';
+      } else {
+        currentMinPrice = min;
+        currentMaxPrice = max;
+      }
+      currentPage = 1;
+      syncFiltersToURL(true);
+      closeMobileDrawer();
+      fetchCategoryPageData();
+    });
+  });
+
+  // Customer rating radio options
+  const ratingRadios = document.querySelectorAll('input[name="filter-rating-radio"]');
+  ratingRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      currentRating = e.target.value;
+      currentPage = 1;
+      syncFiltersToURL(true);
+      closeMobileDrawer();
+      fetchCategoryPageData();
+    });
+  });
+
+  // In Stock checkbox
+  if (filterInStockCheckbox) {
+    filterInStockCheckbox.addEventListener('change', (e) => {
+      currentInStock = e.target.checked;
+      currentPage = 1;
+      syncFiltersToURL(true);
+      closeMobileDrawer();
+      fetchCategoryPageData();
+    });
+  }
+
+  // Clear all filters handlers
+  [filterClearAllBtn, btnClearActiveFilters, categoryResetFilterBtn, categoryEmptyResetBtn].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        clearAllFilters();
+        closeMobileDrawer();
+      });
+    }
+  });
+
+  // Mobile Drawer controls
+  if (mobileFilterTriggerBtn) mobileFilterTriggerBtn.addEventListener('click', openMobileDrawer);
+  if (filterDrawerCloseBtn) filterDrawerCloseBtn.addEventListener('click', closeMobileDrawer);
+  if (filterDrawerBackdrop) filterDrawerBackdrop.addEventListener('click', closeMobileDrawer);
+  if (filterDrawerApplyBtn) filterDrawerApplyBtn.addEventListener('click', closeMobileDrawer);
 
   // Sorting Select
   if (categorySortSelect) {
     categorySortSelect.addEventListener('change', (e) => {
       currentSort = e.target.value;
-      applyFiltersAndSort();
+      currentPage = 1;
+      syncFiltersToURL(true);
+      fetchCategoryPageData();
     });
   }
 
@@ -1337,7 +1626,8 @@ function initEventListeners() {
     categoryPrevPageBtn.addEventListener('click', () => {
       if (currentPage > 1) {
         currentPage--;
-        renderProducts();
+        syncFiltersToURL(true);
+        fetchCategoryPageData();
         window.scrollTo({ top: categoryProductsGrid.offsetTop - 120, behavior: 'smooth' });
       }
     });
@@ -1345,14 +1635,22 @@ function initEventListeners() {
 
   if (categoryNextPageBtn) {
     categoryNextPageBtn.addEventListener('click', () => {
-      const totalPages = Math.ceil(displayedProducts.length / itemsPerPage);
+      const totalPages = Math.ceil(totalProductsCount / itemsPerPage);
       if (currentPage < totalPages) {
         currentPage++;
-        renderProducts();
+        syncFiltersToURL(true);
+        fetchCategoryPageData();
         window.scrollTo({ top: categoryProductsGrid.offsetTop - 120, behavior: 'smooth' });
       }
     });
   }
+
+  // Browser navigation popstate (Back/Forward)
+  window.addEventListener('popstate', () => {
+    readFiltersFromURL();
+    syncUIWithFilterState();
+    fetchCategoryPageData();
+  });
 
   // Retry Button
   if (categoryRetryBtn) {
@@ -1364,6 +1662,8 @@ function initEventListeners() {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   updateAuthUI();
+  readFiltersFromURL();
+  syncUIWithFilterState();
   initEventListeners();
   fetchCategoryPageData();
 });

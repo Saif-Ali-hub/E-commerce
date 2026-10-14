@@ -24,6 +24,23 @@ const orderItemSchema = new mongoose.Schema({
     type: Number,
     required: false,
     min: [0, 'Subtotal cannot be negative']
+  },
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  sellerName: {
+    type: String,
+    trim: true,
+    default: null
+  },
+  selectedVariant: {
+    variantId: { type: String, default: null },
+    sku: { type: String, default: null },
+    title: { type: String, default: null },
+    price: { type: Number, default: null },
+    attributes: { type: mongoose.Schema.Types.Mixed, default: null }
   }
 });
 
@@ -142,8 +159,8 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       enum: {
-        values: ['UPI', 'COD', 'NET_BANKING', 'WALLET'],
-        message: 'Invalid payment method. Allowed: UPI, COD, NET_BANKING, WALLET'
+        values: ['UPI', 'COD', 'NET_BANKING', 'WALLET', 'RAZORPAY', 'CARD'],
+        message: 'Invalid payment method. Allowed: UPI, COD, NET_BANKING, WALLET, RAZORPAY, CARD'
       },
       required: false
     },
@@ -159,6 +176,25 @@ const orderSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: null
+    },
+    razorpayOrderId: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    razorpayPaymentId: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    razorpaySignature: {
+      type: String,
+      trim: true,
+      default: null
+    },
+    stockDeducted: {
+      type: Boolean,
+      default: false
     },
     paymentUpdatedAt: {
       type: Date,

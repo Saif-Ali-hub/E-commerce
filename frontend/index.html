@@ -192,6 +192,16 @@
                     <span class="dropdown-item-desc">Store statistics &amp; controls</span>
                   </div>
                 </button>
+
+                <!-- 6. Merchant Dashboard (Shown for verified merchants & admin) -->
+                <a href="seller-dashboard.html" class="dropdown-item" id="nav-seller-btn" role="menuitem" style="display: none; text-decoration: none;"
+                  aria-label="Merchant Dashboard">
+                  <span class="dropdown-item-icon">🏪</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Merchant Dashboard</span>
+                    <span class="dropdown-item-desc">Manage products, orders &amp; payouts</span>
+                  </div>
+                </a>
               </div>
 
               <div class="dropdown-divider"></div>
@@ -524,6 +534,9 @@
   <section class="festival-sale-section" id="festival-sale-section" aria-label="Festival Mega Sale is Live">
     <div class="container">
       <div class="festival-sale-banner" id="festival-sale-banner">
+        <!-- Dynamic Blasting Firecrackers Canvas Background -->
+        <canvas class="festive-firecrackers-canvas" id="festive-firecrackers-canvas" aria-hidden="true"></canvas>
+
         <!-- Decorative Ambient Glows -->
         <div class="festive-glow festive-glow-left" aria-hidden="true"></div>
         <div class="festive-glow festive-glow-right" aria-hidden="true"></div>
@@ -862,8 +875,24 @@
 
           <div class="checkout-payments-grid" id="checkout-payments-grid" role="radiogroup"
             aria-label="Select Payment Method">
+            <!-- Razorpay Option -->
+            <label class="checkout-payment-card" for="payment-method-razorpay" id="payment-card-razorpay" data-method="RAZORPAY">
+              <div class="checkout-payment-card-top">
+                <input type="radio" name="checkoutPaymentMethod" id="payment-method-razorpay" value="RAZORPAY"
+                  class="checkout-payment-radio">
+                <div class="checkout-payment-card-title">
+                  <span class="payment-method-icon">💳</span>
+                  <span class="payment-method-name">Razorpay (Cards / UPI / NetBanking)</span>
+                </div>
+                <span class="payment-badge-pill" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 600;">Instant</span>
+              </div>
+              <p class="checkout-payment-desc">
+                Pay instantly and securely with Credit/Debit Cards, UPI apps, Net Banking, or Wallets via Razorpay.
+              </p>
+            </label>
+
             <!-- UPI Option -->
-            <label class="checkout-payment-card" for="payment-method-upi" id="payment-card-upi">
+            <label class="checkout-payment-card" for="payment-method-upi" id="payment-card-upi" data-method="UPI">
               <div class="checkout-payment-card-top">
                 <input type="radio" name="checkoutPaymentMethod" id="payment-method-upi" value="UPI"
                   class="checkout-payment-radio">
@@ -879,7 +908,7 @@
             </label>
 
             <!-- Cash on Delivery (COD) Option -->
-            <label class="checkout-payment-card is-selected" for="payment-method-cod" id="payment-card-cod">
+            <label class="checkout-payment-card is-selected" for="payment-method-cod" id="payment-card-cod" data-method="COD">
               <div class="checkout-payment-card-top">
                 <input type="radio" name="checkoutPaymentMethod" id="payment-method-cod" value="COD" checked
                   class="checkout-payment-radio">
@@ -895,7 +924,7 @@
             </label>
 
             <!-- Net Banking Option -->
-            <label class="checkout-payment-card" for="payment-method-netbanking" id="payment-card-netbanking">
+            <label class="checkout-payment-card" for="payment-method-netbanking" id="payment-card-netbanking" data-method="NET_BANKING">
               <div class="checkout-payment-card-top">
                 <input type="radio" name="checkoutPaymentMethod" id="payment-method-netbanking" value="NET_BANKING"
                   class="checkout-payment-radio">
@@ -911,6 +940,7 @@
             </label>
           </div>
         </div>
+
 
         <div class="checkout-section-header" style="margin-top: 20px; margin-bottom: 8px;">
           <h3 class="checkout-section-title">📦 Order Summary</h3>
@@ -1009,6 +1039,10 @@
           <div class="receipt-row">
             <span class="receipt-label">Order ID:</span>
             <span class="receipt-value" id="success-order-id">#---</span>
+          </div>
+          <div class="receipt-row" id="receipt-tracking-row" style="display: none;">
+            <span class="receipt-label">Tracking Number:</span>
+            <span class="receipt-value font-bold" id="success-tracking-id" style="color: #2563eb; font-family: monospace;">---</span>
           </div>
           <div class="receipt-row">
             <span class="receipt-label">Order Date:</span>
@@ -2008,7 +2042,10 @@
             autocomplete="email" />
         </div>
         <div class="form-group">
-          <label for="login-password" class="form-label">Password</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="login-password" class="form-label" style="margin-bottom: 0;">Password</label>
+            <button type="button" id="forgot-password-trigger-btn" style="background: none; border: none; padding: 0; color: #2563eb; font-size: 0.82rem; cursor: pointer; text-decoration: underline;">Forgot Password?</button>
+          </div>
           <input type="password" id="login-password" required placeholder="••••••••" class="form-input"
             autocomplete="current-password" />
         </div>
@@ -2087,6 +2124,49 @@
 
         <button type="submit" class="btn btn-primary btn-full" id="reg-submit-btn">Create Account</button>
       </form>
+
+      <!-- Forgot & Reset Password View -->
+      <div id="forgot-password-view" class="auth-form" style="display: none; flex-direction: column;">
+        <h3 style="margin-top: 0; margin-bottom: 6px; font-size: 1.15rem; color: var(--color-text-main);">Reset Your Password</h3>
+        <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 14px;">
+          Enter your registered email address to receive a secure 6-digit verification code.
+        </p>
+
+        <!-- Step 1: Request OTP -->
+        <form id="forgot-password-step1-form">
+          <div class="form-group">
+            <label for="forgot-email" class="form-label">Email Address</label>
+            <input type="email" id="forgot-email" required placeholder="you@example.com" class="form-input" />
+          </div>
+          <button type="submit" id="send-otp-btn" class="btn btn-primary btn-full" style="margin-bottom: 8px;">Send Verification Code</button>
+        </form>
+
+        <!-- Step 2: Enter OTP & Set New Password -->
+        <form id="forgot-password-step2-form" style="display: none;">
+          <div style="background: rgba(37, 99, 235, 0.08); border-left: 3px solid #2563eb; padding: 10px 12px; border-radius: 4px; margin-bottom: 14px; font-size: 0.82rem; color: var(--color-text-main);">
+            ✓ 6-digit verification code sent to <strong id="forgot-email-sent-display"></strong>. Valid for 15 minutes.
+          </div>
+          <div class="form-group">
+            <label for="reset-otp-input" class="form-label">6-Digit Verification Code</label>
+            <input type="text" id="reset-otp-input" required maxlength="6" placeholder="123456" class="form-input" style="font-family: monospace; font-size: 1.1rem; letter-spacing: 4px; text-align: center;" />
+          </div>
+          <div class="form-group">
+            <label for="reset-new-password" class="form-label">New Password <span class="form-hint">(min 8 chars, letters &amp; numbers)</span></label>
+            <input type="password" id="reset-new-password" required minlength="8" placeholder="••••••••" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label for="reset-confirm-password" class="form-label">Confirm New Password</label>
+            <input type="password" id="reset-confirm-password" required minlength="8" placeholder="••••••••" class="form-input" />
+          </div>
+          <button type="submit" id="submit-reset-password-btn" class="btn btn-primary btn-full" style="margin-bottom: 8px;">Update Password</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 10px;">
+          <button type="button" id="back-to-login-btn" style="background: none; border: none; color: var(--color-text-muted); font-size: 0.84rem; text-decoration: underline; cursor: pointer;">
+            ← Back to Log In
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3199,6 +3279,8 @@
     </div>
   </footer>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="firecrackers.js"></script>
   <script src="app.js"></script>
 </body>
 

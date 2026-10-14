@@ -228,91 +228,208 @@
       </a>
     </div>
 
-    <!-- Controls Bar: Category Info & Sorting -->
-    <div class="category-controls-bar">
-      <div class="category-controls-info">
-        <span class="category-items-count-text" id="category-items-count-display">All Products</span>
-      </div>
+    <!-- Mobile Filter Drawer Backdrop Overlay -->
+    <div class="filter-drawer-backdrop" id="filter-drawer-backdrop" style="display: none;"></div>
 
-      <!-- Category Sort Options -->
-      <div class="category-sort-wrap">
-        <label for="category-sort-select" class="sort-label">Sort By:</label>
-        <select id="category-sort-select" class="sort-select" aria-label="Sort products">
-          <option value="featured">Featured / Default</option>
-          <option value="trending">Trending</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="rating">By Rating</option>
-          <option value="newest">Newest Arrivals</option>
-        </select>
-      </div>
-    </div>
+    <div class="category-browse-layout">
+      <!-- Faceted Search & Multi-Filter Sidebar -->
+      <aside class="category-filter-sidebar" id="category-filter-sidebar" aria-label="Product Filters">
+        <div class="filter-sidebar-header">
+          <div class="filter-sidebar-title-wrap">
+            <span class="filter-sidebar-icon">⚡</span>
+            <h2 class="filter-sidebar-title">Filters</h2>
+          </div>
+          <div class="filter-sidebar-actions">
+            <button type="button" class="btn-filter-clear" id="filter-clear-all-btn" title="Reset all filters">Clear All</button>
+            <button type="button" class="filter-drawer-close-btn" id="filter-drawer-close-btn" aria-label="Close filters">✕</button>
+          </div>
+        </div>
 
-    <!-- Active Filter Summary & Result Count -->
-    <div class="category-filter-summary" id="category-filter-summary" style="display: none;">
-      <span class="filter-summary-text" id="category-filter-summary-text">Showing filtered results</span>
-      <button type="button" class="btn btn-secondary btn-sm" id="category-reset-filter-btn">Clear Filter</button>
-    </div>
+        <!-- Filter Section 1: Categories -->
+        <div class="filter-section" id="filter-section-categories">
+          <div class="filter-section-header">
+            <h3 class="filter-section-title">Categories</h3>
+          </div>
+          <div class="filter-categories-list" id="filter-categories-list">
+            <!-- Dynamically populated via category.js -->
+          </div>
+        </div>
 
-    <!-- State 1: Loading Skeleton -->
-    <div id="category-loading-state" class="products-grid" aria-busy="true">
-      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
-      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
-      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
-      <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
-    </div>
+        <!-- Filter Section 2: Price Range -->
+        <div class="filter-section" id="filter-section-price">
+          <div class="filter-section-header">
+            <h3 class="filter-section-title">Price Range</h3>
+            <span class="filter-section-hint" id="filter-price-scope-hint">₹0 - ₹85,000+</span>
+          </div>
+          <div class="filter-price-inputs-row">
+            <div class="filter-price-input-group">
+              <span class="currency-prefix">₹</span>
+              <input type="number" id="filter-min-price" class="filter-price-input" placeholder="Min" min="0" step="50" aria-label="Minimum price" />
+            </div>
+            <span class="filter-price-sep">to</span>
+            <div class="filter-price-input-group">
+              <span class="currency-prefix">₹</span>
+              <input type="number" id="filter-max-price" class="filter-price-input" placeholder="Max" min="0" step="50" aria-label="Maximum price" />
+            </div>
+            <button type="button" class="btn-price-apply" id="filter-price-apply-btn" title="Apply price filter">Go</button>
+          </div>
+          <!-- Quick Price Preset Chips -->
+          <div class="filter-price-chips" id="filter-price-chips">
+            <button type="button" class="price-chip" data-min="" data-max="1000">Under ₹1K</button>
+            <button type="button" class="price-chip" data-min="1000" data-max="5000">₹1K - ₹5K</button>
+            <button type="button" class="price-chip" data-min="5000" data-max="20000">₹5K - ₹20K</button>
+            <button type="button" class="price-chip" data-min="20000" data-max="">Above ₹20K</button>
+          </div>
+        </div>
 
-    <!-- State 2: Error State -->
-    <div id="category-error-state" class="product-not-found-card" style="display: none;">
-      <div class="product-not-found-icon">⚠️</div>
-      <h2 class="product-not-found-title" id="category-error-title">Unable to Load Products</h2>
-      <p class="product-not-found-desc" id="category-error-message">
-        We could not load the products for this category. Please check your network or try again.
-      </p>
-      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-        <button type="button" class="btn btn-primary" id="category-retry-btn">
-          <span>↻ Retry</span>
-        </button>
-        <a href="index.html" class="btn btn-secondary">
-          <span>← Back to Home</span>
-        </a>
-      </div>
-    </div>
+        <!-- Filter Section 3: Customer Rating -->
+        <div class="filter-section" id="filter-section-rating">
+          <div class="filter-section-header">
+            <h3 class="filter-section-title">Customer Rating</h3>
+          </div>
+          <div class="filter-rating-options">
+            <label class="filter-rating-label">
+              <input type="radio" name="filter-rating-radio" value="4" class="filter-radio-input" />
+              <span class="filter-rating-stars">★★★★☆</span>
+              <span class="filter-rating-text">4★ &amp; above</span>
+            </label>
+            <label class="filter-rating-label">
+              <input type="radio" name="filter-rating-radio" value="3" class="filter-radio-input" />
+              <span class="filter-rating-stars">★★★☆☆</span>
+              <span class="filter-rating-text">3★ &amp; above</span>
+            </label>
+            <label class="filter-rating-label">
+              <input type="radio" name="filter-rating-radio" value="2" class="filter-radio-input" />
+              <span class="filter-rating-stars">★★☆☆☆</span>
+              <span class="filter-rating-text">2★ &amp; above</span>
+            </label>
+            <label class="filter-rating-label">
+              <input type="radio" name="filter-rating-radio" value="" class="filter-radio-input" checked />
+              <span class="filter-rating-text">All Ratings</span>
+            </label>
+          </div>
+        </div>
 
-    <!-- State 3: Empty State -->
-    <div id="category-empty-state" class="product-not-found-card" style="display: none;">
-      <div class="product-not-found-icon">🛍️</div>
-      <h2 class="product-not-found-title" id="category-empty-title">No Products Found</h2>
-      <p class="product-not-found-desc" id="category-empty-message">
-        There are currently no products matching your criteria in this category.
-      </p>
-      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-        <button type="button" class="btn btn-primary" id="category-empty-reset-btn" style="display: none;">
-          <span>Clear Filter</span>
-        </button>
-        <a href="index.html" class="btn btn-secondary">
-          <span>Explore All Categories</span>
-        </a>
-      </div>
-    </div>
+        <!-- Filter Section 4: Availability -->
+        <div class="filter-section" id="filter-section-stock">
+          <div class="filter-section-header">
+            <h3 class="filter-section-title">Availability</h3>
+          </div>
+          <label class="filter-checkbox-label">
+            <input type="checkbox" id="filter-in-stock-checkbox" class="filter-checkbox-input" />
+            <span class="filter-checkbox-text">In Stock Only</span>
+            <span class="filter-count-badge" id="filter-in-stock-badge">0</span>
+          </label>
+        </div>
 
-    <!-- State 4: Products Grid (Shows ALL products belonging to the category) -->
-    <div class="products-grid" id="category-products-grid" style="display: none;">
-      <!-- Populated dynamically via category.js -->
-    </div>
+        <!-- Mobile Drawer Apply Action Button -->
+        <div class="filter-drawer-footer">
+          <button type="button" class="btn btn-primary btn-block" id="filter-drawer-apply-btn" style="width: 100%;">Show Results</button>
+        </div>
+      </aside>
 
-    <!-- Pagination Controls -->
-    <div class="pagination-container" id="category-pagination-container" style="display: none;">
-      <div class="pagination-controls">
-        <button class="pagination-btn pagination-nav-btn pagination-prev-btn" id="category-prev-page-btn" aria-label="Previous Page">
-          <span class="pagination-arrow" aria-hidden="true">←</span>
-          <span>Previous</span>
-        </button>
-        <div class="pagination-pages" id="category-pagination-pages"></div>
-        <button class="pagination-btn pagination-nav-btn pagination-next-btn" id="category-next-page-btn" aria-label="Next Page">
-          <span>Next</span>
-          <span class="pagination-arrow" aria-hidden="true">→</span>
-        </button>
+      <!-- Main Product Listing Content -->
+      <div class="category-main-content">
+        <!-- Controls Bar: Category Info & Sorting -->
+        <div class="category-controls-bar">
+          <div class="category-controls-info">
+            <!-- Mobile Filters Toggle Button -->
+            <button type="button" class="mobile-filter-trigger-btn" id="mobile-filter-trigger-btn" aria-label="Open filter sidebar">
+              <span class="filter-icon">⚙️</span>
+              <span>Filters</span>
+              <span class="mobile-filter-count-badge" id="mobile-filter-active-count" style="display: none;">0</span>
+            </button>
+            <span class="category-items-count-text" id="category-items-count-display">All Products</span>
+          </div>
+
+          <!-- Category Sort Options -->
+          <div class="category-sort-wrap">
+            <label for="category-sort-select" class="sort-label">Sort By:</label>
+            <select id="category-sort-select" class="sort-select" aria-label="Sort products">
+              <option value="featured">Featured / Default</option>
+              <option value="popular">Popular / Trending</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="rating_desc">Top Rated (4★+)</option>
+              <option value="newest">Newest Arrivals</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Active Filter Summary & Result Count -->
+        <div class="category-active-filters-bar" id="category-active-filters-bar" style="display: none;">
+          <span class="active-filters-label">Active:</span>
+          <div class="active-filters-pills" id="active-filters-pills"></div>
+          <button type="button" class="btn-clear-active-filters" id="btn-clear-active-filters">Clear All</button>
+        </div>
+
+        <!-- Legacy Filter Summary Row (preserved for search queries) -->
+        <div class="category-filter-summary" id="category-filter-summary" style="display: none;">
+          <span class="filter-summary-text" id="category-filter-summary-text">Showing filtered results</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="category-reset-filter-btn">Clear Filter</button>
+        </div>
+
+        <!-- State 1: Loading Skeleton -->
+        <div id="category-loading-state" class="products-grid" aria-busy="true">
+          <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+          <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+          <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+          <div class="skeleton-card shimmer"><div class="skeleton-media shimmer"></div><div class="skeleton-body"><div class="skeleton-line shimmer title"></div><div class="skeleton-line shimmer price"></div><div class="skeleton-btn shimmer"></div></div></div>
+        </div>
+
+        <!-- State 2: Error State -->
+        <div id="category-error-state" class="product-not-found-card" style="display: none;">
+          <div class="product-not-found-icon">⚠️</div>
+          <h2 class="product-not-found-title" id="category-error-title">Unable to Load Products</h2>
+          <p class="product-not-found-desc" id="category-error-message">
+            We could not load the products for this category. Please check your network or try again.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="category-retry-btn">
+              <span>↻ Retry</span>
+            </button>
+            <a href="index.html" class="btn btn-secondary">
+              <span>← Back to Home</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- State 3: Empty State -->
+        <div id="category-empty-state" class="product-not-found-card" style="display: none;">
+          <div class="product-not-found-icon">🛍️</div>
+          <h2 class="product-not-found-title" id="category-empty-title">No Products Found</h2>
+          <p class="product-not-found-desc" id="category-empty-message">
+            There are currently no products matching your selected filters in this category.
+          </p>
+          <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="category-empty-reset-btn">
+              <span>Clear All Filters</span>
+            </button>
+            <a href="index.html" class="btn btn-secondary">
+              <span>Explore All Categories</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- State 4: Products Grid (Shows products matching category & filters) -->
+        <div class="products-grid" id="category-products-grid" style="display: none;">
+          <!-- Populated dynamically via category.js -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-container" id="category-pagination-container" style="display: none;">
+          <div class="pagination-controls">
+            <button class="pagination-btn pagination-nav-btn pagination-prev-btn" id="category-prev-page-btn" aria-label="Previous Page">
+              <span class="pagination-arrow" aria-hidden="true">←</span>
+              <span>Previous</span>
+            </button>
+            <div class="pagination-pages" id="category-pagination-pages"></div>
+            <button class="pagination-btn pagination-nav-btn pagination-next-btn" id="category-next-page-btn" aria-label="Next Page">
+              <span>Next</span>
+              <span class="pagination-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </main>

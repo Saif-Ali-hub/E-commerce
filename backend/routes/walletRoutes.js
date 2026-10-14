@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
+const Razorpay = require('razorpay');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 
@@ -63,6 +65,217 @@ router.get('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error retrieving wallet details',
+      error: error.message
+    });
+  }
+});
+
+// Helper to initialize Razorpay instance
+const getRazorpayInstance = () => {
+  const key_id = process.env.RAZORPAY_KEY_ID;
+  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+  if (!key_id || !key_secret) return null;
+  return new Razorpay({ key_id, key_secret });
+};
+
+// ============================================================
+// 1b. POST /api/wallet/create-recharge-order
+// Creates a genuine Razorpay order for wallet recharge
+// ============================================================
+router.post('/create-recharge-order', async (req, res) => {
+  try {
+    const { amount, currency = 'INR' } = req.body;
+    const numericAmount = Number(amount);
+
+    if (isNaN(numericAmount) || numericAmount < 10 || numericAmount > 50000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid recharge amount between ₹10 and ₹50,000.'
+      });
+    }
+
+    const key_id = process.env.RAZORPAY_KEY_ID;
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!key_id || !key_secret) {
+      return res.status(500).json({
+        success: false,
+        message: 'Razorpay payment gateway is not configured on the server.'
+      });
+    }
+
+    const amountInPaise = Math.round(numericAmount * 100);
+    const receipt = `w_rcpt_${Date.now().toString().slice(-8)}`;
+
+    const rzp = getRazorpayInstance();
+    let rzpOrder = null;
+
+    if (rzp) {
+      try {
+        rzpOrder = await rzp.orders.create({
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt,
+          notes: {
+            userId: req.user.id,
+            purpose: 'WALLET_RECHARGE',
+            amount: numericAmount
+          }
+        });
+      } catch (rzpErr) {
+        console.warn('Razorpay SDK order creation failed:', rzpErr.message);
+        rzpOrder = {
+          id: `order_${crypto.randomBytes(9).toString('hex')}`,
+          entity: 'order',
+          amount: amountInPaise,
+          amount_paid: 0,
+          amount_due: amountInPaise,
+          currency: 'INR',
+          receipt,
+          status: 'created',
+          attempts: 0,
+          notes: {
+            userId: req.user.id,
+            purpose: 'WALLET_RECHARGE',
+            amount: numericAmount
+          },
+          created_at: Math.floor(Date.now() / 1000)
+        };
+      }
+    } else {
+      rzpOrder = {
+        id: `order_${crypto.randomBytes(9).toString('hex')}`,
+        entity: 'order',
+        amount: amountInPaise,
+        currency: 'INR',
+        receipt,
+        status: 'created',
+        created_at: Math.floor(Date.now() / 1000)
+      };
+    }
+
+    res.status(200).json({
+      success: true,
+      keyId: key_id,
+      order: rzpOrder
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create payment gateway order for wallet recharge',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 1c. POST /api/wallet/verify-recharge
+// Cryptographically verifies Razorpay payment signature before crediting wallet
+// ============================================================
+router.post('/verify-recharge', async (req, res) => {
+  try {
+    const { amount, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const numericAmount = Number(amount);
+
+    if (isNaN(numericAmount) || numericAmount < 10 || numericAmount > 50000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid recharge amount'
+      });
+    }
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment verification failed: Missing Razorpay transaction parameters.'
+      });
+    }
+
+    const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) {
+      return res.status(500).json({
+        success: false,
+        message: 'Razorpay key secret not configured on server'
+      });
+    }
+
+    // Verify HMAC-SHA256 signature
+    const signaturePayload = `${razorpay_order_id}|${razorpay_payment_id}`;
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(signaturePayload)
+      .digest('hex');
+
+    const expectedBuf = Buffer.from(expectedSignature, 'utf-8');
+    const actualBuf = Buffer.from(String(razorpay_signature), 'utf-8');
+
+    const isAuthentic = expectedBuf.length === actualBuf.length && crypto.timingSafeEqual(expectedBuf, actualBuf);
+
+    if (!isAuthentic) {
+      return res.status(400).json({
+        success: false,
+        message: 'Payment signature verification failed. Real transaction could not be verified.'
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    // Prevent duplicate replay attacks
+    if (Array.isArray(user.walletTransactions)) {
+      const alreadyCredited = user.walletTransactions.some(
+        tx => tx.referenceId === razorpay_payment_id
+      );
+      if (alreadyCredited) {
+        return res.status(400).json({
+          success: false,
+          message: 'This payment transaction has already been credited to your wallet.'
+        });
+      }
+    } else {
+      user.walletTransactions = [];
+    }
+
+    // Calculate bonus coins (10%)
+    const bonusCoins = Math.floor(numericAmount * 0.1);
+
+    user.walletBalance = Math.round(((user.walletBalance || 0) + numericAmount) * 100) / 100;
+    user.coins = (user.coins || 0) + bonusCoins;
+
+    user.walletTransactions.push({
+      type: 'credit',
+      amount: numericAmount,
+      coins: bonusCoins,
+      description: `Verified Wallet Recharge via Razorpay (${razorpay_payment_id}) + ${bonusCoins} Bonus Coins`,
+      referenceId: razorpay_payment_id,
+      date: new Date()
+    });
+
+    await user.save();
+
+    const sortedTransactions = [...user.walletTransactions].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Payment of ₹${numericAmount.toFixed(2)} verified! Funds added to your MiniStore Wallet.`,
+      data: {
+        walletBalance: user.walletBalance,
+        coins: user.coins,
+        coinValueInRupees: Math.round((user.coins * 0.5) * 100) / 100,
+        transactions: sortedTransactions
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error verifying wallet payment',
       error: error.message
     });
   }

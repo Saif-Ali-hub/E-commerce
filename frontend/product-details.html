@@ -302,8 +302,13 @@
             </table>
           </div>
 
+          <!-- Optional Product Variants Selector (Size, Color, Storage) -->
+          <div id="pd-variants-container" class="product-variants-container" style="display: none; margin: 18px 0; padding: 16px; background: var(--color-bg-alt, #f9fafb); border: 1px solid var(--color-border, #e5e7eb); border-radius: var(--radius-md, 8px);">
+            <div id="pd-variants-groups" style="display: flex; flex-direction: column; gap: 14px;"></div>
+          </div>
+
           <!-- Purchase Controls (Quantity + Add to Cart + Wishlist) -->
-          <div class="product-purchase-box">
+          <div class="product-purchase-box" id="pd-purchase-actions">
             <div class="quantity-control-wrap">
               <span class="quantity-label">Quantity:</span>
               <div class="quantity-selector">
@@ -317,6 +322,10 @@
               <button type="button" class="btn btn-primary btn-add-to-cart-large" id="pd-add-cart-btn">
                 <span>🛒</span>
                 <span id="pd-add-cart-text">Add to Cart</span>
+              </button>
+              <button class="btn btn-accent btn-lg" id="pd-buy-now-btn" type="button">
+                <span class="btn-icon">⚡</span>
+                <span>Buy Now</span>
               </button>
               <button type="button" class="btn btn-secondary btn-wishlist-large" id="pd-wishlist-btn"
                 aria-label="Add to Wishlist">
@@ -391,6 +400,73 @@
 
         <!-- Verified Reviews List -->
         <div class="reviews-list" id="pd-reviews-list"></div>
+      </section>
+
+      <!-- Customer Questions & Answers Section -->
+      <section class="product-qa-section" id="qa-section" style="margin-top: 48px;">
+        <div class="qa-header-wrap">
+          <div class="qa-header-left">
+            <h3 class="qa-header-title">Customer Questions &amp; Answers</h3>
+            <span class="qa-count-chip" id="pd-qa-chip">0 Questions</span>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="pd-ask-question-trigger-btn">
+            <i class="fas fa-question-circle"></i> Ask a Question
+          </button>
+        </div>
+
+        <!-- Q&A Quick Search -->
+        <div class="qa-search-bar" id="pd-qa-search-wrap">
+          <div class="qa-search-input-wrap">
+            <i class="fas fa-search qa-search-icon"></i>
+            <input type="text" id="pd-qa-search-input" class="qa-search-input" placeholder="Have a question? Search for answers..." />
+            <button type="button" id="pd-qa-search-clear" class="qa-search-clear-btn" style="display: none;" title="Clear search">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Ask Question Form -->
+        <div class="qa-ask-form-card" id="pd-ask-question-form-card" style="display: none;">
+          <div class="qa-ask-form-header">
+            <h4 class="qa-ask-form-title"><i class="fas fa-edit"></i> Ask the Community &amp; Verified Sellers</h4>
+            <button type="button" class="btn-icon-subtle" id="pd-close-ask-question-btn" title="Close"><i class="fas fa-times"></i></button>
+          </div>
+          <form id="pd-ask-question-form">
+            <div class="qa-form-group">
+              <label for="pd-question-input" class="qa-form-label">Your Question <span class="required-star">*</span></label>
+              <textarea id="pd-question-input" class="qa-form-textarea" rows="3" maxlength="500" placeholder="e.g., Does this come with an Indian plug adapter? Is it covered under international warranty?" required></textarea>
+              <div class="qa-form-hints">
+                <span>Questions are public and answered by verified merchants or fellow shoppers.</span>
+                <span id="pd-question-char-count">0/500</span>
+              </div>
+            </div>
+            <div class="qa-form-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="pd-cancel-ask-question-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-sm" id="pd-submit-question-btn">
+                <i class="fas fa-paper-plane"></i> Post Question
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Loading State -->
+        <div id="pd-qa-loading" style="display: none;" class="qa-loading-state">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+          <p>Loading questions &amp; answers...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="pd-qa-empty" style="display: none;" class="qa-empty-state">
+          <div class="qa-empty-icon"><i class="fas fa-comments"></i></div>
+          <h4 class="qa-empty-title">No questions yet</h4>
+          <p class="qa-empty-desc">Have a question about this product? Ask the community and verified sellers.</p>
+          <button type="button" class="btn btn-outline-primary btn-sm" id="pd-empty-ask-btn">
+            <i class="fas fa-plus"></i> Ask the First Question
+          </button>
+        </div>
+
+        <!-- Questions & Answers List -->
+        <div class="qa-list" id="pd-qa-list"></div>
       </section>
 
       <!-- Related Products Section -->
@@ -601,6 +677,280 @@
     </div>
   </div>
 
+  <!-- Express Checkout Modal (1-Click Buy Now) -->
+  <div class="modal-backdrop" id="express-checkout-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="express-modal-title">
+    <div class="modal-container express-modal-container">
+      <button class="modal-close-icon" id="express-modal-close-btn" aria-label="Close Express Checkout">✕</button>
+
+      <!-- Step A: Order Configuration View -->
+      <div id="express-modal-form-view">
+        <div class="express-modal-header">
+          <div class="express-title-wrap">
+            <span class="express-flash-icon">⚡</span>
+            <div>
+              <h2 class="modal-title" id="express-modal-title">1-Click Express Checkout</h2>
+              <p class="modal-subtitle">Instant purchase without touching your shopping cart</p>
+            </div>
+          </div>
+          <span class="security-badge-pill">🔒 256-Bit SSL Secured</span>
+        </div>
+
+        <div class="express-modal-body-grid">
+          <!-- Left Column: Product Preview + Address + Payment Method -->
+          <div class="express-left-col">
+            <!-- Product Preview Card -->
+            <div class="express-product-card" id="express-product-card">
+              <img id="express-product-img" src="" alt="Product preview" class="express-thumb" />
+              <div class="express-product-info">
+                <h4 class="express-product-title" id="express-product-title">Product Name</h4>
+                <div class="express-variant-tag" id="express-variant-tag" style="display: none;"></div>
+                <div class="express-price-line">
+                  <span class="express-unit-price" id="express-unit-price">₹0.00</span>
+                  <span class="express-stock-status" id="express-stock-status">✓ In Stock</span>
+                </div>
+              </div>
+              <div class="express-qty-control">
+                <button type="button" class="quantity-btn" id="express-qty-minus" aria-label="Decrease quantity">−</button>
+                <input type="number" id="express-qty-input" class="quantity-input" value="1" min="1" max="99" aria-label="Order quantity" />
+                <button type="button" class="quantity-btn" id="express-qty-plus" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <!-- Delivery Address Section -->
+            <div class="express-section">
+              <div class="express-section-header">
+                <span class="express-section-title">📍 Delivery Address</span>
+                <button type="button" class="btn btn-secondary btn-sm" id="express-add-addr-toggle-btn">+ New Address</button>
+              </div>
+
+              <!-- Quick Inline Address Form (toggleable) -->
+              <div id="express-new-addr-box" class="express-new-addr-box" style="display: none;">
+                <h4 class="express-subheading">Add New Shipping Address</h4>
+                <div class="express-addr-form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" id="express-new-fullname" class="form-input" placeholder="e.g. John Doe" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone Number *</label>
+                    <input type="tel" id="express-new-phone" class="form-input" placeholder="10-digit mobile" maxlength="10" required />
+                  </div>
+                  <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Flat / House No. / Street *</label>
+                    <input type="text" id="express-new-line1" class="form-input" placeholder="House/Flat number, Building name" required />
+                  </div>
+                  <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Landmark / Area (Optional)</label>
+                    <input type="text" id="express-new-line2" class="form-input" placeholder="Near landmark, sector" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">City *</label>
+                    <input type="text" id="express-new-city" class="form-input" placeholder="City" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">State *</label>
+                    <input type="text" id="express-new-state" class="form-input" placeholder="State" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">6-Digit PIN Code *</label>
+                    <input type="text" id="express-new-pincode" class="form-input" placeholder="e.g. 110001" maxlength="6" required />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Address Type</label>
+                    <select id="express-new-type" class="form-input">
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="express-addr-form-actions">
+                  <button type="button" class="btn btn-primary btn-sm" id="express-save-addr-btn">Save &amp; Use Address</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="express-cancel-addr-btn">Cancel</button>
+                </div>
+              </div>
+
+              <!-- Saved Addresses Grid -->
+              <div id="express-addresses-grid" class="express-addresses-grid">
+                <!-- Injected via JavaScript -->
+              </div>
+              <div id="express-no-address-box" class="express-no-address-box" style="display: none;">
+                <p>No saved addresses found. Please add a shipping address to proceed.</p>
+              </div>
+            </div>
+
+            <!-- Payment Options Section -->
+            <div class="express-section">
+              <div class="express-section-header">
+                <span class="express-section-title">💳 Payment Method</span>
+              </div>
+              <div class="express-payments-grid" role="radiogroup" aria-label="Select Payment Method">
+                <!-- Razorpay -->
+                <label class="checkout-payment-card is-selected" for="express-pay-razorpay" id="express-card-razorpay">
+                  <div class="checkout-payment-card-top">
+                    <input type="radio" name="expressPaymentMethod" id="express-pay-razorpay" value="RAZORPAY" checked class="checkout-payment-radio" />
+                    <div class="checkout-payment-card-title">
+                      <span class="payment-method-icon">💳</span>
+                      <span class="payment-method-name">Razorpay (Cards / UPI / NetBanking)</span>
+                    </div>
+                    <span class="payment-badge-pill" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 600;">Instant</span>
+                  </div>
+                  <p class="checkout-payment-desc">Pay instantly &amp; securely with Cards, UPI, NetBanking, or Wallets.</p>
+                </label>
+
+                <!-- MiniStore Wallet -->
+                <label class="checkout-payment-card" for="express-pay-wallet" id="express-card-wallet">
+                  <div class="checkout-payment-card-top">
+                    <input type="radio" name="expressPaymentMethod" id="express-pay-wallet" value="WALLET" class="checkout-payment-radio" />
+                    <div class="checkout-payment-card-title">
+                      <span class="payment-method-icon">👛</span>
+                      <span class="payment-method-name">MiniStore Wallet</span>
+                    </div>
+                    <span class="payment-badge-pill" id="express-wallet-pill">₹0.00</span>
+                  </div>
+                  <p class="checkout-payment-desc" id="express-wallet-desc">Deduct from your available store wallet balance (up to 50% fair usage ceiling).</p>
+                </label>
+
+                <!-- Cash on Delivery -->
+                <label class="checkout-payment-card" for="express-pay-cod" id="express-card-cod">
+                  <div class="checkout-payment-card-top">
+                    <input type="radio" name="expressPaymentMethod" id="express-pay-cod" value="COD" class="checkout-payment-radio" />
+                    <div class="checkout-payment-card-title">
+                      <span class="payment-method-icon">💵</span>
+                      <span class="payment-method-name">Cash on Delivery</span>
+                    </div>
+                    <span class="payment-badge-pill">Pay at Doorstep</span>
+                  </div>
+                  <p class="checkout-payment-desc">Pay with cash or UPI QR upon delivery at your door.</p>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Coupon, Wallet Checkbox, Breakdown & Place Order -->
+          <div class="express-right-col">
+            <!-- Coupon Code Box -->
+            <div class="checkout-promo-box">
+              <div class="checkout-promo-header">
+                <span class="promo-header-title">🏷️ Apply Coupon</span>
+              </div>
+              <div class="promo-input-group" id="express-promo-input-group">
+                <input type="text" id="express-coupon-input" class="promo-input" placeholder="e.g. FESTIVE10, SUPER50" autocomplete="off" spellcheck="false" />
+                <button type="button" id="express-coupon-apply-btn" class="btn btn-primary btn-sm promo-apply-btn">Apply</button>
+              </div>
+              <div id="express-coupon-feedback" class="promo-feedback" style="display: none;"></div>
+
+              <div class="applied-coupon-card" id="express-applied-coupon-card" style="display: none;">
+                <div class="applied-coupon-info">
+                  <span class="applied-coupon-badge">🏷️ <strong id="express-applied-coupon-code"></strong></span>
+                  <span class="applied-coupon-saving" id="express-applied-coupon-saving"></span>
+                </div>
+                <button type="button" class="btn-remove-coupon" id="express-remove-coupon-btn" title="Remove coupon">✕ Remove</button>
+              </div>
+            </div>
+
+            <!-- Wallet Partial Toggle (When COD/Razorpay is selected) -->
+            <div class="checkout-wallet-box" id="express-wallet-toggle-box" style="display: none;">
+              <label class="checkout-wallet-toggle-card" for="express-use-wallet-checkbox">
+                <div class="checkout-wallet-left">
+                  <input type="checkbox" id="express-use-wallet-checkbox" class="checkout-wallet-checkbox" />
+                  <div class="checkout-wallet-meta">
+                    <span class="checkout-wallet-name">👛 Apply Wallet Credits</span>
+                    <span class="checkout-wallet-balance-hint">Max 50% ceiling: <strong id="express-wallet-max-text">₹0.00</strong></span>
+                  </div>
+                </div>
+                <span class="checkout-wallet-saving-badge" id="express-wallet-deduct-badge">-₹0.00</span>
+              </label>
+            </div>
+
+            <!-- SuperCoins Earned Teaser -->
+            <div class="checkout-wallet-rewards-teaser" id="express-rewards-teaser">
+              <span>🪙 Earn approx. <strong id="express-coins-text">+10 SuperCoins</strong> (5% cashback)</span>
+            </div>
+
+            <!-- Order Total Breakdown -->
+            <div class="checkout-total-card">
+              <div class="cart-summary-row">
+                <span class="summary-label">Item Subtotal:</span>
+                <span class="summary-total" id="express-subtotal-val">₹0.00</span>
+              </div>
+              <div class="cart-summary-row">
+                <span class="summary-label">Delivery Fee:</span>
+                <span class="summary-total" id="express-shipping-val">FREE</span>
+              </div>
+              <div class="cart-summary-row promo-discount-row" id="express-discount-row" style="display: none;">
+                <span class="summary-label">🏷️ Coupon Discount:</span>
+                <span class="summary-total discount-text" id="express-discount-val">-₹0.00</span>
+              </div>
+              <div class="cart-summary-row wallet-discount-row" id="express-wallet-row" style="display: none;">
+                <span class="summary-label">👛 Wallet Balance:</span>
+                <span class="summary-total discount-text" id="express-wallet-val">-₹0.00</span>
+              </div>
+              <div class="cart-summary-row total-highlight-row">
+                <span class="summary-label">Grand Total:</span>
+                <span class="summary-total" id="express-grand-total">₹0.00</span>
+              </div>
+            </div>
+
+            <div id="express-error-alert" class="auth-error-alert" style="display: none;"></div>
+
+            <div class="express-actions">
+              <button type="button" class="btn btn-accent btn-full btn-lg" id="express-place-order-btn">
+                <span>⚡ Place Order Now</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-full" id="express-modal-cancel-btn">
+                <span>Continue Browsing</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step B: Express Order Success View -->
+      <div id="express-success-view" class="modal-state" style="display: none;">
+        <div class="success-icon">🎉</div>
+        <h2 class="modal-title" style="margin-bottom: 6px;">Express Order Confirmed!</h2>
+        <p class="state-text">Your order has been placed via 1-Click Express Checkout. Your cart was left untouched!</p>
+
+        <div class="order-receipt-box">
+          <div class="receipt-row">
+            <span class="receipt-label">Order ID:</span>
+            <span class="receipt-value font-bold" id="express-success-order-id">#---</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Tracking Number:</span>
+            <span class="receipt-value font-bold" id="express-success-tracking-id" style="color: #2563eb; font-family: monospace;">MS-TRK-XXXXXX</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Tax Invoice:</span>
+            <span class="receipt-value font-bold" id="express-success-invoice-id">INV-...</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Payment Method:</span>
+            <span class="receipt-value" id="express-success-payment">---</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Amount Paid:</span>
+            <span class="receipt-value font-bold" id="express-success-total">₹0.00</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Estimated Delivery:</span>
+            <span class="receipt-value" id="express-success-delivery">2-4 Business Days</span>
+          </div>
+        </div>
+
+        <div class="checkout-success-actions" style="margin-top: 20px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary" id="express-download-invoice-btn">
+            <span>📄 View / Download Tax Invoice</span>
+          </button>
+          <button type="button" class="btn btn-secondary" id="express-success-continue-btn">
+            <span>🛍️ Continue Shopping</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast-notification" class="toast-notification" style="display: none;" role="status" aria-live="polite"></div>
 
@@ -636,6 +986,7 @@
     </div>
   </footer>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="product-details.js"></script>
 </body>
 

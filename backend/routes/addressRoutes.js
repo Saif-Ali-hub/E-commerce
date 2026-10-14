@@ -33,11 +33,12 @@ const METRO_PINCODES = {
 
 // ============================================================
 // Public: GET /api/addresses/check-pincode/:pincode
+// Alias: GET /api/addresses/estimate-pincode?pincode=...
 // Fast delivery estimator & courier serviceability
 // ============================================================
-router.get('/check-pincode/:pincode', (req, res) => {
+const handlePincodeCheck = (pincodeInput, res) => {
   try {
-    const rawPin = String(req.params.pincode || '').trim();
+    const rawPin = String(pincodeInput || '').trim();
     const pinRegex = /^[1-9][0-9]{5}$/;
 
     if (!pinRegex.test(rawPin)) {
@@ -98,6 +99,16 @@ router.get('/check-pincode/:pincode', (req, res) => {
       error: error.message
     });
   }
+};
+
+// Existing route: path parameter
+router.get('/check-pincode/:pincode', (req, res) => {
+  handlePincodeCheck(req.params.pincode, res);
+});
+
+// Alias route: query parameter
+router.get('/estimate-pincode', (req, res) => {
+  handlePincodeCheck(req.query.pincode, res);
 });
 
 // All address CRUD routes below require JWT authentication
