@@ -429,11 +429,34 @@
       this.dpr = Math.min(window.devicePixelRatio || 1, 2);
       this.autoTimer = null;
       this.isVisible = typeof window !== 'undefined' && !window.IntersectionObserver;
+      this.isTabVisible = typeof document !== 'undefined' ? !document.hidden : true;
       this.hasLaunchedOpening = false;
       this.blastCycleIndex = 0;
       this.BLAST_INTERVAL_MS = 3000; // Exact 3-second continuous celebration cycle
+      this.pendingTimeouts = new Set();
+      this.MAX_ACTIVE_ROCKETS = 8;
+      this.MAX_ACTIVE_EXPLOSIONS = 6;
 
       this.init();
+    }
+
+    canAnimate() {
+      const docHidden = typeof document !== 'undefined' && document.hidden;
+      return this.isVisible && this.isTabVisible && !docHidden;
+    }
+
+    safeSetTimeout(fn, delay) {
+      const id = setTimeout(() => {
+        this.pendingTimeouts.delete(id);
+        fn();
+      }, delay);
+      this.pendingTimeouts.add(id);
+      return id;
+    }
+
+    clearPendingTimeouts() {
+      this.pendingTimeouts.forEach(id => clearTimeout(id));
+      this.pendingTimeouts.clear();
     }
 
     init() {
@@ -449,15 +472,25 @@
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             this.isVisible = entry.isIntersecting;
-            if (this.isVisible) {
+            if (this.canAnimate()) {
               if (!this.hasLaunchedOpening) {
                 this.launchOpeningDisplay();
+              }
+              if (!this.autoTimer) {
+                this.startThreeSecondBlastingLoop();
               }
               if (!this.isRunning && (this.rockets.length > 0 || this.explosions.length > 0)) {
                 this.start();
               }
-            } else if (!this.isVisible && this.isRunning && this.rockets.length === 0 && this.explosions.length === 0) {
-              this.stop();
+            } else if (!this.isVisible) {
+              if (this.autoTimer) {
+                clearInterval(this.autoTimer);
+                this.autoTimer = null;
+              }
+              this.clearPendingTimeouts();
+              if (this.isRunning && this.rockets.length === 0 && this.explosions.length === 0) {
+                this.stop();
+              }
             }
           });
         }, { threshold: 0.1 });
@@ -466,6 +499,22 @@
         // Fallback when IntersectionObserver is not supported
         this.isVisible = true;
         this.launchOpeningDisplay();
+      }
+
+      // Tab visibility change listeners: stop background timers & animation immediately when hidden
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            this.pause();
+          } else {
+            this.resume();
+          }
+        });
+      }
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('pagehide', () => this.pause(), { passive: true });
+        window.addEventListener('pageshow', () => this.resume(), { passive: true });
       }
 
       // Interactive: click anywhere on banner launches instant rocket targeting click
@@ -484,8 +533,40 @@
       this.startThreeSecondBlastingLoop();
     }
 
+    pause() {
+      this.isTabVisible = false;
+      this.stop();
+      if (this.autoTimer) {
+        clearInterval(this.autoTimer);
+        this.autoTimer = null;
+      }
+      this.clearPendingTimeouts();
+      // Safely reset in-flight objects so returning after background time does not produce catch-up bursts
+      this.rockets = [];
+      this.explosions = [];
+      if (this.ctx && this.width > 0 && this.height > 0) {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+      }
+    }
+
+    resume() {
+      this.isTabVisible = typeof document !== 'undefined' ? !document.hidden : true;
+      if (!this.canAnimate()) return;
+
+      // Restart clean 3-second cadence
+      this.startThreeSecondBlastingLoop();
+
+      // Launch single initial rocket after a brief smooth delay
+      this.safeSetTimeout(() => {
+        if (this.canAnimate()) {
+          this.launchBigSkyRocket();
+        }
+      }, 300);
+    }
+
     launchOpeningDisplay() {
       if (this.hasLaunchedOpening) return;
+      if (!this.canAnimate()) return;
 
       if (this.width <= 0 || this.height <= 0) {
         this.resize();
@@ -494,15 +575,15 @@
       this.hasLaunchedOpening = true;
 
       // Launch initial immediate barrage (100ms) so banner is instantly alive
-      setTimeout(() => {
-        if (!this.isVisible && window.IntersectionObserver) {
-          // If banner scrolled away before timeout, allow re-launch on next visibility
+      this.safeSetTimeout(() => {
+        if (!this.canAnimate()) {
+          // If banner scrolled away or tab hidden before timeout, allow re-launch on next visibility
           this.hasLaunchedOpening = false;
           return;
         }
         this.launchBigSkyRocket(this.width * 0.48, this.height * 0.28, STARBURST_THEMES[1]);
-        setTimeout(() => {
-          if (!this.isVisible && window.IntersectionObserver) return;
+        this.safeSetTimeout(() => {
+          if (!this.canAnimate()) return;
           this.launchBigSkyRocket(this.width * 0.22, this.height * 0.38, STARBURST_THEMES[0]);
         }, 260);
       }, 100);
@@ -538,7 +619,8 @@
     }
 
     launchBigSkyRocket(customTargetX, customTargetY, customTheme) {
-      if (!this.isVisible) return;
+      if (!this.canAnimate()) return;
+      if (this.rockets.length >= this.MAX_ACTIVE_ROCKETS) return;
 
       if (this.width <= 0 || this.height <= 0) {
         this.resize();
@@ -573,23 +655,27 @@
     }
 
     explodeRadialStarburst(x, y, theme) {
+      if (this.explosions.length >= this.MAX_ACTIVE_EXPLOSIONS) return;
       const burstRadius = randomRange(this.width * 0.18, this.width * 0.26);
       const explosion = new RadialStarburstExplosion(x, y, theme, Math.max(120, Math.min(220, burstRadius)));
       this.explosions.push(explosion);
     }
 
     startThreeSecondBlastingLoop() {
-      if (this.autoTimer) clearInterval(this.autoTimer);
+      if (this.autoTimer) {
+        clearInterval(this.autoTimer);
+        this.autoTimer = null;
+      }
 
       this.autoTimer = setInterval(() => {
-        if (!this.isVisible) return;
+        if (!this.canAnimate()) return;
 
         // Primary sky rocket blast
         this.launchBigSkyRocket();
 
         // Tandem companion rocket offset by 260-400ms for natural festive rhythm
-        setTimeout(() => {
-          if (this.isVisible) {
+        this.safeSetTimeout(() => {
+          if (this.canAnimate()) {
             this.launchBigSkyRocket();
           }
         }, randomRange(260, 400));
@@ -611,7 +697,16 @@
 
     start() {
       if (this.isRunning) return;
+      if (!this.canAnimate()) return;
       this.isRunning = true;
+      if (this.animId) {
+        if (typeof window.cancelAnimationFrame === 'function') {
+          window.cancelAnimationFrame(this.animId);
+        } else {
+          clearTimeout(this.animId);
+        }
+        this.animId = null;
+      }
       this.loop();
     }
 
@@ -628,7 +723,11 @@
     }
 
     loop() {
-      if (!this.isRunning) return;
+      this.animId = null;
+      if (!this.isRunning || !this.canAnimate()) {
+        this.stop();
+        return;
+      }
 
       this.ctx.clearRect(0, 0, this.width, this.height);
 
@@ -652,6 +751,11 @@
 
       // Pause loop if no active objects and out of viewport
       if (!this.isVisible && this.rockets.length === 0 && this.explosions.length === 0) {
+        this.stop();
+        return;
+      }
+
+      if (!this.isRunning || !this.canAnimate()) {
         this.stop();
         return;
       }
