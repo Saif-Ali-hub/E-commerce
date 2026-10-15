@@ -1679,8 +1679,9 @@ a {
   }
 }
 
-/* Badge Micro-Animation */
-.badge-pop {
+/* Badge & Button Micro-Animation */
+.badge-pop,
+.pop-anim {
   animation: badgePopAnim 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -8853,78 +8854,112 @@ textarea.form-input {
 
 /* ============================================================
    Festive Product Cards & Heavy Discount Layout
+   (Matched with Home Page Product Card Dimensions & Spacing)
    ============================================================ */
 .festive-products-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 14px;
 }
 
 .festive-product-card {
   border: 1px solid rgba(245, 158, 11, 0.22);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
 }
 
 .festive-product-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme="dark"] .festive-product-card {
   border-color: rgba(245, 158, 11, 0.2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .festive-product-card:hover {
   border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 12px 28px rgba(234, 88, 12, 0.22);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.22);
+}
+
+/* Match Home Page Product Card Image & Dimensions */
+.festive-product-card .card-media {
+  aspect-ratio: 16 / 11;
+  max-height: 175px;
+  background-color: var(--color-bg-alt);
+}
+
+.festive-product-card .card-category {
+  display: none;
 }
 
 /* Heavy Festive Corner Ribbon Badge */
 .festive-deal-badge {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   z-index: 5;
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: var(--radius-full);
-  font-size: 0.74rem;
+  font-size: 0.66rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  gap: 3px;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
   animation: badgePopAnim 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .badge-flame {
-  font-size: 0.82rem;
+  font-size: 0.74rem;
+}
+
+.festive-product-card .wishlist-heart-btn {
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+}
+
+.festive-product-card .wishlist-heart-btn .heart-icon {
+  font-size: 0.95rem;
+}
+
+/* Match Home Page Product Card Body & Spacing */
+.festive-product-card .card-body {
+  padding: 12px 13px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .festive-card-tag-row {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .festive-micro-tag {
   display: inline-block;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: #b45309;
   background: #fef3c7;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: var(--radius-sm);
   border: 1px solid #fde68a;
+  line-height: 1.2;
 }
 
 [data-theme="dark"] .festive-micro-tag {
@@ -8933,16 +8968,45 @@ textarea.form-input {
   border-color: rgba(245, 158, 11, 0.35);
 }
 
-/* Heavy Discount Price Block */
+.festive-product-card .card-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+  line-height: 1.3;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: auto;
+  min-height: 0;
+}
+
+.festive-product-card .card-rating-row {
+  margin-bottom: 4px;
+  gap: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.festive-product-card .rating-stars-inline {
+  font-size: 0.8rem;
+}
+
+.festive-product-card .card-rating-text,
+.festive-product-card .card-rating-count {
+  font-size: 0.72rem;
+}
+
+/* Heavy Discount Price Block - Compact & Harmonious */
 .festive-price-block {
-  margin: 10px 0 8px;
-  padding: 8px 10px;
-  border-radius: var(--radius-md);
+  margin: 6px 0;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
   background: rgba(245, 158, 11, 0.06);
   border: 1px dashed rgba(245, 158, 11, 0.3);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 [data-theme="dark"] .festive-price-block {
@@ -8953,14 +9017,15 @@ textarea.form-input {
 .festive-price-row {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
 }
 
 .festive-deal-price {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: #b91c1c;
   letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 [data-theme="dark"] .festive-deal-price {
@@ -8968,18 +9033,19 @@ textarea.form-input {
 }
 
 .festive-original-price {
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
   text-decoration: line-through;
   font-weight: 500;
 }
 
 .festive-save-pill {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #15803d;
   display: inline-flex;
   align-items: center;
+  line-height: 1.2;
 }
 
 [data-theme="dark"] .festive-save-pill {
@@ -8988,17 +9054,17 @@ textarea.form-input {
 
 /* Festive Claimed Urgency Bar */
 .festive-claimed-box {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .claimed-text-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
 }
 
@@ -9012,14 +9078,14 @@ textarea.form-input {
 
 .claimed-status {
   color: #dc2626;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .claimed-track {
   width: 100%;
-  height: 6px;
+  height: 5px;
   border-radius: var(--radius-full);
   background: var(--color-border);
   overflow: hidden;
@@ -9032,7 +9098,25 @@ textarea.form-input {
   transition: width 0.8s ease-out;
 }
 
-/* Festive Add to Cart Button */
+/* Festive Add to Cart Button & Actions */
+.festive-product-card .card-actions {
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.festive-claim-btn {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .btn-festive-cart {
   background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
   border-color: #d97706;
@@ -9052,6 +9136,20 @@ textarea.form-input {
   box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
 }
 
+/* Skeleton Loading matching dimensions */
+.festive-products-grid .skeleton-card {
+  border-radius: var(--radius-md);
+}
+
+.festive-products-grid .skeleton-media {
+  aspect-ratio: 16 / 11;
+  max-height: 175px;
+}
+
+.festive-products-grid .skeleton-body {
+  padding: 12px 13px 14px;
+}
+
 /* ============================================================
    Responsive Media Queries for Festive Page
    ============================================================ */
@@ -9062,7 +9160,8 @@ textarea.form-input {
   }
 
   .festive-products-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
@@ -9079,11 +9178,6 @@ textarea.form-input {
     grid-template-columns: 1fr;
   }
 
-  .festive-products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
   .festive-toolbar-subrow {
     flex-direction: column;
     align-items: flex-start;
@@ -9096,13 +9190,21 @@ textarea.form-input {
   }
 }
 
+@media (max-width: 640px) {
+  .festive-products-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .festive-product-card .card-media,
+  .festive-products-grid .skeleton-media {
+    max-height: 190px;
+  }
+}
+
 @media (max-width: 520px) {
   .festive-hero-title {
     font-size: 1.8rem;
-  }
-
-  .festive-products-grid {
-    grid-template-columns: 1fr;
   }
 
   .festive-time-box .time-digit {

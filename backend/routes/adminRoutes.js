@@ -71,14 +71,44 @@ router.get('/dashboard', async (req, res) => {
 // ============================================================
 router.get('/orders', async (req, res) => {
   try {
-    const orders = await Order.find()
-      .populate('user', 'name email')
-      .sort({ createdAt: -1 });
+    const orders = await Order.find().sort({ createdAt: -1 }).lean();
+
+    // Collect valid user ObjectIds to batch populate
+    const userIds = orders
+      .map((o) => o.user)
+      .filter((u) => u && isValidObjectId(u.toString()));
+
+    const users = await User.find({ _id: { $in: userIds } })
+      .select('name email avatar phone role')
+      .lean();
+    const userMap = new Map(users.map((u) => [u._id.toString(), u]));
+
+    const formattedOrders = orders.map((order) => {
+      let userObj = null;
+      const rawUser = order.user;
+
+      if (rawUser && isValidObjectId(rawUser.toString()) && userMap.has(rawUser.toString())) {
+        userObj = userMap.get(rawUser.toString());
+      } else if (rawUser && typeof rawUser === 'object' && rawUser.name) {
+        userObj = rawUser;
+      } else if (typeof rawUser === 'string' && rawUser.trim() && !isValidObjectId(rawUser)) {
+        userObj = { name: rawUser.trim(), email: '' };
+      } else if (order.shippingAddress && order.shippingAddress.fullName) {
+        userObj = { name: order.shippingAddress.fullName.trim(), email: '' };
+      } else {
+        userObj = { name: 'Customer', email: '' };
+      }
+
+      return {
+        ...order,
+        user: userObj
+      };
+    });
 
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders
+      count: formattedOrders.length,
+      data: formattedOrders
     });
   } catch (error) {
     res.status(500).json({
@@ -853,6 +883,155 @@ router.put('/sellers/:id/verify', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error updating seller verification status',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 12. GET /api/admin/users - Paginated user management with search & filter
+// ============================================================
+router.get('/users', async (req, res) => {
+  try {
+    const { page = 1, limit = 10, q = '', role = 'all', status = 'all' } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 10));
+
+    const filter = {};
+
+    if (role && role !== 'all') {
+      filter.role = role.toLowerCase().trim();
+    }
+
+    if (status && status !== 'all') {
+      filter.status = status.toLowerCase().trim();
+    }
+
+    if (q && q.trim()) {
+      const searchTerm = q.trim();
+      const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      filter.$or = [
+        { name: regex },
+        { email: regex },
+        { phone: regex },
+        { 'sellerDetails.businessName': regex }
+      ];
+    }
+
+    const total = await User.countDocuments(filter);
+    const users = await User.find(filter)
+      .select('-password -resetPasswordToken -resetPasswordExpire -__v')
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .lean();
+
+    const formattedUsers = users.map((user) => {
+      let maskedPan = '';
+      if (user.sellerDetails && user.sellerDetails.pan) {
+        const rawPan = user.sellerDetails.pan.toString().trim();
+        maskedPan = rawPan.length === 10
+          ? `${rawPan.slice(0, 5)}****${rawPan.slice(9)}`
+          : `${rawPan.slice(0, 2)}****`;
+      }
+
+      return {
+        _id: user._id,
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role || 'customer',
+        status: user.status || 'active',
+        phone: user.phone || '',
+        avatar: user.avatar || '',
+        walletBalance: user.walletBalance || 0,
+        coins: user.coins || 0,
+        sellerDetails: user.sellerDetails
+          ? {
+              ...user.sellerDetails,
+              pan: maskedPan
+            }
+          : undefined,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedUsers.length,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / limitNum) || 1,
+      data: formattedUsers
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error retrieving users',
+      error: error.message
+    });
+  }
+});
+
+// ============================================================
+// 13. PUT /api/admin/users/:id/status - Toggle user account status
+// ============================================================
+router.put('/users/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
+    const cleanStatus = (status || '').toLowerCase().trim();
+    if (!['active', 'suspended', 'inactive'].includes(cleanStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status must be either "active", "suspended", or "inactive".'
+      });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    // Guard: Prevent admin from deactivating or suspending themselves
+    if (user._id.toString() === req.user.id && cleanStatus !== 'active') {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot suspend or deactivate your own administrator account.'
+      });
+    }
+
+    user.status = cleanStatus;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `User "${user.name}" status updated to ${cleanStatus}.`,
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error updating user status',
       error: error.message
     });
   }

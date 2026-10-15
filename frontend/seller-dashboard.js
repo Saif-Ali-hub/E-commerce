@@ -15,15 +15,20 @@ try {
   currentUser = null;
 }
 
+const isSeller = Boolean(currentUser && currentUser.role === 'seller');
+const isPendingSeller = Boolean(
+  isSeller &&
+  (!currentUser.sellerDetails || currentUser.sellerDetails.verificationStatus !== 'verified')
+);
 const isVerifiedSeller = Boolean(
-  currentUser &&
+  isSeller &&
   currentUser.sellerDetails &&
   currentUser.sellerDetails.verificationStatus === 'verified'
 );
 const isAdmin = Boolean(currentUser && currentUser.role === 'admin');
 
-if (!token || !currentUser || (!isVerifiedSeller && !isAdmin)) {
-  alert('Access denied. Merchant Dashboard is restricted to verified sellers and store administrators.');
+if (!token || !currentUser || (!isSeller && !isAdmin)) {
+  alert('Access denied. Merchant Dashboard is restricted to sellers and store administrators.');
   window.location.href = 'index.html';
 }
 
@@ -31,6 +36,7 @@ if (!token || !currentUser || (!isVerifiedSeller && !isAdmin)) {
 let currentTab = 'overview';
 let cachedProducts = [];
 let cachedOrders = [];
+let currentSellerFilter = '';
 
 // DOM Elements
 const sellerHeaderName = document.getElementById('seller-header-name');
@@ -38,6 +44,9 @@ const sellerHeroName = document.getElementById('seller-hero-name');
 const sellerBusinessNameDisplay = document.getElementById('seller-business-name-display');
 const sellerAvatarInitial = document.getElementById('seller-avatar-initial');
 const sellerVerifyPill = document.getElementById('seller-verify-pill');
+const sellerPendingBanner = document.getElementById('seller-pending-banner');
+const adminStoreFilterWrap = document.getElementById('admin-store-filter-wrap');
+const adminSellerSelect = document.getElementById('admin-seller-select');
 const sellerAlertBox = document.getElementById('seller-alert-box');
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const themeToggleIcon = document.getElementById('theme-toggle-icon');
@@ -50,7 +59,8 @@ const sections = {
   overview: document.getElementById('section-overview'),
   products: document.getElementById('section-products'),
   orders: document.getElementById('section-orders'),
-  earnings: document.getElementById('section-earnings')
+  earnings: document.getElementById('section-earnings'),
+  profile: document.getElementById('section-profile')
 };
 
 // Filter Inputs
@@ -88,23 +98,128 @@ function initSellerIdentity() {
   const businessName =
     currentUser.sellerDetails?.businessName ||
     currentUser.name ||
-    'Verified Merchant';
+    'Merchant';
 
   const initial = businessName.charAt(0).toUpperCase();
 
   if (sellerHeaderName) sellerHeaderName.textContent = businessName;
-  if (sellerHeroName) sellerHeroName.textContent = `${businessName} Portal`;
+  if (sellerHeroName) {
+    if (isAdmin) {
+      sellerHeroName.textContent = 'Platform Merchant Overview';
+    } else {
+      sellerHeroName.textContent = `${businessName} Portal`;
+    }
+  }
   if (sellerBusinessNameDisplay) {
-    sellerBusinessNameDisplay.textContent = `• Business PAN: ${currentUser.sellerDetails?.pan || 'Verified'}`;
+    if (isAdmin) {
+      sellerBusinessNameDisplay.textContent = '• Multi-Store Administration & Oversight';
+    } else {
+      sellerBusinessNameDisplay.textContent = `• Business PAN: ${currentUser.sellerDetails?.pan || 'Verified'}`;
+    }
   }
   if (sellerAvatarInitial) sellerAvatarInitial.textContent = initial;
 
-  if (isAdmin && sellerVerifyPill) {
-    sellerVerifyPill.textContent = '🛡️ Admin Access';
-    sellerVerifyPill.style.background = 'rgba(239, 68, 68, 0.2)';
-    sellerVerifyPill.style.borderColor = '#ef4444';
-    sellerVerifyPill.style.color = '#fca5a5';
+  if (isAdmin) {
+    if (sellerVerifyPill) {
+      sellerVerifyPill.textContent = '🛡️ Platform Admin';
+      sellerVerifyPill.style.background = 'rgba(239, 68, 68, 0.2)';
+      sellerVerifyPill.style.borderColor = '#ef4444';
+      sellerVerifyPill.style.color = '#fca5a5';
+    }
+    if (adminStoreFilterWrap) {
+      adminStoreFilterWrap.style.display = 'flex';
+      initAdminStoreSelector();
+    }
+  } else if (isPendingSeller) {
+    if (sellerPendingBanner) {
+      sellerPendingBanner.style.display = 'block';
+    }
+    if (sellerVerifyPill) {
+      sellerVerifyPill.textContent = '⏳ Verification Pending';
+      sellerVerifyPill.style.background = 'rgba(245, 158, 11, 0.2)';
+      sellerVerifyPill.style.borderColor = '#f59e0b';
+      sellerVerifyPill.style.color = '#f59e0b';
+    }
+    if (heroAddProductBtn) {
+      heroAddProductBtn.style.opacity = '0.6';
+      heroAddProductBtn.title = 'Privileges unlock upon verification';
+    }
+    if (openAddProductBtn) {
+      openAddProductBtn.style.opacity = '0.6';
+      openAddProductBtn.title = 'Privileges unlock upon verification';
+    }
   }
+
+  renderSellerProfile();
+}
+
+function renderSellerProfile() {
+  const seller = currentUser.sellerDetails || {};
+  const status = (seller.verificationStatus || (isSeller ? 'pending' : (isAdmin ? 'verified' : 'pending'))).toLowerCase();
+
+  const nameEl = document.getElementById('profile-business-name');
+  const addrEl = document.getElementById('profile-business-address');
+  const phoneEl = document.getElementById('profile-contact-number');
+  const panEl = document.getElementById('profile-pan');
+  const gstinEl = document.getElementById('profile-gstin');
+  const statusEl = document.getElementById('profile-verification-status');
+  const badgeEl = document.getElementById('profile-status-badge');
+
+  if (nameEl) nameEl.textContent = seller.businessName || currentUser.name || 'Not provided';
+  if (addrEl) addrEl.textContent = seller.businessAddress || 'Not provided';
+  if (phoneEl) phoneEl.textContent = seller.contactNumber || currentUser.phone || 'Not provided';
+  if (panEl) panEl.textContent = seller.pan || 'Not provided';
+  if (gstinEl) gstinEl.textContent = seller.gstin || 'Not Applicable';
+  if (statusEl) {
+    statusEl.textContent = status.toUpperCase();
+    statusEl.style.color = status === 'verified' ? '#10b981' : (status === 'rejected' ? '#ef4444' : '#f59e0b');
+  }
+  if (badgeEl) {
+    if (status === 'verified') {
+      badgeEl.textContent = '✓ Verified Merchant';
+      badgeEl.className = 'status-badge status-delivered';
+    } else if (status === 'rejected') {
+      badgeEl.textContent = '✕ Application Rejected';
+      badgeEl.className = 'status-badge status-cancelled';
+    } else {
+      badgeEl.textContent = '⏳ Application Under Review';
+      badgeEl.className = 'status-badge status-pending';
+    }
+  }
+}
+
+async function initAdminStoreSelector() {
+  if (!isAdmin || !adminSellerSelect) return;
+  try {
+    const res = await sellerFetch('/admin/users?role=seller&limit=100');
+    if (!res) return;
+    const result = await res.json();
+    if (res.ok && result.success && Array.isArray(result.data)) {
+      adminSellerSelect.innerHTML = '<option value="" style="color: #0f172a;">🌐 All Stores (Platform Overview)</option>';
+      result.data.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s._id || s.id;
+        opt.style.color = '#0f172a';
+        const bName = s.sellerDetails?.businessName || s.name || s.email;
+        const sIcon = s.sellerDetails?.verificationStatus === 'verified' ? '✓' : '⏳';
+        opt.textContent = `${sIcon} ${bName} (${s.email})`;
+        adminSellerSelect.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error('Error populating admin store select:', err);
+  }
+
+  adminSellerSelect.addEventListener('change', () => {
+    currentSellerFilter = adminSellerSelect.value;
+    const selectedText = adminSellerSelect.options[adminSellerSelect.selectedIndex]?.text || '';
+    if (currentSellerFilter) {
+      if (sellerHeroName) sellerHeroName.textContent = `${selectedText.replace(/^[✓⏳]\s*/, '')} (Admin View)`;
+    } else {
+      if (sellerHeroName) sellerHeroName.textContent = 'Platform Merchant Overview';
+    }
+    refreshData();
+  });
 }
 
 // Theme handling
@@ -169,8 +284,22 @@ async function sellerFetch(endpoint, options = {}) {
 // Data Fetching: Overview & Analytics
 // ============================================================================
 async function fetchOverview() {
+  if (isPendingSeller) {
+    document.getElementById('kpi-total-sales').textContent = '₹0.00';
+    document.getElementById('kpi-units-sold').textContent = '0';
+    document.getElementById('kpi-active-products').textContent = '0';
+    document.getElementById('kpi-low-stock').textContent = '0';
+    document.getElementById('kpi-pending-orders').textContent = '0';
+    document.getElementById('kpi-net-payout').textContent = '₹0.00';
+    renderOverviewOrders([]);
+    return;
+  }
+
   try {
-    const res = await sellerFetch('/seller/overview');
+    const endpoint = currentSellerFilter
+      ? `/seller/overview?sellerId=${currentSellerFilter}`
+      : '/seller/overview';
+    const res = await sellerFetch(endpoint);
     if (!res) return;
     const result = await res.json();
 
@@ -209,7 +338,10 @@ function renderOverviewOrders(orders) {
   if (!tbody) return;
 
   if (orders.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 24px;">No customer orders placed for your catalog yet.</td></tr>`;
+    const emptyMsg = isPendingSeller
+      ? '⏳ Your merchant application is currently under review. Customer orders will appear here once your account is verified.'
+      : 'No customer orders placed for your catalog yet.';
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 24px;">${emptyMsg}</td></tr>`;
     return;
   }
 
@@ -240,6 +372,12 @@ function renderOverviewOrders(orders) {
 // Data Fetching: My Products
 // ============================================================================
 async function fetchProducts() {
+  if (isPendingSeller) {
+    cachedProducts = [];
+    renderProductsTable([]);
+    return;
+  }
+
   try {
     const query = new URLSearchParams();
     if (productCategorySelect && productCategorySelect.value !== 'All') {
@@ -250,6 +388,9 @@ async function fetchProducts() {
     }
     if (productSearchInput && productSearchInput.value.trim()) {
       query.append('search', productSearchInput.value.trim());
+    }
+    if (currentSellerFilter) {
+      query.append('sellerId', currentSellerFilter);
     }
 
     const res = await sellerFetch(`/seller/products?${query.toString()}`);
@@ -273,7 +414,10 @@ function renderProductsTable(products) {
   if (!tbody) return;
 
   if (products.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 24px;">No products matching your search filter. List your first product using the button above.</td></tr>`;
+    const emptyMsg = isPendingSeller
+      ? '⏳ Your merchant application is currently under review by store administrators. Product listing privileges will unlock once your account is verified.'
+      : 'No products matching your search filter. List your first product using the button above.';
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 28px;">${emptyMsg}</td></tr>`;
     return;
   }
 
@@ -289,6 +433,17 @@ function renderProductsTable(products) {
     }
 
     const imgUrl = (p.images && p.images[0]) || p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&auto=format&fit=crop&q=80';
+
+    const actionsHtml = isPendingSeller
+      ? `<span style="font-size: 0.78rem; color: var(--color-text-muted);">🔒 Under Review</span>`
+      : `
+        <button class="btn btn-secondary btn-sm" onclick="openQuickEditModal('${p._id}')" style="margin-right: 6px;">
+          ✏️ Edit
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="deleteProduct('${p._id}', '${encodeURIComponent(p.name)}')" style="color: #ef4444;">
+          🗑️
+        </button>
+      `;
 
     return `
       <tr>
@@ -310,12 +465,7 @@ function renderProductsTable(products) {
           </span>
         </td>
         <td style="text-align: right;">
-          <button class="btn btn-secondary btn-sm" onclick="openQuickEditModal('${p._id}')" style="margin-right: 6px;">
-            ✏️ Edit
-          </button>
-          <button class="btn btn-secondary btn-sm" onclick="deleteProduct('${p._id}', '${encodeURIComponent(p.name)}')" style="color: #ef4444;">
-            🗑️
-          </button>
+          ${actionsHtml}
         </td>
       </tr>
     `;
@@ -324,6 +474,10 @@ function renderProductsTable(products) {
 
 // Quick Edit Modal
 window.openQuickEditModal = function(productId) {
+  if (isPendingSeller) {
+    showAlert('Product editing privileges are restricted while verification is pending.', 'error');
+    return;
+  }
   const prod = cachedProducts.find(p => p._id === productId);
   if (!prod) return;
 
@@ -352,6 +506,10 @@ if (closeQuickEditBtn) closeQuickEditBtn.addEventListener('click', closeQuickEdi
 if (quickEditForm) {
   quickEditForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isPendingSeller) {
+      showAlert('Product editing privileges are restricted while verification is pending.', 'error');
+      return;
+    }
     const id = editProductId.value;
     const name = editProductName.value.trim();
     const price = parseFloat(editProductPrice.value);
@@ -394,6 +552,10 @@ if (quickEditForm) {
 
 // Delete Product
 window.deleteProduct = async function(productId, encodedName) {
+  if (isPendingSeller) {
+    showAlert('Product deletion is restricted while verification is pending.', 'error');
+    return;
+  }
   const name = decodeURIComponent(encodedName);
   if (!confirm(`Are you sure you want to remove "${name}" from your catalog?`)) {
     return;
@@ -419,6 +581,10 @@ window.deleteProduct = async function(productId, encodedName) {
 
 // Add New Product
 function openAddProduct() {
+  if (isPendingSeller) {
+    showAlert('Your merchant application is currently under review by store administrators. Product listing and dispatch privileges will unlock upon verification.', 'error');
+    return;
+  }
   addProductForm.reset();
   addProductModal.style.display = 'flex';
 }
@@ -490,8 +656,18 @@ if (addProductForm) {
 // Data Fetching: Order Fulfillment
 // ============================================================================
 async function fetchOrders() {
+  if (isPendingSeller) {
+    cachedOrders = [];
+    renderOrdersTable([]);
+    renderEarningsLedger([]);
+    return;
+  }
+
   try {
-    const res = await sellerFetch('/seller/orders');
+    const endpoint = currentSellerFilter
+      ? `/seller/orders?sellerId=${currentSellerFilter}`
+      : '/seller/orders';
+    const res = await sellerFetch(endpoint);
     if (!res) return;
     const result = await res.json();
 
@@ -513,7 +689,10 @@ function renderOrdersTable(orders) {
   if (!tbody) return;
 
   if (orders.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 24px;">No customer orders placed for your products yet.</td></tr>`;
+    const emptyMsg = isPendingSeller
+      ? '⏳ Your merchant application is currently under review by store administrators. Incoming customer orders will appear here once verified.'
+      : 'No customer orders placed for your products yet.';
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 24px;">${emptyMsg}</td></tr>`;
     return;
   }
 
@@ -536,7 +715,7 @@ function renderOrdersTable(orders) {
     `).join('');
 
     const statusClass = `status-${(ord.status || 'pending').toLowerCase()}`;
-    const canDispatch = ord.status === 'Pending' || ord.status === 'Processing';
+    const canDispatch = !isPendingSeller && (ord.status === 'Pending' || ord.status === 'Processing');
 
     return `
       <tr>
@@ -556,7 +735,7 @@ function renderOrdersTable(orders) {
             </button>
           ` : `
             <span style="font-size: 0.8rem; color: var(--color-text-muted);">
-              ${ord.tracking?.trackingNumber ? `AWB: ${ord.tracking.trackingNumber}` : 'Completed'}
+              ${ord.tracking?.trackingNumber ? `AWB: ${ord.tracking.trackingNumber}` : (isPendingSeller ? '🔒 Under Review' : 'Completed')}
             </span>
           `}
         </td>
@@ -567,6 +746,10 @@ function renderOrdersTable(orders) {
 
 // Dispatch Modal
 window.openDispatchModal = function(orderId, existingCarrier) {
+  if (isPendingSeller) {
+    showAlert('Order dispatching is restricted while your merchant application is under review.', 'error');
+    return;
+  }
   dispatchOrderId.value = orderId;
   if (existingCarrier) dispatchCarrier.value = existingCarrier;
   dispatchTrackingNo.value = `MS-TRK-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -665,6 +848,15 @@ function switchTab(targetTab) {
   if (targetTab === 'products') fetchProducts();
   if (targetTab === 'orders') fetchOrders();
   if (targetTab === 'earnings') fetchOrders();
+  if (targetTab === 'profile') renderSellerProfile();
+}
+
+function refreshData() {
+  if (currentTab === 'overview') fetchOverview();
+  else if (currentTab === 'products') fetchProducts();
+  else if (currentTab === 'orders') fetchOrders();
+  else if (currentTab === 'earnings') fetchOrders();
+  else if (currentTab === 'profile') renderSellerProfile();
 }
 
 tabButtons.forEach(btn => {
@@ -696,6 +888,7 @@ if (refreshDashboardBtn) {
     fetchOverview();
     fetchProducts();
     fetchOrders();
+    renderSellerProfile();
     showAlert('Dashboard metrics refreshed!');
   });
 }

@@ -4,7 +4,9 @@ let gridFSBucket = null;
 
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/E-commerce';
+    let rawUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/e-commerce';
+    // Normalize database name to lowercase 'e-commerce' to prevent Windows case conflicts
+    const uri = rawUri.replace(/\/E-commerce(\?|$)/i, '/e-commerce$1');
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000,
       autoIndex: true

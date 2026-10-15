@@ -310,7 +310,38 @@ function updateAuthUI() {
     if (dropdownUserName) dropdownUserName.textContent = user.name || 'User';
     if (dropdownUserEmail) dropdownUserEmail.textContent = user.email || '';
     if (dropdownUserRole) {
-      dropdownUserRole.textContent = user.role === 'admin' ? 'Administrator' : 'Customer';
+      if (user.role === 'admin') {
+        dropdownUserRole.textContent = 'Administrator';
+      } else if (user.role === 'seller') {
+        dropdownUserRole.textContent = 'Seller Account';
+      } else {
+        dropdownUserRole.textContent = 'Customer';
+      }
+    }
+
+    const navAdminBtn = document.getElementById('nav-admin-btn');
+    const navSellerBtn = document.getElementById('nav-seller-btn');
+    if (navAdminBtn) {
+      navAdminBtn.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
+    }
+    if (navSellerBtn) {
+      const isSeller = user.role === 'seller';
+      const isAdmin = user.role === 'admin';
+      const isPending = (user.sellerDetails && user.sellerDetails.verificationStatus === 'pending') || user.sellerStatus === 'pending' || user.verificationStatus === 'pending';
+      navSellerBtn.style.display = (isSeller || isAdmin) ? 'inline-flex' : 'none';
+
+      const titleEl = navSellerBtn.querySelector('.dropdown-item-title');
+      const descEl = navSellerBtn.querySelector('.dropdown-item-desc');
+      if (titleEl) {
+        titleEl.textContent = 'Merchant Dashboard';
+      }
+      if (descEl) {
+        if (isSeller && isPending) {
+          descEl.innerHTML = '<span class="badge-verification badge-pending" style="display: inline-block; padding: 1px 6px; font-size: 0.72rem; margin-top: 2px;">⏳ Pending Review</span>';
+        } else {
+          descEl.textContent = 'Manage products, orders & payouts';
+        }
+      }
     }
 
     const savedCartCount = parseInt(localStorage.getItem('ministore_cart_count') || '0', 10);
@@ -327,6 +358,10 @@ function updateAuthUI() {
     updateWishlistBadge(wishlistProductIds.size);
   } else {
     closeProfileDropdown();
+    const navAdminBtn = document.getElementById('nav-admin-btn');
+    const navSellerBtn = document.getElementById('nav-seller-btn');
+    if (navAdminBtn) navAdminBtn.style.display = 'none';
+    if (navSellerBtn) navSellerBtn.style.display = 'none';
     if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
     if (navUserInfo) navUserInfo.style.display = 'none';
     if (navUserName) navUserName.textContent = '';

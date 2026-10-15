@@ -79,6 +79,12 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
+    try {
+      const { syncLegacyData } = require('./scripts/syncLegacyData');
+      syncLegacyData().catch((e) => console.warn('Legacy sync notice:', e.message));
+    } catch (e) {
+      // Ignore if script missing
+    }
     const server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
       console.log(`Connected to database: ${mongoose.connection.name}`);

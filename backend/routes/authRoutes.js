@@ -524,5 +524,97 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
+// ============================================================
+// 6. POST /api/auth/become-seller - Upgrade customer to seller
+// ============================================================
+router.post('/become-seller', authMiddleware, async (req, res) => {
+  try {
+    const { businessName, businessAddress, contactNumber, phone, pan, gstin } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    // Admins are already top-level
+    if (user.role === 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Administrator accounts already have full platform-wide merchant access.'
+      });
+    }
+
+    if (!businessName || !businessName.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Business Name is required to apply for a seller account.'
+      });
+    }
+
+    const contact = (contactNumber || phone || user.phone || '').trim();
+    if (!contact) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid business contact number is required.'
+      });
+    }
+
+    const rawPan = (pan || '').trim().toUpperCase();
+    if (!rawPan || rawPan.length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: 'A valid 10-character Permanent Account Number (PAN) is required.'
+      });
+    }
+
+    user.role = 'seller';
+    user.sellerDetails = {
+      businessName: businessName.trim(),
+      businessAddress: (businessAddress || '').trim(),
+      contactNumber: contact,
+      pan: rawPan,
+      gstin: (gstin || '').trim().toUpperCase(),
+      verificationStatus: 'pending'
+    };
+
+    if (!user.phone && contact) {
+      user.phone = contact;
+    }
+
+    const updatedUser = await user.save();
+    const formattedDetails = formatSellerDetails(updatedUser.sellerDetails);
+
+    const userPayload = {
+      id: updatedUser._id,
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      status: updatedUser.status || 'active',
+      phone: updatedUser.phone || '',
+      avatar: updatedUser.avatar || '',
+      sellerDetails: formattedDetails,
+      createdAt: updatedUser.createdAt
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: 'Your merchant application has been submitted successfully and is currently under review by store administrators.',
+      data: userPayload,
+      user: userPayload
+    });
+  } catch (error) {
+    console.error('Error in /api/auth/become-seller:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error processing seller application',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
 

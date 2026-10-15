@@ -390,6 +390,33 @@ const adminOrdersSection = document.getElementById('admin-orders-section');
 const adminReviewsSection = document.getElementById('admin-reviews-section');
 const adminReviewsTbody = document.getElementById('admin-reviews-tbody');
 
+// Admin Users Tab & Elements
+const adminTabUsers = document.getElementById('admin-tab-users');
+const adminUsersSection = document.getElementById('admin-users-section');
+const adminUsersTbody = document.getElementById('admin-users-tbody');
+const adminUsersSearch = document.getElementById('admin-users-search');
+const userRoleFilterPills = document.getElementById('user-role-filter-pills');
+const refreshUsersBtn = document.getElementById('refresh-users-btn');
+const usersPrevPageBtn = document.getElementById('users-prev-page-btn');
+const usersNextPageBtn = document.getElementById('users-next-page-btn');
+const adminUsersCountText = document.getElementById('admin-users-count-text');
+const cardOverviewUsers = document.getElementById('card-overview-users');
+
+// Become Seller Modal Elements
+const becomeSellerModal = document.getElementById('become-seller-modal');
+const becomeSellerCloseBtn = document.getElementById('become-seller-close-btn');
+const becomeSellerCancelBtn = document.getElementById('become-seller-cancel-btn');
+const becomeSellerForm = document.getElementById('become-seller-form');
+const becomeSellerAlert = document.getElementById('become-seller-alert');
+const btnOpenBecomeSeller = document.getElementById('btn-open-become-seller');
+const footerBecomeSellerBtn = document.getElementById('footer-become-seller-btn');
+const sellerAppBusinessName = document.getElementById('seller-app-business-name');
+const sellerAppBusinessAddress = document.getElementById('seller-app-business-address');
+const sellerAppContact = document.getElementById('seller-app-contact');
+const sellerAppPan = document.getElementById('seller-app-pan');
+const sellerAppGstin = document.getElementById('seller-app-gstin');
+const sellerAppSubmitBtn = document.getElementById('seller-app-submit-btn');
+
 // Admin Analytics Tab & Section
 const adminTabAnalytics = document.getElementById('admin-tab-analytics');
 const adminAnalyticsSection = document.getElementById('admin-analytics-section');
@@ -1163,11 +1190,34 @@ function updateAuthUI() {
       navAdminBtn.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
     }
     if (navSellerBtn) {
-      const isVerifiedMerchant = Boolean(
-        user.sellerDetails && user.sellerDetails.verificationStatus === 'verified'
-      );
-      navSellerBtn.style.display = (isVerifiedMerchant || user.role === 'admin') ? 'inline-flex' : 'none';
+      const isSeller = user.role === 'seller';
+      const isAdmin = user.role === 'admin';
+      const isPending = user.sellerDetails && user.sellerDetails.verificationStatus === 'pending';
+      navSellerBtn.style.display = (isSeller || isAdmin) ? 'inline-flex' : 'none';
+
+      const titleEl = navSellerBtn.querySelector('.dropdown-item-title');
+      const descEl = navSellerBtn.querySelector('.dropdown-item-desc');
+      if (titleEl) {
+        titleEl.textContent = 'Merchant Dashboard';
+      }
+      if (descEl) {
+        if (isSeller && isPending) {
+          descEl.innerHTML = '<span class="badge-verification badge-pending" style="display: inline-block; padding: 1px 6px; font-size: 0.72rem; margin-top: 2px;">⏳ Pending Review</span>';
+        } else {
+          descEl.textContent = 'Manage products, orders & payouts';
+        }
+      }
     }
+
+    const profileBecomeSellerCard = document.getElementById('profile-become-seller-card');
+    const profileSellerCard = document.getElementById('profile-seller-card');
+    if (profileBecomeSellerCard) {
+      profileBecomeSellerCard.style.display = user.role === 'customer' ? 'flex' : 'none';
+    }
+    if (profileSellerCard) {
+      profileSellerCard.style.display = user.role === 'seller' ? 'block' : 'none';
+    }
+
     fetchUserWallet();
 
     // Restore cached lightweight badge/state from localStorage without making API calls
@@ -1184,6 +1234,13 @@ function updateAuthUI() {
     }
     updateWishlistCountBadge(wishlistProductIds.size);
     updateAllWishlistHeartButtons();
+
+    // Deep link directly into admin panel if navigated via #admin
+    if (window.location.hash === '#admin' && user.role === 'admin') {
+      setTimeout(() => {
+        openAdminModal();
+      }, 150);
+    }
   } else {
     closeProfileDropdown();
     navLoginBtn.style.display = 'inline-flex';
@@ -6275,6 +6332,7 @@ function setAdminTab(tabName) {
 
   // Toggle Tab Button Classes
   if (adminTabOverview) adminTabOverview.classList.toggle('active', tabName === 'overview');
+  if (adminTabUsers) adminTabUsers.classList.toggle('active', tabName === 'users');
   if (adminTabSales) adminTabSales.classList.toggle('active', tabName === 'sales');
   if (adminTabCoupons) adminTabCoupons.classList.toggle('active', tabName === 'coupons');
   if (adminTabProducts) adminTabProducts.classList.toggle('active', tabName === 'products');
@@ -6291,6 +6349,7 @@ function setAdminTab(tabName) {
 
   // Toggle Section Displays consistently as flex
   if (adminOverviewSection) adminOverviewSection.style.display = tabName === 'overview' ? 'flex' : 'none';
+  if (adminUsersSection) adminUsersSection.style.display = tabName === 'users' ? 'flex' : 'none';
   if (adminSalesSection) adminSalesSection.style.display = tabName === 'sales' ? 'flex' : 'none';
   if (adminCouponsSection) adminCouponsSection.style.display = tabName === 'coupons' ? 'flex' : 'none';
   if (adminSellersSection) adminSellersSection.style.display = tabName === 'sellers' ? 'flex' : 'none';
@@ -6300,6 +6359,7 @@ function setAdminTab(tabName) {
   if (adminAnalyticsSection) adminAnalyticsSection.style.display = tabName === 'analytics' ? 'flex' : 'none';
 
   if (tabName === 'overview') fetchAdminStats();
+  if (tabName === 'users') fetchAdminUsers(adminUsersPage);
   if (tabName === 'sellers') fetchAdminSellers();
   if (tabName === 'sales') fetchAdminSales();
   if (tabName === 'coupons') fetchAdminCoupons();
@@ -7906,18 +7966,320 @@ async function verifyAdminSeller(id, status) {
   }
 }
 
+// ============================================================
+// Admin User Management Logic & API Handlers
+// ============================================================
+let adminUsersPage = 1;
+const adminUsersLimit = 10;
+let adminUsersRoleFilter = 'all';
+let adminUsersSearchQuery = '';
+let adminUsersTotal = 0;
+let adminUsersTotalPages = 1;
+
+async function fetchAdminUsers(page = 1) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  adminUsersPage = page;
+  if (adminUsersTbody) {
+    adminUsersTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 28px; color: var(--color-text-muted);">Loading user accounts...</td></tr>`;
+  }
+
+  try {
+    const queryParams = new URLSearchParams({
+      page: adminUsersPage,
+      limit: adminUsersLimit,
+      role: adminUsersRoleFilter,
+      q: adminUsersSearchQuery
+    });
+
+    const res = await fetch(`${API_BASE_URL}/admin/users?${queryParams.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = await res.json();
+
+    if (res.ok && result.success && Array.isArray(result.data)) {
+      adminUsersTotal = result.total || 0;
+      adminUsersTotalPages = result.totalPages || 1;
+
+      if (adminUsersCountText) {
+        adminUsersCountText.textContent = `Showing ${result.data.length} of ${adminUsersTotal} users (Page ${adminUsersPage} of ${adminUsersTotalPages})`;
+      }
+      if (usersPrevPageBtn) {
+        usersPrevPageBtn.disabled = adminUsersPage <= 1;
+      }
+      if (usersNextPageBtn) {
+        usersNextPageBtn.disabled = adminUsersPage >= adminUsersTotalPages;
+      }
+
+      renderAdminUsersTable(result.data);
+    } else {
+      if (adminUsersTbody) {
+        adminUsersTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color: var(--color-danger);">${escapeHtml(result.message || 'Failed to load users.')}</td></tr>`;
+      }
+    }
+  } catch (err) {
+    if (adminUsersTbody) {
+      adminUsersTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color: var(--color-danger);">Network error fetching user accounts.</td></tr>`;
+    }
+  }
+}
+
+function renderAdminUsersTable(users) {
+  if (!adminUsersTbody) return;
+
+  if (users.length === 0) {
+    adminUsersTbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding: 36px; color: var(--color-text-muted);">
+          No users found matching your search or role filter.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const currentUser = getAuthUser();
+
+  adminUsersTbody.innerHTML = users.map((u) => {
+    const initials = (u.name || 'U').charAt(0).toUpperCase();
+    const role = (u.role || 'customer').toLowerCase();
+    const status = (u.status || 'active').toLowerCase();
+    const isSelf = Boolean(currentUser && (currentUser.id === u._id || currentUser._id === u._id));
+
+    // Role badge
+    let roleBadge = '';
+    if (role === 'admin') {
+      roleBadge = `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem;">🛡️ Admin</span>`;
+    } else if (role === 'seller') {
+      const vStatus = u.sellerDetails?.verificationStatus || 'pending';
+      const isVerified = vStatus === 'verified';
+      roleBadge = `<span class="badge" style="background: rgba(147, 51, 234, 0.12); color: #9333ea; border: 1px solid rgba(147, 51, 234, 0.3); font-weight: 700; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem;">🏪 Seller (${isVerified ? '✅' : '⏳'})</span>`;
+    } else {
+      roleBadge = `<span class="badge" style="background: rgba(100, 116, 139, 0.12); color: #475569; border: 1px solid rgba(100, 116, 139, 0.3); font-weight: 600; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem;">👤 Customer</span>`;
+    }
+
+    // Status badge
+    let statusBadge = '';
+    if (status === 'active') {
+      statusBadge = `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; padding: 3px 8px; border-radius: 999px; font-size: 0.75rem;">Active</span>`;
+    } else if (status === 'suspended') {
+      statusBadge = `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #dc2626; font-weight: 700; padding: 3px 8px; border-radius: 999px; font-size: 0.75rem;">Suspended</span>`;
+    } else {
+      statusBadge = `<span class="badge" style="background: rgba(100, 116, 139, 0.15); color: #64748b; font-weight: 600; padding: 3px 8px; border-radius: 999px; font-size: 0.75rem;">Inactive</span>`;
+    }
+
+    // Date joined
+    const dateFormatted = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }) : '—';
+
+    // Actions
+    let actionBtn = '';
+    if (isSelf) {
+      actionBtn = `<span style="font-size: 0.75rem; color: var(--color-text-muted); font-style: italic;">Current Session</span>`;
+    } else if (status === 'active') {
+      actionBtn = `<button type="button" class="btn btn-secondary btn-sm" style="color: #dc2626; border-color: rgba(239, 68, 68, 0.4); font-size: 0.75rem; padding: 3px 8px;" onclick="toggleAdminUserStatus('${u._id}', 'suspended')">Suspend</button>`;
+    } else {
+      actionBtn = `<button type="button" class="btn btn-secondary btn-sm" style="color: #059669; border-color: rgba(16, 185, 129, 0.4); font-size: 0.75rem; padding: 3px 8px;" onclick="toggleAdminUserStatus('${u._id}', 'active')">Activate</button>`;
+    }
+
+    // Avatar preview
+    const avatarHtml = u.avatar
+      ? `<img src="${escapeHtml(u.avatar)}" alt="" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'; if (this.nextElementSibling) this.nextElementSibling.style.display='flex';" /><div style="display:none; width: 34px; height: 34px; border-radius: 50%; background: var(--color-primary); color:#fff; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem;">${initials}</div>`
+      : `<div style="width: 34px; height: 34px; border-radius: 50%; background: var(--color-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem;">${initials}</div>`;
+
+    return `
+      <tr>
+        <td>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            ${avatarHtml}
+            <div>
+              <strong style="color: var(--color-text-main); font-size: 0.92rem; display: block;">${escapeHtml(u.name || 'User')}</strong>
+              ${u.sellerDetails?.businessName ? `<small style="color: var(--color-primary); font-size: 0.78rem;">🏬 ${escapeHtml(u.sellerDetails.businessName)}</small>` : ''}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="font-weight: 500;">${escapeHtml(u.email)}</div>
+          <div style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px;">📞 ${escapeHtml(u.phone || 'No phone')}</div>
+        </td>
+        <td>${roleBadge}</td>
+        <td>${statusBadge}</td>
+        <td style="font-size: 0.82rem; color: var(--color-text-muted);">${dateFormatted}</td>
+        <td class="text-right">${actionBtn}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function toggleAdminUserStatus(userId, newStatus) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  const actionVerb = newStatus === 'active' ? 'activate' : 'suspend';
+  if (!confirm(`Are you sure you want to ${actionVerb} this user account?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const result = await res.json();
+
+    if (res.ok && result.success) {
+      showToast(result.message || `User status updated to ${newStatus}.`);
+      fetchAdminUsers(adminUsersPage);
+    } else {
+      showToast(result.message || 'Failed to update user status.');
+    }
+  } catch (err) {
+    showToast('Network error updating user status.');
+  }
+}
+
+// ============================================================
+// Become a Seller Modal Handlers
+// ============================================================
+function openBecomeSellerModal() {
+  closeProfileDropdown();
+  const user = getAuthUser();
+  if (!user) {
+    openAuthModal('login', 'Please sign in or create an account to sell on MiniStore.');
+    return;
+  }
+
+  if (user.role === 'seller' || user.role === 'admin') {
+    showToast('You already have access to the Merchant Portal.');
+    window.location.href = 'seller-dashboard.html';
+    return;
+  }
+
+  if (becomeSellerAlert) becomeSellerAlert.style.display = 'none';
+  if (sellerAppContact && user.phone) sellerAppContact.value = user.phone;
+
+  if (becomeSellerModal) {
+    becomeSellerModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeBecomeSellerModal() {
+  if (becomeSellerModal) {
+    closeModalWithAnimation(becomeSellerModal, () => {
+      if (becomeSellerForm) becomeSellerForm.reset();
+      if (becomeSellerAlert) becomeSellerAlert.style.display = 'none';
+    });
+  }
+}
+
+async function handleBecomeSellerSubmit(e) {
+  e.preventDefault();
+  const token = getAuthToken();
+  if (!token) {
+    openAuthModal('login');
+    return;
+  }
+
+  const businessName = sellerAppBusinessName ? sellerAppBusinessName.value.trim() : '';
+  const businessAddress = sellerAppBusinessAddress ? sellerAppBusinessAddress.value.trim() : '';
+  const contact = sellerAppContact ? sellerAppContact.value.trim() : '';
+  const pan = sellerAppPan ? sellerAppPan.value.trim().toUpperCase() : '';
+  const gstin = sellerAppGstin ? sellerAppGstin.value.trim().toUpperCase() : '';
+
+  if (!businessName) {
+    showBecomeSellerAlert('Please enter your registered Business / Brand Name.');
+    return;
+  }
+  if (!businessAddress) {
+    showBecomeSellerAlert('Please enter your business operating address.');
+    return;
+  }
+  if (!contact || contact.length < 10) {
+    showBecomeSellerAlert('Please enter a valid 10-digit business phone number.');
+    return;
+  }
+  if (!pan || pan.length !== 10) {
+    showBecomeSellerAlert('Permanent Account Number (PAN) must be exactly 10 characters.');
+    return;
+  }
+
+  if (sellerAppSubmitBtn) {
+    sellerAppSubmitBtn.disabled = true;
+    sellerAppSubmitBtn.textContent = 'Submitting Application...';
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/become-seller`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        businessName,
+        businessAddress,
+        contactNumber: contact,
+        pan,
+        gstin
+      })
+    });
+    const result = await res.json();
+
+    if (res.ok && result.success && (result.data || result.user)) {
+      const updatedUser = result.data || result.user;
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      updateAuthUI();
+      closeBecomeSellerModal();
+      showToast('🎉 Application submitted! Your merchant profile is now under review. You can visit your Merchant Dashboard.');
+    } else {
+      showBecomeSellerAlert(result.message || 'Failed to submit seller application.');
+    }
+  } catch (err) {
+    showBecomeSellerAlert('Network error submitting application. Please try again.');
+  } finally {
+    if (sellerAppSubmitBtn) {
+      sellerAppSubmitBtn.disabled = false;
+      sellerAppSubmitBtn.textContent = 'Submit Application';
+    }
+  }
+}
+
+function showBecomeSellerAlert(msg) {
+  if (becomeSellerAlert) {
+    becomeSellerAlert.textContent = msg;
+    becomeSellerAlert.style.display = 'block';
+  }
+}
+
 // Expose handlers to global window for inline onclick handlers
 window.copyCouponCodeToClipboard = copyCouponCodeToClipboard;
 window.toggleAdminCoupon = toggleAdminCoupon;
 window.deleteAdminCoupon = deleteAdminCoupon;
 window.verifyAdminSeller = verifyAdminSeller;
+window.toggleAdminUserStatus = toggleAdminUserStatus;
 
 // Event Listeners - Admin Modal Controls
 if (navAdminBtn) navAdminBtn.addEventListener('click', openAdminModal);
 if (adminCloseBtn) adminCloseBtn.addEventListener('click', closeAdminModal);
+window.addEventListener('hashchange', () => {
+  if (window.location.hash === '#admin') {
+    const user = getAuthUser();
+    if (user && user.role === 'admin') {
+      openAdminModal();
+    }
+  }
+});
 if (refreshAdminBtn) {
   refreshAdminBtn.addEventListener('click', () => {
     if (currentAdminTab === 'overview') fetchAdminStats();
+    if (currentAdminTab === 'users') fetchAdminUsers(adminUsersPage);
     if (currentAdminTab === 'sellers') fetchAdminSellers();
     if (currentAdminTab === 'sales') fetchAdminSales();
     if (currentAdminTab === 'products') fetchAdminProducts();
@@ -7930,6 +8292,54 @@ if (refreshAdminBtn) {
 }
 
 if (adminTabOverview) adminTabOverview.addEventListener('click', () => setAdminTab('overview'));
+if (adminTabUsers) adminTabUsers.addEventListener('click', () => setAdminTab('users'));
+if (cardOverviewUsers) cardOverviewUsers.addEventListener('click', () => setAdminTab('users'));
+if (refreshUsersBtn) refreshUsersBtn.addEventListener('click', () => fetchAdminUsers(adminUsersPage));
+
+if (usersPrevPageBtn) {
+  usersPrevPageBtn.addEventListener('click', () => {
+    if (adminUsersPage > 1) fetchAdminUsers(adminUsersPage - 1);
+  });
+}
+if (usersNextPageBtn) {
+  usersNextPageBtn.addEventListener('click', () => {
+    if (adminUsersPage < adminUsersTotalPages) fetchAdminUsers(adminUsersPage + 1);
+  });
+}
+
+// Role filter pills listener for users
+document.querySelectorAll('#user-role-filter-pills .filter-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#user-role-filter-pills .filter-pill').forEach(p => p.classList.remove('is-active'));
+    pill.classList.add('is-active');
+    adminUsersRoleFilter = pill.getAttribute('data-user-role') || 'all';
+    fetchAdminUsers(1);
+  });
+});
+
+// Search input listener for admin users
+let adminUsersSearchDebounce = null;
+if (adminUsersSearch) {
+  adminUsersSearch.addEventListener('input', (e) => {
+    clearTimeout(adminUsersSearchDebounce);
+    adminUsersSearchDebounce = setTimeout(() => {
+      adminUsersSearchQuery = e.target.value.trim();
+      fetchAdminUsers(1);
+    }, 300);
+  });
+}
+
+// Become Seller Event Listeners
+if (btnOpenBecomeSeller) btnOpenBecomeSeller.addEventListener('click', openBecomeSellerModal);
+if (footerBecomeSellerBtn) footerBecomeSellerBtn.addEventListener('click', openBecomeSellerModal);
+if (becomeSellerCloseBtn) becomeSellerCloseBtn.addEventListener('click', closeBecomeSellerModal);
+if (becomeSellerCancelBtn) becomeSellerCancelBtn.addEventListener('click', closeBecomeSellerModal);
+if (becomeSellerForm) becomeSellerForm.addEventListener('submit', handleBecomeSellerSubmit);
+if (becomeSellerModal) {
+  becomeSellerModal.addEventListener('click', (e) => {
+    if (e.target === becomeSellerModal) closeBecomeSellerModal();
+  });
+}
 if (adminTabSellers) adminTabSellers.addEventListener('click', () => setAdminTab('sellers'));
 if (cardPendingMerchants) cardPendingMerchants.addEventListener('click', () => setAdminTab('sellers'));
 if (cardOverviewProducts) cardOverviewProducts.addEventListener('click', () => setAdminTab('products'));

@@ -1294,6 +1294,7 @@
         <button type="button" class="admin-tab" id="admin-tab-orders">📋 Orders <span class="admin-badge-count" id="admin-pending-orders-count" style="display: none;">0</span></button>
         <button type="button" class="admin-tab" id="admin-tab-reviews">⭐ Reviews</button>
         <button type="button" class="admin-tab" id="admin-tab-analytics">📈 Analytics</button>
+        <button type="button" class="admin-tab" id="admin-tab-users">👥 Users</button>
       </div>
 
       <!-- Admin Alert / Status Box -->
@@ -2018,6 +2019,61 @@
           </table>
         </div>
       </div>
+
+      <!-- Section: User Account Management (Admin) -->
+      <section class="admin-section" id="admin-users-section" style="display: none;">
+        <div class="admin-subhead">
+          <div>
+            <h3 class="admin-subtitle">User Account Management</h3>
+            <p class="admin-subdesc">Browse, search, and manage registered customers, sellers, and system administrators.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="refresh-users-btn" title="Refresh user list">↻ Refresh</button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="admin-filter-bar" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center;">
+          <div class="filter-pill-group" id="user-role-filter-pills">
+            <button type="button" class="filter-pill is-active" data-user-role="all">All Users</button>
+            <button type="button" class="filter-pill" data-user-role="customer">👤 Customers</button>
+            <button type="button" class="filter-pill" data-user-role="seller">🏪 Sellers</button>
+            <button type="button" class="filter-pill" data-user-role="admin">🛡️ Admins</button>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex: 1; max-width: 340px;">
+            <input type="text" id="admin-users-search" class="form-input form-input-sm" placeholder="🔍 Search name, email, phone..." style="width: 100%;" />
+          </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-users-table">
+            <thead>
+              <tr>
+                <th>User &amp; Avatar</th>
+                <th>Email &amp; Contact</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Date Joined</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Users Pagination -->
+        <div id="admin-users-pagination" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; font-size: 0.85rem; color: var(--color-text-muted);">
+          <span id="admin-users-count-text">Showing 0 users</span>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="users-prev-page-btn" disabled>← Previous</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="users-next-page-btn" disabled>Next →</button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
@@ -2264,6 +2320,20 @@
           </div>
         </form>
 
+        <!-- Become a Seller Banner (Visible for customers) -->
+        <div class="profile-become-seller-card" id="profile-become-seller-card" style="display: none; margin-top: 20px; padding: 18px 20px; border-radius: 12px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.08)); border: 1px solid rgba(37, 99, 235, 0.2); justify-content: space-between; align-items: center; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 2rem;">🏪</span>
+            <div>
+              <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: var(--color-text-main);">Sell on MiniStore</h4>
+              <p style="margin: 0; font-size: 0.85rem; color: var(--color-text-muted);">Expand your business. List products and receive direct payouts with 0% setup fees.</p>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-open-become-seller" style="white-space: nowrap;">
+            Become a Seller
+          </button>
+        </div>
+
         <!-- Dedicated Seller Business Details Card (Visible only for Seller accounts) -->
         <div class="profile-seller-card" id="profile-seller-card" style="display: none;">
           <div class="profile-seller-header">
@@ -2340,6 +2410,62 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Become a Seller / Merchant Application Modal -->
+  <div class="modal-backdrop" id="become-seller-modal" style="display: none;" role="dialog" aria-modal="true"
+    aria-labelledby="become-seller-modal-title">
+    <div class="modal-container profile-modal-container" style="max-width: 560px;">
+      <button class="modal-close-icon" id="become-seller-close-btn" aria-label="Close become seller dialog">✕</button>
+
+      <div class="profile-modal-header">
+        <span class="info-header-badge badge-indigo">🏪 Merchant Program</span>
+        <h2 class="profile-modal-title" id="become-seller-modal-title">Sell on MiniStore</h2>
+        <p class="profile-modal-subtitle">Register your business details to unlock vendor catalog and dispatch privileges.</p>
+      </div>
+
+      <div id="become-seller-alert" class="auth-error-alert" style="display: none;"></div>
+
+      <form id="become-seller-form" class="profile-form">
+        <div class="form-group">
+          <label for="seller-app-business-name" class="form-label">Business / Brand Name <span style="color: var(--color-danger);">*</span></label>
+          <input type="text" id="seller-app-business-name" class="form-input" placeholder="e.g. Apex Electronics Ltd" required />
+        </div>
+
+        <div class="form-group">
+          <label for="seller-app-business-address" class="form-label">Registered Business Address <span style="color: var(--color-danger);">*</span></label>
+          <textarea id="seller-app-business-address" class="form-input" rows="2" placeholder="Full registered company / store address" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="seller-app-contact" class="form-label">Business Contact / Phone <span style="color: var(--color-danger);">*</span></label>
+          <input type="tel" id="seller-app-contact" class="form-input" placeholder="+91 98765 43210" required />
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="seller-app-pan" class="form-label">Business PAN <span style="color: var(--color-danger);">*</span></label>
+            <input type="text" id="seller-app-pan" class="form-input font-mono" placeholder="ABCDE1234F" maxlength="10" style="text-transform: uppercase;" required />
+          </div>
+
+          <div class="form-group">
+            <label for="seller-app-gstin" class="form-label">GSTIN <span style="font-size: 0.75rem; color: var(--color-text-muted);">(Optional)</span></label>
+            <input type="text" id="seller-app-gstin" class="form-input font-mono" placeholder="22AAAAA0000A1Z5" maxlength="15" style="text-transform: uppercase;" />
+          </div>
+        </div>
+
+        <div style="background: var(--color-bg); padding: 12px 14px; border-radius: 8px; font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 16px;">
+          ℹ️ Your application will be reviewed by MiniStore administrators. Once verified, you will be able to add products, dispatch orders, and track payouts.
+        </div>
+
+        <div class="profile-modal-actions">
+          <button type="submit" class="btn btn-primary" id="seller-app-submit-btn">
+            Submit Application
+          </button>
+          <button type="button" class="btn btn-secondary" id="become-seller-cancel-btn">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -3252,8 +3378,8 @@
           <li><button type="button" class="footer-link-btn" id="footer-shipping-btn">Shipping &amp; Delivery</button>
           </li>
           <li><button type="button" class="footer-link-btn" id="footer-returns-btn">7-Day Easy Returns</button></li>
-          <li><button type="button" class="footer-link-btn" id="footer-reviews-btn">Verified Customer Reviews</button>
-          </li>
+          <li><button type="button" class="footer-link-btn" id="footer-reviews-btn">Verified Customer Reviews</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-become-seller-btn" style="color: var(--color-primary); font-weight: 600;">🏪 Sell on MiniStore</button></li>
         </ul>
       </div>
       <div class="footer-col">

@@ -16,25 +16,42 @@ router.use(sellerOrAdminMiddleware);
 
 // ============================================================================
 // 1. GET /api/seller/overview
-// Aggregate KPI metrics and recent orders for authenticated merchant
+// Aggregate KPI metrics and recent orders for authenticated merchant or admin platform overview
 // ============================================================================
 router.get('/overview', async (req, res) => {
   try {
-    const sellerId = req.user.id;
+    const isAdmin = req.sellerUser && req.sellerUser.role === 'admin';
+    const querySellerId = req.query.sellerId;
+    const targetSellerId = (isAdmin && querySellerId && querySellerId !== 'all')
+      ? querySellerId
+      : (isAdmin && (!querySellerId || querySellerId === 'all') ? null : req.user.id);
 
-    // Fetch all products listed by this seller
-    const products = await Product.find({ seller: sellerId });
-    const productIds = products.map((p) => p._id.toString());
-    const activeProducts = products.length;
-    const lowStockCount = products.filter((p) => p.stock < 5).length;
+    let products;
+    let productIds;
+    let activeProducts;
+    let lowStockCount;
+    let orders;
 
-    // Fetch orders containing this seller's products
-    const orders = await Order.find({
-      $or: [
-        { 'items.seller': sellerId },
-        { 'items.product': { $in: products.map((p) => p._id) } }
-      ]
-    }).sort({ createdAt: -1 });
+    if (isAdmin && !targetSellerId) {
+      // Platform-wide overview for administrator
+      products = await Product.find();
+      productIds = products.map((p) => p._id.toString());
+      activeProducts = products.length;
+      lowStockCount = products.filter((p) => p.stock < 5).length;
+      orders = await Order.find().sort({ createdAt: -1 });
+    } else {
+      // Isolated merchant overview
+      products = await Product.find({ seller: targetSellerId });
+      productIds = products.map((p) => p._id.toString());
+      activeProducts = products.length;
+      lowStockCount = products.filter((p) => p.stock < 5).length;
+      orders = await Order.find({
+        $or: [
+          { 'items.seller': targetSellerId },
+          { 'items.product': { $in: products.map((p) => p._id) } }
+        ]
+      }).sort({ createdAt: -1 });
+    }
 
     let totalRevenue = 0;
     let totalUnitsSold = 0;
@@ -45,8 +62,9 @@ router.get('/overview', async (req, res) => {
     for (const order of orders) {
       const isCancelled = order.status === 'Cancelled';
 
-      // Sliced items belonging strictly to this seller
+      // Sliced items belonging strictly to this seller (or all items if admin platform view)
       const sellerItems = (order.items || []).filter((item) => {
+        if (isAdmin && !targetSellerId) return true;
         const itemSeller = item.seller ? item.seller.toString() : null;
         const itemProd = item.product
           ? item.product._id
@@ -54,15 +72,17 @@ router.get('/overview', async (req, res) => {
             : item.product.toString()
           : null;
         return (
-          itemSeller === sellerId.toString() ||
+          itemSeller === targetSellerId.toString() ||
           (itemProd && productIds.includes(itemProd))
         );
       });
 
-      const orderSellerTotal = sellerItems.reduce(
-        (sum, it) => sum + (it.price || 0) * (it.quantity || 1),
-        0
-      );
+      const orderSellerTotal = (isAdmin && !targetSellerId)
+        ? (order.totalAmount || order.total || sellerItems.reduce((sum, it) => sum + (it.price || 0) * (it.quantity || 1), 0))
+        : sellerItems.reduce(
+            (sum, it) => sum + (it.price || 0) * (it.quantity || 1),
+            0
+          );
 
       if (!isCancelled) {
         totalRevenue += orderSellerTotal;
@@ -98,6 +118,7 @@ router.get('/overview', async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
+        isPlatformOverview: Boolean(isAdmin && !targetSellerId),
         metrics: {
           totalRevenue: Math.round(totalRevenue * 100) / 100,
           totalUnitsSold,
@@ -142,7 +163,10 @@ router.get('/products', async (req, res) => {
 
     // Multi-tenant check: non-admin can only view their own products
     const isAdmin = req.sellerUser && req.sellerUser.role === 'admin';
-    if (!isAdmin || req.query.mine === 'true') {
+    const querySellerId = req.query.sellerId;
+    if (isAdmin && querySellerId && querySellerId !== 'all') {
+      filter.seller = querySellerId;
+    } else if (!isAdmin || req.query.mine === 'true') {
       filter.seller = req.user.id;
     }
 
@@ -453,19 +477,30 @@ router.delete('/products/:id', async (req, res) => {
 // ============================================================================
 router.get('/orders', async (req, res) => {
   try {
-    const sellerId = req.user.id;
+    const isAdmin = req.sellerUser && req.sellerUser.role === 'admin';
+    const querySellerId = req.query.sellerId;
+    const targetSellerId = (isAdmin && querySellerId && querySellerId !== 'all')
+      ? querySellerId
+      : (isAdmin && (!querySellerId || querySellerId === 'all') ? null : req.user.id);
 
-    // Retrieve all products owned by this seller
-    const sellerProducts = await Product.find({ seller: sellerId }).select('_id');
-    const sellerProductIds = sellerProducts.map((p) => p._id.toString());
+    let orders;
+    let sellerProductIds = [];
 
-    // Find orders containing this seller's items
-    const orders = await Order.find({
-      $or: [
-        { 'items.seller': sellerId },
-        { 'items.product': { $in: sellerProducts.map((p) => p._id) } }
-      ]
-    }).sort({ createdAt: -1 });
+    if (isAdmin && !targetSellerId) {
+      orders = await Order.find().sort({ createdAt: -1 });
+    } else {
+      // Retrieve all products owned by this seller
+      const sellerProducts = await Product.find({ seller: targetSellerId }).select('_id');
+      sellerProductIds = sellerProducts.map((p) => p._id.toString());
+
+      // Find orders containing this seller's items
+      orders = await Order.find({
+        $or: [
+          { 'items.seller': targetSellerId },
+          { 'items.product': { $in: sellerProducts.map((p) => p._id) } }
+        ]
+      }).sort({ createdAt: -1 });
+    }
 
     // Multi-tenant Privacy Slicing:
     // Strip out all other sellers' products so Seller A never sees Seller B's items
@@ -473,6 +508,7 @@ router.get('/orders', async (req, res) => {
       const orderObj = order.toObject ? order.toObject() : { ...order };
 
       const sellerItems = (orderObj.items || []).filter((item) => {
+        if (isAdmin && !targetSellerId) return true;
         const itemSellerId = item.seller ? item.seller.toString() : null;
         const itemProdId = item.product
           ? item.product._id
@@ -480,15 +516,17 @@ router.get('/orders', async (req, res) => {
             : item.product.toString()
           : null;
         return (
-          itemSellerId === sellerId.toString() ||
+          itemSellerId === targetSellerId.toString() ||
           (itemProdId && sellerProductIds.includes(itemProdId))
         );
       });
 
-      const sellerOrderTotal = sellerItems.reduce(
-        (sum, it) => sum + (it.price || 0) * (it.quantity || 1),
-        0
-      );
+      const sellerOrderTotal = (isAdmin && !targetSellerId)
+        ? (orderObj.totalAmount || orderObj.total || sellerItems.reduce((sum, it) => sum + (it.price || 0) * (it.quantity || 1), 0))
+        : sellerItems.reduce(
+            (sum, it) => sum + (it.price || 0) * (it.quantity || 1),
+            0
+          );
 
       return {
         _id: orderObj._id,

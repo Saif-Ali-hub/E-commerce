@@ -147,10 +147,30 @@
 
                 <!-- 3. Return to Home -->
                 <a href="index.html" class="dropdown-item" role="menuitem">
+                  <span class="dropdown-item-icon">🏠</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Storefront Home</span>
+                    <span class="dropdown-item-desc">Browse store homepage</span>
+                  </div>
+                </a>
+
+                <!-- 4. Admin Dashboard (Shown for admin only) -->
+                <a href="index.html#admin" class="dropdown-item" id="nav-admin-btn" role="menuitem" style="display: none; text-decoration: none;"
+                  aria-label="Admin Dashboard">
+                  <span class="dropdown-item-icon">🛡️</span>
+                  <div class="dropdown-item-text">
+                    <span class="dropdown-item-title">Admin Dashboard</span>
+                    <span class="dropdown-item-desc">Store statistics &amp; controls</span>
+                  </div>
+                </a>
+
+                <!-- 5. Merchant Dashboard (Shown for sellers & admin) -->
+                <a href="seller-dashboard.html" class="dropdown-item" id="nav-seller-btn" role="menuitem" style="display: none; text-decoration: none;"
+                  aria-label="Merchant Dashboard">
                   <span class="dropdown-item-icon">🏪</span>
                   <div class="dropdown-item-text">
-                    <span class="dropdown-item-title">All Categories</span>
-                    <span class="dropdown-item-desc">Browse store homepage</span>
+                    <span class="dropdown-item-title">Merchant Dashboard</span>
+                    <span class="dropdown-item-desc">Manage products, orders &amp; payouts</span>
                   </div>
                 </a>
               </div>

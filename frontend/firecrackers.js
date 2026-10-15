@@ -1,165 +1,309 @@
 /**
- * MiniStore Festive Firecrackers Background Engine
- * High-performance, luminous HTML5 canvas firecrackers blasting animation.
+ * MiniStore Festive Firecrackers Background Engine - Radiant Starburst Edition
+ * High-performance, luminous 60 FPS HTML5 Canvas sky rocket firecrackers background animation.
+ * Features:
+ *  - Soaring sky rockets with glowing propulsion streaks and spark exhaust
+ *  - Apogee deceleration (top 20% to 40% of banner) and dramatic detonation
+ *  - Saturated 70-90 needle ray radial starbursts (chrysanthemum / peony style)
+ *  - Incandescent central nucleus with cross-flare and sparkling star beads at ray tips
+ *  - Saturated festive palettes (Electric Cyan, Golden Sunburst, Ruby Crimson, Royal Sapphire, Electric Violet)
+ *  - Continuous 3-second celebration cadence with 250-400ms offset tandem companion bursts
+ *  - Interactive click-to-blast anywhere on the banner
+ *  - Retina / HiDPI 2x capping with zero layout thrashing on resize
+ *  - IntersectionObserver loop pause & prefers-reduced-motion compliance
+ *  - Robust hexToRgba color parsing preventing canvas addColorStop crashes
  * File: frontend/firecrackers.js
  */
 
 (function (window, document) {
   'use strict';
 
-  // Festive color palettes (Radiant Saffron, Shimmering Gold, Ruby Crimson, Emerald, Royal Violet, Electric Cyan, Diamond White)
-  const FESTIVE_PALETTES = [
-    { name: 'Saffron & Gold', colors: ['#f59e0b', '#fbbf24', '#fde047', '#ff7800', '#ffffff'] },
-    { name: 'Ruby & Rose', colors: ['#ef4444', '#f43f5e', '#fb7185', '#fda4af', '#fef08a'] },
-    { name: 'Emerald & Mint', colors: ['#10b981', '#34d399', '#6ee7b7', '#fde047', '#ffffff'] },
-    { name: 'Royal Purple & Cyan', colors: ['#8b5cf6', '#a855f7', '#06b6d4', '#38bdf8', '#fef08a'] },
-    { name: 'Golden Brocade', colors: ['#fbbf24', '#f59e0b', '#d97706', '#fef08a', '#ffffff'] },
-    { name: 'Carnival Rainbow', colors: ['#ff4444', '#ffbb00', '#00e676', '#00e5ff', '#d500f9', '#ffffff'] }
-  ];
+  // Helper for safe, crash-proof RGBA parsing in canvas gradients & strokes
+  function hexToRgba(hex, alpha = 1) {
+    if (!hex || typeof hex !== 'string') return `rgba(255, 255, 255, ${alpha})`;
+    let clean = hex.replace('#', '').trim();
+    if (clean.length === 3) {
+      clean = clean.split('').map(c => c + c).join('');
+    }
+    if (clean.length !== 6) return `rgba(255, 255, 255, ${alpha})`;
+    const r = parseInt(clean.substring(0, 2), 16) || 0;
+    const g = parseInt(clean.substring(2, 4), 16) || 0;
+    const b = parseInt(clean.substring(4, 6), 16) || 0;
+    return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
+  }
 
   function randomRange(min, max) {
     return Math.random() * (max - min) + min;
   }
 
-  function randomColor(palette) {
-    const p = palette || FESTIVE_PALETTES[Math.floor(Math.random() * FESTIVE_PALETTES.length)];
-    return p.colors[Math.floor(Math.random() * p.colors.length)];
-  }
-
-  // Flash flare at detonation
-  class Flash {
-    constructor(x, y, radius, color) {
-      this.x = x;
-      this.y = y;
-      this.radius = radius;
-      this.color = color;
-      this.alpha = 0.45;
-      this.decay = 0.08;
+  // Five vibrant saturated festive palettes matching high-end celebration fireworks
+  const STARBURST_THEMES = [
+    {
+      name: 'Electric Cyan',
+      core: '#ffffff',
+      glow: '#00e5ff',
+      colors: ['#00e5ff', '#38bdf8', '#7dd3fc', '#0284c7', '#ffffff'],
+      streak: '#00e5ff'
+    },
+    {
+      name: 'Golden Sunburst',
+      core: '#ffffff',
+      glow: '#fbbf24',
+      colors: ['#fbbf24', '#f59e0b', '#fde047', '#ff7800', '#ffffff'],
+      streak: '#f59e0b'
+    },
+    {
+      name: 'Ruby Crimson',
+      core: '#ffffff',
+      glow: '#ff2a55',
+      colors: ['#ff2a55', '#f43f5e', '#fb7185', '#fda4af', '#ffffff'],
+      streak: '#ff2a55'
+    },
+    {
+      name: 'Royal Sapphire',
+      core: '#ffffff',
+      glow: '#3b82f6',
+      colors: ['#3b82f6', '#2563eb', '#60a5fa', '#93c5fd', '#ffffff'],
+      streak: '#38bdf8'
+    },
+    {
+      name: 'Electric Violet',
+      core: '#ffffff',
+      glow: '#a855f7',
+      colors: ['#a855f7', '#c084fc', '#e879f9', '#d946ef', '#ffffff'],
+      streak: '#c084fc'
     }
+  ];
 
-    update() {
-      this.alpha -= this.decay;
-      return this.alpha > 0;
-    }
-
-    draw(ctx) {
-      if (this.alpha <= 0) return;
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-      grad.addColorStop(0, `rgba(255, 255, 255, ${this.alpha * 0.9})`);
-      grad.addColorStop(0.3, this.color.replace(')', `, ${this.alpha * 0.6})`).replace('rgb', 'rgba').replace('#', 'rgba('));
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  // Single explosive firecracker spark particle
-  class Particle {
-    constructor(x, y, color, vx, vy, options = {}) {
-      this.x = x;
-      this.y = y;
-      this.color = color;
-      this.vx = vx;
-      this.vy = vy;
-      this.friction = options.friction || 0.965;
-      this.gravity = options.gravity !== undefined ? options.gravity : 0.08;
+  // Individual radiant needle spoke of the starburst explosion
+  class StarburstSpoke {
+    constructor(originX, originY, angle, maxRadius, theme, options = {}) {
+      this.originX = originX;
+      this.originY = originY;
+      this.angle = angle;
+      this.maxRadius = maxRadius;
+      this.speed = options.speed || randomRange(4.8, 7.8);
+      this.friction = options.friction || 0.948;
+      this.vx = Math.cos(angle) * this.speed;
+      this.vy = Math.sin(angle) * this.speed;
+      this.tipX = originX;
+      this.tipY = originY;
+      this.tailX = originX;
+      this.tailY = originY;
+      this.gravity = options.gravity || 0.042;
+      this.color = theme.colors[Math.floor(Math.random() * theme.colors.length)];
+      this.glowColor = theme.glow;
       this.alpha = 1;
-      this.decay = options.decay || randomRange(0.012, 0.024);
-      this.size = options.size || randomRange(2, 3.5);
-      this.flicker = options.flicker || Math.random() > 0.3;
-      this.history = [];
-      this.maxHistory = options.trailLength || 4;
-      this.secondary = options.secondary || false;
-      this.hasPopped = false;
+      this.decay = options.decay || randomRange(0.012, 0.021);
+      this.spokeLengthRatio = options.spokeLengthRatio || randomRange(0.70, 0.95);
+      this.tipSize = options.tipSize || randomRange(2.2, 3.6);
+      this.lineWidth = options.lineWidth || randomRange(1.6, 2.6);
+      this.sparkle = Math.random() > 0.28;
     }
 
     update() {
-      this.history.push({ x: this.x, y: this.y, alpha: this.alpha });
-      if (this.history.length > this.maxHistory) {
-        this.history.shift();
-      }
-
       this.vx *= this.friction;
       this.vy *= this.friction;
       this.vy += this.gravity;
 
-      this.x += this.vx;
-      this.y += this.vy;
+      this.tipX += this.vx;
+      this.tipY += this.vy;
+
+      const dist = Math.hypot(this.tipX - this.originX, this.tipY - this.originY);
+      const tailDist = Math.max(0, dist * (1 - this.spokeLengthRatio));
+      const angle = Math.atan2(this.tipY - this.originY, this.tipX - this.originX);
+
+      this.tailX = this.originX + Math.cos(angle) * tailDist;
+      this.tailY = this.originY + Math.sin(angle) * tailDist;
 
       this.alpha -= this.decay;
-      this.size = Math.max(0.6, this.size * 0.992);
-
       return this.alpha > 0;
     }
 
     draw(ctx) {
       if (this.alpha <= 0) return;
 
-      const currentAlpha = this.flicker && this.alpha < 0.6
-        ? this.alpha * (0.6 + Math.random() * 0.5)
+      const currentAlpha = this.sparkle && this.alpha < 0.72
+        ? this.alpha * (0.65 + Math.random() * 0.6)
         : this.alpha;
 
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
 
-      // Draw luminous motion trail
-      if (this.history.length > 1) {
-        ctx.beginPath();
-        ctx.moveTo(this.history[0].x, this.history[0].y);
-        for (let i = 1; i < this.history.length; i++) {
-          ctx.lineTo(this.history[i].x, this.history[i].y);
-        }
-        ctx.lineTo(this.x, this.y);
-        ctx.strokeStyle = this.color;
-        ctx.globalAlpha = Math.max(0, currentAlpha * 0.65);
-        ctx.lineWidth = Math.max(1, this.size * 0.85);
-        ctx.lineCap = 'round';
-        ctx.stroke();
-      }
-
-      // Draw particle glowing head
+      // Outer color needle ray
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.moveTo(this.tailX, this.tailY);
+      ctx.lineTo(this.tipX, this.tipY);
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = this.lineWidth;
+      ctx.lineCap = 'round';
+      ctx.globalAlpha = Math.max(0, currentAlpha * 0.88);
+      ctx.stroke();
+
+      // Inner white beam core
+      ctx.beginPath();
+      ctx.moveTo(this.tailX, this.tailY);
+      ctx.lineTo(this.tipX, this.tipY);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(0.8, this.lineWidth * 0.45);
+      ctx.globalAlpha = Math.min(1, currentAlpha * 1.15);
+      ctx.stroke();
+
+      // Glowing star tip bead
+      ctx.beginPath();
+      ctx.arc(this.tipX, this.tipY, this.tipSize, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
-      ctx.globalAlpha = currentAlpha;
+      ctx.globalAlpha = Math.max(0, currentAlpha * 0.95);
       ctx.fill();
 
-      // Diamond sparkle center
-      if (this.size > 2) {
+      // White diamond highlight at tip
+      ctx.beginPath();
+      ctx.arc(this.tipX, this.tipY, this.tipSize * 0.48, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = Math.min(1, currentAlpha * 1.3);
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  // Intense Incandescent Nucleus with Cross-Star Flare
+  class StarburstCore {
+    constructor(x, y, maxRadius, theme) {
+      this.x = x;
+      this.y = y;
+      this.radius = 4;
+      this.maxRadius = maxRadius || randomRange(45, 72);
+      this.theme = theme;
+      this.alpha = 1;
+      this.decay = 0.040;
+    }
+
+    update() {
+      this.radius += (this.maxRadius - this.radius) * 0.20;
+      this.alpha -= this.decay;
+      return this.alpha > 0;
+    }
+
+    draw(ctx) {
+      if (this.alpha <= 0) return;
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+
+      const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${this.alpha})`);
+      grad.addColorStop(0.22, `rgba(255, 245, 190, ${this.alpha * 0.92})`);
+      grad.addColorStop(0.58, hexToRgba(this.theme.glow, this.alpha * 0.65));
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cross-star flare radiating through detonation center
+      if (this.alpha > 0.25) {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.6;
+        ctx.globalAlpha = this.alpha * 0.9;
+        const flareLen = this.radius * 0.8;
+
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.45, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.globalAlpha = Math.min(1, currentAlpha * 1.2);
-        ctx.fill();
+        ctx.moveTo(this.x - flareLen, this.y);
+        ctx.lineTo(this.x + flareLen, this.y);
+        ctx.moveTo(this.x, this.y - flareLen);
+        ctx.lineTo(this.x, this.y + flareLen);
+        ctx.stroke();
       }
 
       ctx.restore();
     }
   }
 
-  // Rising rocket shell
-  class Rocket {
-    constructor(startX, startY, targetX, targetY, palette, onDetonate) {
+  // Complete Radial Starburst Firework Explosion (70–90 radiant needle rays)
+  class RadialStarburstExplosion {
+    constructor(x, y, theme, burstRadius) {
+      this.x = x;
+      this.y = y;
+      this.theme = theme;
+      this.radius = burstRadius || randomRange(110, 175);
+      this.core = new StarburstCore(x, y, this.radius * 0.44, theme);
+      this.spokes = [];
+      this.isAlive = true;
+
+      this.initSpokes();
+    }
+
+    initSpokes() {
+      const spokeCount = Math.floor(randomRange(72, 90));
+      for (let i = 0; i < spokeCount; i++) {
+        const angle = (Math.PI * 2 * i) / spokeCount + randomRange(-0.025, 0.025);
+        const maxRad = this.radius * randomRange(0.78, 1.15);
+        const speed = randomRange(4.8, 8.2);
+
+        this.spokes.push(new StarburstSpoke(this.x, this.y, angle, maxRad, this.theme, {
+          speed,
+          decay: randomRange(0.012, 0.021),
+          tipSize: randomRange(2.2, 3.6),
+          lineWidth: randomRange(1.6, 2.5)
+        }));
+      }
+
+      // Shorter secondary inner ring
+      const innerCount = Math.floor(spokeCount * 0.35);
+      for (let i = 0; i < innerCount; i++) {
+        const angle = randomRange(0, Math.PI * 2);
+        this.spokes.push(new StarburstSpoke(this.x, this.y, angle, this.radius * 0.52, this.theme, {
+          speed: randomRange(2.5, 4.5),
+          decay: randomRange(0.018, 0.028),
+          tipSize: randomRange(1.6, 2.4),
+          lineWidth: 1.3
+        }));
+      }
+    }
+
+    update() {
+      let coreAlive = this.core ? this.core.update() : false;
+      if (!coreAlive) this.core = null;
+
+      for (let i = this.spokes.length - 1; i >= 0; i--) {
+        if (!this.spokes[i].update()) {
+          this.spokes.splice(i, 1);
+        }
+      }
+
+      this.isAlive = Boolean(this.core || this.spokes.length > 0);
+      return this.isAlive;
+    }
+
+    draw(ctx) {
+      if (this.core) {
+        this.core.draw(ctx);
+      }
+      for (let i = 0; i < this.spokes.length; i++) {
+        this.spokes[i].draw(ctx);
+      }
+    }
+  }
+
+  // Soaring Ascending Sky Rocket with radiant vertical light streak & spark plume
+  class SkyRocket {
+    constructor(startX, startY, targetX, targetY, theme, onDetonate) {
       this.x = startX;
       this.y = startY;
       this.targetX = targetX;
       this.targetY = targetY;
-      this.palette = palette;
+      this.theme = theme;
       this.onDetonate = onDetonate;
 
       const angle = Math.atan2(targetY - startY, targetX - startX);
       const distance = Math.hypot(targetX - startX, targetY - startY);
-      const speed = Math.min(9.5, Math.max(6, distance * 0.024));
+      const speed = Math.min(12, Math.max(8.5, distance * 0.032));
 
       this.vx = Math.cos(angle) * speed;
       this.vy = Math.sin(angle) * speed;
       this.history = [];
-      this.maxHistory = 6;
+      this.maxHistory = 14;
       this.sparks = [];
     }
 
@@ -172,29 +316,34 @@
       this.x += this.vx;
       this.y += this.vy;
 
-      // Rocket decelerates slightly near its apogee
+      // Rocket decelerates smoothly as it nears its apogee
       this.vy *= 0.985;
+      this.vx *= 0.99;
 
-      // Emit rising tail sparks
-      if (Math.random() > 0.25) {
-        this.sparks.push(new Particle(
-          this.x + randomRange(-1.5, 1.5),
-          this.y + randomRange(0, 4),
-          Math.random() > 0.5 ? '#f59e0b' : '#fef08a',
-          randomRange(-0.8, 0.8),
-          randomRange(0.5, 2),
-          { decay: 0.07, size: 1.5, gravity: 0.04, trailLength: 2 }
-        ));
+      // Drop fiery propulsion sparks
+      if (Math.random() > 0.18) {
+        this.sparks.push({
+          x: this.x + randomRange(-1.5, 1.5),
+          y: this.y + randomRange(4, 8),
+          vx: randomRange(-0.8, 0.8),
+          vy: randomRange(1.5, 3.5),
+          alpha: 1,
+          size: randomRange(1.8, 2.8),
+          color: Math.random() > 0.45 ? this.theme.streak : '#ffffff'
+        });
       }
 
-      // Update tail sparks
       for (let i = this.sparks.length - 1; i >= 0; i--) {
-        if (!this.sparks[i].update()) {
+        const s = this.sparks[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.alpha -= 0.068;
+        if (s.alpha <= 0) {
           this.sparks.splice(i, 1);
         }
       }
 
-      // Detonate if reached target Y or velocity has flipped downward
+      // Detonate once reaching the apogee
       if (this.y <= this.targetY || this.vy >= -0.5) {
         this.detonate();
         return false;
@@ -205,36 +354,61 @@
 
     detonate() {
       if (this.onDetonate) {
-        this.onDetonate(this.x, this.y, this.palette);
+        this.onDetonate(this.x, this.y, this.theme);
       }
     }
 
     draw(ctx) {
-      // Draw rising tail sparks
-      for (const spark of this.sparks) {
-        spark.draw(ctx);
+      // 1. Draw propulsion sparks
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < this.sparks.length; i++) {
+        const s = this.sparks[i];
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = Math.max(0, s.alpha);
+        ctx.fill();
       }
+      ctx.restore();
 
-      // Draw rocket head & streak
+      // 2. Draw vertical rocket streak
       if (this.history.length > 1) {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
+
+        // Outer glow
         ctx.beginPath();
         ctx.moveTo(this.history[0].x, this.history[0].y);
         for (let i = 1; i < this.history.length; i++) {
           ctx.lineTo(this.history[i].x, this.history[i].y);
         }
         ctx.lineTo(this.x, this.y);
-        ctx.strokeStyle = '#fef08a';
-        ctx.lineWidth = 2.2;
-        ctx.globalAlpha = 0.85;
+        ctx.strokeStyle = this.theme.glow;
+        ctx.lineWidth = 4.5;
+        ctx.globalAlpha = 0.65;
+        ctx.lineCap = 'round';
         ctx.stroke();
 
+        // Inner white streak
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+        ctx.moveTo(this.history[0].x, this.history[0].y);
+        for (let i = 1; i < this.history.length; i++) {
+          ctx.lineTo(this.history[i].x, this.history[i].y);
+        }
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.8;
+        ctx.globalAlpha = 0.95;
+        ctx.stroke();
+
+        // Warhead tip
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3.8, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.globalAlpha = 1;
         ctx.fill();
+
         ctx.restore();
       }
     }
@@ -247,15 +421,17 @@
       this.container = container || canvas.parentElement;
       this.ctx = canvas.getContext('2d');
       this.rockets = [];
-      this.particles = [];
-      this.flashes = [];
+      this.explosions = [];
       this.isRunning = false;
       this.animId = null;
       this.width = 0;
       this.height = 0;
       this.dpr = Math.min(window.devicePixelRatio || 1, 2);
       this.autoTimer = null;
-      this.isVisible = true;
+      this.isVisible = typeof window !== 'undefined' && !window.IntersectionObserver;
+      this.hasLaunchedOpening = false;
+      this.blastCycleIndex = 0;
+      this.BLAST_INTERVAL_MS = 3000; // Exact 3-second continuous celebration cycle
 
       this.init();
     }
@@ -268,74 +444,125 @@
         new ResizeObserver(() => this.resize()).observe(this.container);
       }
 
-      // Pause when out of screen to save battery/CPU
+      // Pause loop when out of screen to save battery & CPU
       if (window.IntersectionObserver && this.container) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             this.isVisible = entry.isIntersecting;
-            if (this.isVisible && !this.isRunning) {
-              this.start();
-            } else if (!this.isVisible && this.isRunning && this.rockets.length === 0 && this.particles.length === 0) {
+            if (this.isVisible) {
+              if (!this.hasLaunchedOpening) {
+                this.launchOpeningDisplay();
+              }
+              if (!this.isRunning && (this.rockets.length > 0 || this.explosions.length > 0)) {
+                this.start();
+              }
+            } else if (!this.isVisible && this.isRunning && this.rockets.length === 0 && this.explosions.length === 0) {
               this.stop();
             }
           });
         }, { threshold: 0.1 });
         observer.observe(this.container);
+      } else {
+        // Fallback when IntersectionObserver is not supported
+        this.isVisible = true;
+        this.launchOpeningDisplay();
       }
 
-      // Interactive: click on container triggers instant burst!
+      // Interactive: click anywhere on banner launches instant rocket targeting click
       if (this.container) {
         this.container.addEventListener('click', (e) => {
-          // Don't trigger if clicked on interactive buttons or links
-          if (e.target.closest('a, button, input, select, textarea, .btn-copy-coupon, #festive-shop-now-btn')) {
+          if (e.target.closest('a, button, input, select, textarea, .btn-copy-coupon, #festive-shop-now-btn, [role="button"]')) {
             return;
           }
           const rect = this.canvas.getBoundingClientRect();
           const clickX = e.clientX - rect.left;
           const clickY = e.clientY - rect.top;
-          this.createBurst(clickX, clickY);
+          this.launchBigSkyRocket(clickX, clickY);
         });
       }
 
-      this.start();
-      this.scheduleNextLaunch();
+      this.startThreeSecondBlastingLoop();
     }
 
+    launchOpeningDisplay() {
+      if (this.hasLaunchedOpening) return;
+
+      if (this.width <= 0 || this.height <= 0) {
+        this.resize();
+      }
+
+      this.hasLaunchedOpening = true;
+
+      // Launch initial immediate barrage (100ms) so banner is instantly alive
+      setTimeout(() => {
+        if (!this.isVisible && window.IntersectionObserver) {
+          // If banner scrolled away before timeout, allow re-launch on next visibility
+          this.hasLaunchedOpening = false;
+          return;
+        }
+        this.launchBigSkyRocket(this.width * 0.48, this.height * 0.28, STARBURST_THEMES[1]);
+        setTimeout(() => {
+          if (!this.isVisible && window.IntersectionObserver) return;
+          this.launchBigSkyRocket(this.width * 0.22, this.height * 0.38, STARBURST_THEMES[0]);
+        }, 260);
+      }, 100);
+    }
+
+    // Zero layout thrashing: only reallocate buffer if dimensions actually changed
     resize() {
       if (!this.canvas || !this.container) return;
       const rect = this.container.getBoundingClientRect();
-      const w = Math.max(rect.width, 300);
-      const h = Math.max(rect.height, 180);
+      const w = Math.round(rect.width);
+      const h = Math.round(rect.height);
+      if (w <= 0 || h <= 0) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const targetBufferW = Math.floor(w * dpr);
+      const targetBufferH = Math.floor(h * dpr);
+
+      // Skip if dimensions haven't changed
+      if (this.canvas.width === targetBufferW && this.canvas.height === targetBufferH && this.dpr === dpr) {
+        return;
+      }
 
       this.width = w;
       this.height = h;
+      this.dpr = dpr;
 
-      this.canvas.width = Math.floor(w * this.dpr);
-      this.canvas.height = Math.floor(h * this.dpr);
+      this.canvas.width = targetBufferW;
+      this.canvas.height = targetBufferH;
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
 
-      this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    launchRocket(customTargetX, customTargetY) {
+    launchBigSkyRocket(customTargetX, customTargetY, customTheme) {
       if (!this.isVisible) return;
 
-      const palette = FESTIVE_PALETTES[Math.floor(Math.random() * FESTIVE_PALETTES.length)];
-      const startX = customTargetX !== undefined
-        ? customTargetX + randomRange(-40, 40)
-        : randomRange(this.width * 0.1, this.width * 0.9);
-      const startY = this.height + 10;
+      if (this.width <= 0 || this.height <= 0) {
+        this.resize();
+      }
+
+      const theme = customTheme || STARBURST_THEMES[this.blastCycleIndex % STARBURST_THEMES.length];
+      const launchPositions = [0.24, 0.72, 0.48, 0.85, 0.36];
+      const selectedPos = launchPositions[this.blastCycleIndex % launchPositions.length];
+      this.blastCycleIndex++;
 
       const targetX = customTargetX !== undefined
         ? customTargetX
-        : randomRange(this.width * 0.15, this.width * 0.85);
+        : this.width * (selectedPos + randomRange(-0.05, 0.05));
+
+      // Apogee between 20% and 40% of banner height
       const targetY = customTargetY !== undefined
         ? customTargetY
-        : randomRange(this.height * 0.15, this.height * 0.55);
+        : randomRange(this.height * 0.20, this.height * 0.40);
 
-      const rocket = new Rocket(startX, startY, targetX, targetY, palette, (x, y, pal) => {
-        this.explode(x, y, pal);
+      const startX = targetX + randomRange(-28, 28);
+      const startY = this.height + 15;
+
+      const rocket = new SkyRocket(startX, startY, targetX, targetY, theme, (x, y, thm) => {
+        this.explodeRadialStarburst(x, y, thm);
       });
 
       this.rockets.push(rocket);
@@ -345,144 +572,42 @@
       }
     }
 
-    createBurst(x, y) {
-      const palette = FESTIVE_PALETTES[Math.floor(Math.random() * FESTIVE_PALETTES.length)];
-      this.explode(x, y, palette);
-      if (!this.isRunning) this.start();
+    explodeRadialStarburst(x, y, theme) {
+      const burstRadius = randomRange(this.width * 0.18, this.width * 0.26);
+      const explosion = new RadialStarburstExplosion(x, y, theme, Math.max(120, Math.min(220, burstRadius)));
+      this.explosions.push(explosion);
     }
 
-    explode(x, y, palette) {
-      const pal = palette || FESTIVE_PALETTES[Math.floor(Math.random() * FESTIVE_PALETTES.length)];
-      const blastTypes = ['peony', 'willow', 'crackle', 'doubleRing'];
-      const chosenType = blastTypes[Math.floor(Math.random() * blastTypes.length)];
+    startThreeSecondBlastingLoop() {
+      if (this.autoTimer) clearInterval(this.autoTimer);
 
-      // Detonation flash
-      this.flashes.push(new Flash(x, y, randomRange(60, 95), pal.colors[0]));
+      this.autoTimer = setInterval(() => {
+        if (!this.isVisible) return;
 
-      switch (chosenType) {
-        case 'willow':
-          // Golden weeping willow cascading sparks
-          this.generateWillowBurst(x, y, pal);
-          break;
-        case 'crackle':
-          // Crackling star burst
-          this.generateCrackleBurst(x, y, pal);
-          break;
-        case 'doubleRing':
-          // Dual color concentric rings
-          this.generateDoubleRingBurst(x, y, pal);
-          break;
-        case 'peony':
-        default:
-          // Classic rich radial explosion
-          this.generatePeonyBurst(x, y, pal);
-          break;
-      }
-    }
+        // Primary sky rocket blast
+        this.launchBigSkyRocket();
 
-    generatePeonyBurst(x, y, palette) {
-      const count = Math.floor(randomRange(55, 75));
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 * i) / count + randomRange(-0.15, 0.15);
-        const speed = randomRange(2.2, 6.2);
-        const color = randomColor(palette);
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed;
-
-        this.particles.push(new Particle(x, y, color, vx, vy, {
-          decay: randomRange(0.014, 0.026),
-          size: randomRange(2.2, 3.4),
-          gravity: 0.08,
-          trailLength: 4,
-          flicker: true
-        }));
-      }
-    }
-
-    generateWillowBurst(x, y, palette) {
-      const goldColors = ['#f59e0b', '#fbbf24', '#fef08a', '#d97706'];
-      const count = Math.floor(randomRange(60, 80));
-      for (let i = 0; i < count; i++) {
-        const angle = randomRange(0, Math.PI * 2);
-        const speed = randomRange(1.8, 4.8);
-        const color = goldColors[Math.floor(Math.random() * goldColors.length)];
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed;
-
-        this.particles.push(new Particle(x, y, color, vx, vy, {
-          decay: randomRange(0.009, 0.016), // Long lingering trail
-          size: randomRange(2, 3),
-          friction: 0.978,
-          gravity: 0.045, // Soft floating droop
-          trailLength: 5,
-          flicker: true
-        }));
-      }
-    }
-
-    generateDoubleRingBurst(x, y, palette) {
-      const count = 40;
-      const color1 = palette.colors[0];
-      const color2 = palette.colors[1] || '#fef08a';
-
-      // Outer ring
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 * i) / count;
-        const speed = 4.8;
-        this.particles.push(new Particle(x, y, color1, Math.cos(angle) * speed, Math.sin(angle) * speed, {
-          decay: 0.018,
-          size: 2.8,
-          trailLength: 4
-        }));
-      }
-
-      // Inner ring
-      for (let i = 0; i < count * 0.7; i++) {
-        const angle = (Math.PI * 2 * i) / (count * 0.7);
-        const speed = 2.8;
-        this.particles.push(new Particle(x, y, color2, Math.cos(angle) * speed, Math.sin(angle) * speed, {
-          decay: 0.022,
-          size: 2.2,
-          trailLength: 3
-        }));
-      }
-    }
-
-    generateCrackleBurst(x, y, palette) {
-      const count = 45;
-      for (let i = 0; i < count; i++) {
-        const angle = randomRange(0, Math.PI * 2);
-        const speed = randomRange(2.5, 5.5);
-        const color = randomColor(palette);
-        const vx = Math.cos(angle) * speed;
-        const vy = Math.sin(angle) * speed;
-
-        const p = new Particle(x, y, color, vx, vy, {
-          decay: randomRange(0.015, 0.024),
-          size: randomRange(2, 3),
-          secondary: true
-        });
-        this.particles.push(p);
-      }
-    }
-
-    scheduleNextLaunch() {
-      if (this.autoTimer) clearTimeout(this.autoTimer);
-
-      // Random delay between 900ms and 2200ms
-      const delay = randomRange(900, 2200);
-
-      this.autoTimer = setTimeout(() => {
-        if (this.isVisible) {
-          // Sometimes launch 2 firecrackers in tandem
-          this.launchRocket();
-          if (Math.random() > 0.6) {
-            setTimeout(() => this.launchRocket(), randomRange(150, 400));
+        // Tandem companion rocket offset by 260-400ms for natural festive rhythm
+        setTimeout(() => {
+          if (this.isVisible) {
+            this.launchBigSkyRocket();
           }
-        }
-        this.scheduleNextLaunch();
-      }, delay);
+        }, randomRange(260, 400));
+      }, this.BLAST_INTERVAL_MS);
     }
+
+    // Compatibility aliases for legacy method references & tests
+    generatePeonyBurst(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[0]); }
+    generateWillowBurst(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[1]); }
+    generateDoubleRingBurst(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[2]); }
+    generateCrackleBurst(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[3]); }
+    generateGrandImperialPeony(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[1]); }
+    generateGoldenBrocadeCrown(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[1]); }
+    generateDoubleRingChrysanthemum(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[2]); }
+    generateCrackleGlitterShell(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[3]); }
+    generateRainbowStrobeCrown(x, y) { this.explodeRadialStarburst(x, y, STARBURST_THEMES[4]); }
+    launchRocket(x, y) { return this.launchBigSkyRocket(x, y); }
+    createBurst(x, y) { return this.explodeRadialStarburst(x, y, STARBURST_THEMES[Math.floor(Math.random() * STARBURST_THEMES.length)]); }
 
     start() {
       if (this.isRunning) return;
@@ -493,7 +618,11 @@
     stop() {
       this.isRunning = false;
       if (this.animId) {
-        cancelAnimationFrame(this.animId);
+        if (typeof window.cancelAnimationFrame === 'function') {
+          window.cancelAnimationFrame(this.animId);
+        } else {
+          clearTimeout(this.animId);
+        }
         this.animId = null;
       }
     }
@@ -501,19 +630,9 @@
     loop() {
       if (!this.isRunning) return;
 
-      // Transparent clear to keep banner gradient & decorative glows intact
       this.ctx.clearRect(0, 0, this.width, this.height);
 
-      // 1. Update & draw flashes
-      for (let i = this.flashes.length - 1; i >= 0; i--) {
-        if (!this.flashes[i].update()) {
-          this.flashes.splice(i, 1);
-        } else {
-          this.flashes[i].draw(this.ctx);
-        }
-      }
-
-      // 2. Update & draw rockets
+      // 1. Update & draw ascending sky rockets
       for (let i = this.rockets.length - 1; i >= 0; i--) {
         if (!this.rockets[i].update()) {
           this.rockets.splice(i, 1);
@@ -522,46 +641,38 @@
         }
       }
 
-      // 3. Update & draw particles
-      const newSecondarySparks = [];
-      for (let i = this.particles.length - 1; i >= 0; i--) {
-        const p = this.particles[i];
-        if (!p.update()) {
-          // If particle was marked for secondary micro-crackles, pop small sparks
-          if (p.secondary && !p.hasPopped && Math.random() > 0.4) {
-            for (let s = 0; s < 3; s++) {
-              newSecondarySparks.push(new Particle(
-                p.x,
-                p.y,
-                Math.random() > 0.5 ? '#ffffff' : '#fde047',
-                randomRange(-1.5, 1.5),
-                randomRange(-1.5, 1.5),
-                { decay: 0.06, size: 1.4, gravity: 0.05, trailLength: 2 }
-              ));
-            }
-          }
-          this.particles.splice(i, 1);
+      // 2. Update & draw radial starburst explosions
+      for (let i = this.explosions.length - 1; i >= 0; i--) {
+        if (!this.explosions[i].update()) {
+          this.explosions.splice(i, 1);
         } else {
-          p.draw(this.ctx);
+          this.explosions[i].draw(this.ctx);
         }
       }
 
-      if (newSecondarySparks.length > 0) {
-        this.particles.push(...newSecondarySparks);
-      }
-
-      // If nothing left on screen and not visible, pause loop
-      if (!this.isVisible && this.rockets.length === 0 && this.particles.length === 0 && this.flashes.length === 0) {
+      // Pause loop if no active objects and out of viewport
+      if (!this.isVisible && this.rockets.length === 0 && this.explosions.length === 0) {
         this.stop();
         return;
       }
 
-      this.animId = requestAnimationFrame(() => this.loop());
+      if (typeof window.requestAnimationFrame === 'function') {
+        this.animId = window.requestAnimationFrame(() => this.loop());
+      } else {
+        this.animId = setTimeout(() => this.loop(), 16);
+      }
     }
   }
 
+  // Active stages map to prevent duplicate instances
+  const activeStages = new Map();
+
   // Global initializer helper
   window.initFestiveFirecrackers = function (canvasId, containerId) {
+    if (activeStages.has(canvasId)) {
+      return activeStages.get(canvasId);
+    }
+
     // Respect user's reduced-motion preference
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       console.log('Festive firecrackers skipped: prefers-reduced-motion is active');
@@ -572,17 +683,25 @@
     if (!canvas) return null;
 
     const container = containerId ? document.getElementById(containerId) : canvas.parentElement;
-    return new FirecrackerStage(canvas, container);
+    const stage = new FirecrackerStage(canvas, container);
+    activeStages.set(canvasId, stage);
+    return stage;
   };
 
   // Auto-boot if elements are already in the DOM on load
-  document.addEventListener('DOMContentLoaded', () => {
+  function autoBoot() {
     if (document.getElementById('festive-firecrackers-canvas')) {
       window.initFestiveFirecrackers('festive-firecrackers-canvas', 'festival-sale-banner');
     }
     if (document.getElementById('festive-page-firecrackers-canvas')) {
       window.initFestiveFirecrackers('festive-page-firecrackers-canvas', 'festive-page-hero');
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoBoot);
+  } else {
+    autoBoot();
+  }
 
 })(window, document);

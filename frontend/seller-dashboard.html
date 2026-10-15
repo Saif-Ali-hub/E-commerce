@@ -491,6 +491,36 @@
     [data-theme="dark"] .form-label {
       color: #cbd5e1;
     }
+
+    /* Pending Merchant Banner */
+    .seller-pending-banner {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);
+      animation: fadeInBanner 0.3s ease;
+    }
+
+    [data-theme="dark"] .seller-pending-banner {
+      background: linear-gradient(135deg, rgba(120, 53, 15, 0.3), rgba(69, 26, 3, 0.4));
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="dark"] .seller-pending-banner h3 {
+      color: #fcd34d !important;
+    }
+
+    [data-theme="dark"] .seller-pending-banner p {
+      color: #fde68a !important;
+    }
+
+    @keyframes fadeInBanner {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 
@@ -526,6 +556,21 @@
 
     <!-- Main Content Container -->
     <main class="container" style="max-width: 1400px; padding: 24px 20px; flex: 1;">
+      <!-- Pending Merchant Review Notice Banner -->
+      <div id="seller-pending-banner" class="seller-pending-banner" style="display: none;">
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+          <span style="font-size: 1.6rem; line-height: 1;">⏳</span>
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 6px 0; font-size: 1.05rem; font-weight: 700; color: #92400e;">
+              Merchant Application Under Review
+            </h3>
+            <p style="margin: 0; font-size: 0.92rem; color: #78350f; line-height: 1.5;">
+              Your merchant application is currently under review by store administrators. Product listing and dispatch privileges will unlock upon verification.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- Hero Welcome Card -->
       <div class="seller-hero-card">
         <div>
@@ -534,8 +579,14 @@
             <span class="seller-verify-pill" id="seller-verify-pill">✓ Verified Merchant</span>
             <span id="seller-business-name-display">• Multi-Tenant Workspace</span>
           </p>
+          <div id="admin-store-filter-wrap" style="display: none; align-items: center; gap: 8px; margin-top: 10px;">
+            <label for="admin-seller-select" style="font-size: 0.82rem; font-weight: 600; opacity: 0.95;">Store View:</label>
+            <select id="admin-seller-select" style="background: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 4px 10px; font-size: 0.82rem; cursor: pointer;">
+              <option value="" style="color: #0f172a;">🌐 All Stores (Platform Overview)</option>
+            </select>
+          </div>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
           <button class="btn btn-secondary btn-sm" id="refresh-dashboard-btn" style="background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.25);">
             🔄 Refresh Data
           </button>
@@ -558,6 +609,9 @@
         </button>
         <button class="seller-tab-btn" id="tab-earnings" role="tab" data-tab="earnings">
           💰 Earnings &amp; Payouts
+        </button>
+        <button class="seller-tab-btn" id="tab-profile" role="tab" data-tab="profile">
+          🏢 Business Profile
         </button>
       </div>
 
@@ -740,6 +794,48 @@
                 <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 24px;">Loading settlements...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: BUSINESS PROFILE -->
+      <section id="section-profile" style="display: none;">
+        <div class="seller-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700;">Merchant Business Profile</h3>
+              <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--color-text-muted);">
+                Your verified enterprise credentials, registered GSTIN, and compliance status.
+              </p>
+            </div>
+            <span class="status-badge status-pending" id="profile-status-badge">Pending Review</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+            <div style="background: var(--color-surface-sunken, #f8fafc); padding: 18px; border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">Business Name</div>
+              <div id="profile-business-name" style="font-size: 1.1rem; font-weight: 700;">-</div>
+            </div>
+            <div style="background: var(--color-surface-sunken, #f8fafc); padding: 18px; border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">Registered Address</div>
+              <div id="profile-business-address" style="font-size: 0.95rem; font-weight: 500;">-</div>
+            </div>
+            <div style="background: var(--color-surface-sunken, #f8fafc); padding: 18px; border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">Contact Number</div>
+              <div id="profile-contact-number" style="font-size: 1rem; font-weight: 600;">-</div>
+            </div>
+            <div style="background: var(--color-surface-sunken, #f8fafc); padding: 18px; border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">Permanent Account Number (PAN)</div>
+              <div id="profile-pan" style="font-size: 1rem; font-weight: 700; letter-spacing: 1px;">-</div>
+            </div>
+            <div style="background: var(--color-surface-sunken, #f8fafc); padding: 18px; border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">GSTIN</div>
+              <div id="profile-gstin" style="font-size: 1rem; font-weight: 600;">-</div>
+            </div>
+            <div style="background: var(--color-surface-sunken, #f8fafc); padding: 18px; border-radius: 10px; border: 1px solid var(--color-border, #e2e8f0);">
+              <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); margin-bottom: 6px;">Account Privilege Status</div>
+              <div id="profile-verification-status" style="font-size: 1rem; font-weight: 700;">-</div>
+            </div>
           </div>
         </div>
       </section>
