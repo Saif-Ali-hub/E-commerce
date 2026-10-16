@@ -880,11 +880,11 @@ function enrichOrderTracking(orderDoc) {
     orderObj.tracking = {};
   }
   if (!orderObj.tracking.carrier) {
-    orderObj.tracking.carrier = 'MiniStore Express';
+    orderObj.tracking.carrier = 'Nexura Express';
   }
   if (!orderObj.tracking.trackingNumber) {
     const code = orderObj._id ? orderObj._id.toString().slice(-6).toUpperCase() : Math.floor(100000 + Math.random() * 900000);
-    orderObj.tracking.trackingNumber = `MS-TRK-${code}`;
+    orderObj.tracking.trackingNumber = `NX-TRK-${code}`;
   }
   if (!orderObj.tracking.estimatedDeliveryDate) {
     orderObj.tracking.estimatedDeliveryDate = new Date(new Date(orderObj.createdAt || Date.now()).getTime() + 3 * 24 * 60 * 60 * 1000);

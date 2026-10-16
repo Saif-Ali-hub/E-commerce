@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Product Details | MiniStore. Premium quality, best pricing, and express delivery.">
-  <title>Product Details | MiniStore</title>
+  <meta name="description" content="Product Details | Nexura. Premium quality, best pricing, and express delivery.">
+  <title>Product Details | Nexura</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -47,9 +48,29 @@
   <!-- Header / Navigation -->
   <header class="navbar" id="main-header">
     <div class="container navbar-inner">
-      <a href="index.html" class="brand" id="brand-logo" aria-label="MiniStore Home">
-        <span class="brand-icon">⚡</span>
-        <span class="brand-text">MiniStore</span>
+      <a href="index.html" class="brand" id="brand-logo" aria-label="Nexura Home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="nxBgPdHead" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#3b82f6"/>
+                <stop offset="50%" stop-color="#2563eb"/>
+                <stop offset="100%" stop-color="#1d4ed8"/>
+              </linearGradient>
+              <linearGradient id="nxStrokePdHead" x1="10" y1="10" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="65%" stop-color="#e0f2fe"/>
+                <stop offset="100%" stop-color="#38bdf8"/>
+              </linearGradient>
+            </defs>
+            <rect width="36" height="36" rx="10" fill="url(#nxBgPdHead)"/>
+            <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="9.25" stroke="rgba(255, 255, 255, 0.28)" stroke-width="1.5"/>
+            <path d="M11.5 25V11L24.5 25V11" stroke="url(#nxStrokePdHead)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24.5" cy="11" r="2.2" fill="#38bdf8"/>
+            <circle cx="24.5" cy="11" r="1.1" fill="#ffffff"/>
+          </svg>
+        </span>
+        <span class="brand-text">Nex<span class="brand-text-accent">ura</span></span>
       </a>
 
       <!-- Central Search Bar -->
@@ -78,8 +99,8 @@
           <span class="nav-badge-pill" id="cart-nav-badge">0</span>
         </button>
 
-        <!-- MiniStore Wallet Button & Rewards Pill (Feature 5) -->
-        <a href="index.html" class="wallet-nav-btn" id="nav-wallet-btn" aria-label="MiniStore Wallet" title="MiniStore Wallet & SuperCoins" style="display: none; text-decoration: none;">
+        <!-- Nexura Wallet Button & Rewards Pill (Feature 5) -->
+        <a href="index.html" class="wallet-nav-btn" id="nav-wallet-btn" aria-label="Nexura Wallet" title="Nexura Wallet & SuperCoins" style="display: none; text-decoration: none;">
           <span class="wallet-nav-icon">👛</span>
           <span class="wallet-nav-balance" id="nav-wallet-balance-text">₹150</span>
           <span class="wallet-nav-coins-badge" id="nav-wallet-coins-badge" title="Loyalty SuperCoins">🪙 <span id="nav-wallet-coins-text">50</span></span>
@@ -818,13 +839,13 @@
                   <p class="checkout-payment-desc">Pay instantly &amp; securely with Cards, UPI, NetBanking, or Wallets.</p>
                 </label>
 
-                <!-- MiniStore Wallet -->
+                <!-- Nexura Wallet -->
                 <label class="checkout-payment-card" for="express-pay-wallet" id="express-card-wallet">
                   <div class="checkout-payment-card-top">
                     <input type="radio" name="expressPaymentMethod" id="express-pay-wallet" value="WALLET" class="checkout-payment-radio" />
                     <div class="checkout-payment-card-title">
                       <span class="payment-method-icon">👛</span>
-                      <span class="payment-method-name">MiniStore Wallet</span>
+                      <span class="payment-method-name">Nexura Wallet</span>
                     </div>
                     <span class="payment-badge-pill" id="express-wallet-pill">₹0.00</span>
                   </div>
@@ -979,8 +1000,28 @@
     <div class="container footer-main-grid">
       <div class="footer-col brand-col">
         <div class="footer-brand">
-          <span class="brand-icon">⚡</span>
-          <span class="brand-text">MiniStore</span>
+          <span class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="nxBgPdFoot" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#3b82f6"/>
+                  <stop offset="50%" stop-color="#2563eb"/>
+                  <stop offset="100%" stop-color="#1d4ed8"/>
+                </linearGradient>
+                <linearGradient id="nxStrokePdFoot" x1="10" y1="10" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="65%" stop-color="#e0f2fe"/>
+                  <stop offset="100%" stop-color="#38bdf8"/>
+                </linearGradient>
+              </defs>
+              <rect width="36" height="36" rx="10" fill="url(#nxBgPdFoot)"/>
+              <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="9.25" stroke="rgba(255, 255, 255, 0.28)" stroke-width="1.5"/>
+              <path d="M11.5 25V11L24.5 25V11" stroke="url(#nxStrokePdFoot)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="24.5" cy="11" r="2.2" fill="#38bdf8"/>
+              <circle cx="24.5" cy="11" r="1.1" fill="#ffffff"/>
+            </svg>
+          </span>
+          <span class="brand-text">Nex<span class="brand-text-accent">ura</span></span>
         </div>
         <p class="footer-desc">Your verified destination for quality consumer essentials. Authentic goods, direct INR
           pricing, and express Pan-India fulfillment.</p>
@@ -1002,7 +1043,7 @@
       </div>
     </div>
     <div class="container footer-bottom-bar">
-      <p class="footer-text">&copy; 2026 MiniStore. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
+      <p class="footer-text">&copy; 2026 Nexura. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
     </div>
   </footer>
 

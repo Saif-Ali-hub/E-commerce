@@ -4264,7 +4264,7 @@ function selectCheckoutAddress(addressId) {
 function formatPaymentMethodName(method) {
   if (!method) return 'Not Specified';
   switch (method) {
-    case 'WALLET': return 'MiniStore Wallet (1-Click Instant)';
+    case 'WALLET': return 'Nexura Wallet (1-Click Instant)';
     case 'RAZORPAY': return 'Razorpay (Cards / UPI / NetBanking)';
     case 'UPI': return 'UPI';
     case 'COD': return 'Cash on Delivery';
@@ -4282,7 +4282,7 @@ function formatPaymentStatusBadge(status) {
 function formatPaymentNote(method) {
   switch (method) {
     case 'WALLET':
-      return '👛 Paid in full using MiniStore Wallet. Zero cash collection required on delivery.';
+      return '👛 Paid in full using Nexura Wallet. Zero cash collection required on delivery.';
     case 'RAZORPAY':
       return '💳 Payment successfully verified and captured via Razorpay.';
     case 'COD':
@@ -4523,7 +4523,7 @@ async function placeOrder() {
             key: rzpData.keyId,
             amount: rzpData.order.amount,
             currency: rzpData.order.currency || 'INR',
-            name: 'MiniStore',
+            name: 'Nexura',
             description: `Order #${order.orderId || order._id}`,
             order_id: rzpData.order.id,
             handler: async function (rzpResponse) {
@@ -8151,7 +8151,7 @@ function openBecomeSellerModal() {
   closeProfileDropdown();
   const user = getAuthUser();
   if (!user) {
-    openAuthModal('login', 'Please sign in or create an account to sell on MiniStore.');
+    openAuthModal('login', 'Please sign in or create an account to sell on Nexura.');
     return;
   }
 
@@ -9175,8 +9175,8 @@ function initFooterFunctionality() {
     }
 
     // Carrier & AWB details
-    const carrierName = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'MiniStore Express';
-    const awbNumber = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `MS-TRK-${order._id.slice(-6).toUpperCase()}`;
+    const carrierName = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'Nexura Express';
+    const awbNumber = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `NX-TRK-${order._id.slice(-6).toUpperCase()}`;
 
     if (carrierEl) carrierEl.textContent = carrierName;
     if (awbEl) awbEl.textContent = awbNumber;
@@ -9423,10 +9423,10 @@ function initFooterFunctionality() {
     }
 
     if (invCarrierEl) {
-      invCarrierEl.textContent = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'MiniStore Express';
+      invCarrierEl.textContent = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'Nexura Express';
     }
     if (invAwbEl) {
-      invAwbEl.textContent = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `MS-TRK-${order._id.slice(-6).toUpperCase()}`;
+      invAwbEl.textContent = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `NX-TRK-${order._id.slice(-6).toUpperCase()}`;
     }
 
     if (invShipAddressEl) {
@@ -9979,7 +9979,7 @@ async function executeGatewayRecharge() {
         key: rzpData.keyId,
         amount: rzpData.order.amount,
         currency: rzpData.order.currency || 'INR',
-        name: 'MiniStore Wallet',
+        name: 'Nexura Wallet',
         description: `Wallet Recharge of ₹${pendingGatewayTopupAmount.toFixed(2)} (+10% Bonus Coins)`,
         order_id: rzpData.order.id,
         prefill: {
@@ -10139,7 +10139,7 @@ if (walletModal) {
 if (walletLoginPromptBtn) {
   walletLoginPromptBtn.addEventListener('click', () => {
     closeWalletModal();
-    openAuthModal('login', 'Please log in to access your MiniStore Wallet.');
+    openAuthModal('login', 'Please log in to access your Nexura Wallet.');
   });
 }
 

@@ -606,11 +606,11 @@ router.put('/orders/:id/dispatch', async (req, res) => {
     }
 
     const courierCarrier =
-      carrier && carrier.trim() ? carrier.trim() : order.tracking?.carrier || 'MiniStore Express';
+      carrier && carrier.trim() ? carrier.trim() : order.tracking?.carrier || 'Nexura Express';
     const courierTracking =
       trackingNumber && trackingNumber.trim()
         ? trackingNumber.trim()
-        : order.tracking?.trackingNumber || `MS-TRK-${order._id.toString().slice(-6).toUpperCase()}`;
+        : order.tracking?.trackingNumber || `NX-TRK-${order._id.toString().slice(-6).toUpperCase()}`;
 
     // Update order status & tracking details
     order.status = 'Shipped';

@@ -213,7 +213,7 @@ const orderSchema = new mongoose.Schema(
       carrier: {
         type: String,
         trim: true,
-        default: 'MiniStore Express'
+        default: 'Nexura Express'
       },
       trackingNumber: {
         type: String,
@@ -269,11 +269,11 @@ orderSchema.pre('save', function () {
     this.tracking = {};
   }
   if (!this.tracking.carrier) {
-    this.tracking.carrier = 'MiniStore Express';
+    this.tracking.carrier = 'Nexura Express';
   }
   if (!this.tracking.trackingNumber) {
     const randCode = Math.floor(100000 + Math.random() * 900000);
-    this.tracking.trackingNumber = `MS-TRK-${randCode}`;
+    this.tracking.trackingNumber = `NX-TRK-${randCode}`;
   }
   if (!this.tracking.estimatedDeliveryDate) {
     // Expected delivery in 3 days

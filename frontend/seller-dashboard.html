@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="MiniStore Merchant Portal — Manage inventory, fulfill orders, and track revenue with real-time analytics.">
-  <title>Merchant Portal | MiniStore</title>
+  <meta name="description" content="Nexura Merchant Portal — Manage inventory, fulfill orders, and track revenue with real-time analytics.">
+  <title>Merchant Portal | Nexura</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -530,7 +531,14 @@
     <header class="seller-header">
       <div class="seller-header-inner">
         <a href="seller-dashboard.html" class="seller-brand-wrap">
-          <span class="seller-brand-text">MiniStore</span>
+          <span class="brand-icon" style="width: 32px; height: 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(37,99,235,0.3); display: inline-flex;" aria-hidden="true">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="36" rx="10" fill="#2563eb"/>
+              <path d="M11.5 25V11L24.5 25V11" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="24.5" cy="11" r="2.2" fill="#38bdf8"/>
+            </svg>
+          </span>
+          <span class="seller-brand-text">Nex<span style="color: #38bdf8;">ura</span></span>
           <span class="seller-portal-badge">Merchant Portal</span>
         </a>
 
@@ -941,7 +949,7 @@
           <div class="form-group">
             <label class="form-label">Courier Partner</label>
             <select id="dispatch-carrier" class="form-input">
-              <option value="MiniStore Express">MiniStore Express (Internal Fleet)</option>
+              <option value="Nexura Express">Nexura Express (Internal Fleet)</option>
               <option value="BlueDart">BlueDart Express</option>
               <option value="Delhivery">Delhivery</option>
               <option value="DTDC">DTDC Couriers</option>
@@ -950,7 +958,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Tracking Number / AWB</label>
-            <input type="text" id="dispatch-tracking-no" class="form-input" required placeholder="MS-TRK-XXXXXX" />
+            <input type="text" id="dispatch-tracking-no" class="form-input" required placeholder="NX-TRK-XXXXXX" />
           </div>
           <div class="form-group">
             <label class="form-label">Fulfillment Notes (Optional)</label>

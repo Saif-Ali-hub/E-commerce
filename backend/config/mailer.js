@@ -62,7 +62,7 @@ function getTransporter() {
 async function sendMail(options) {
   try {
     const transporter = getTransporter();
-    const fromAddress = process.env.EMAIL_FROM || '"MiniStore Support" <no-reply@ministore.com>';
+    const fromAddress = process.env.EMAIL_FROM || '"Nexura Support" <no-reply@nexura.com>';
 
     const mailOptions = {
       from: fromAddress,
@@ -102,7 +102,7 @@ async function sendOrderConfirmationEmail(order, pdfBuffer, recipientEmail) {
     }
 
     const orderId = order.orderId || order._id || 'ORD-UNKNOWN';
-    const trackingNumber = order.tracking?.trackingNumber || (order._id ? `MS-TRK-${order._id.toString().slice(-6).toUpperCase()}` : 'MS-TRK-000000');
+    const trackingNumber = order.tracking?.trackingNumber || (order._id ? `NX-TRK-${order._id.toString().slice(-6).toUpperCase()}` : 'NX-TRK-000000');
     const totalFormatted = `INR ${(order.totalPrice ?? order.totalAmount ?? order.total ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 
     const orderItems = order.orderItems || order.items || [];
@@ -117,7 +117,7 @@ async function sendOrderConfirmationEmail(order, pdfBuffer, recipientEmail) {
     const html = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
         <div style="background: linear-gradient(135deg, #1e3a8a, #2563eb); padding: 24px; text-align: center; color: #ffffff;">
-          <h1 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px;">MiniStore</h1>
+          <h1 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px;">Nexura</h1>
           <p style="margin: 6px 0 0; font-size: 14px; opacity: 0.9;">Order Confirmation & Invoice Receipt</p>
         </div>
         <div style="padding: 24px;">
@@ -152,7 +152,7 @@ async function sendOrderConfirmationEmail(order, pdfBuffer, recipientEmail) {
           </p>
         </div>
         <div style="background: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b;">
-          &copy; ${new Date().getFullYear()} MiniStore E-Commerce Ltd. All rights reserved.
+          &copy; ${new Date().getFullYear()} Nexura E-Commerce Ltd. All rights reserved.
         </div>
       </div>
     `;
@@ -168,7 +168,7 @@ async function sendOrderConfirmationEmail(order, pdfBuffer, recipientEmail) {
 
     return await sendMail({
       to,
-      subject: `Order Confirmed: #${orderId} - MiniStore`,
+      subject: `Order Confirmed: #${orderId} - Nexura`,
       html,
       attachments
     });
@@ -187,7 +187,7 @@ async function sendOrderStatusEmail(order, status, recipientEmail) {
     if (!to) return { success: false, message: 'Missing recipient email' };
 
     const orderId = order.orderId || order._id || 'ORD-UNKNOWN';
-    const trackingNumber = order.tracking?.trackingNumber || (order._id ? `MS-TRK-${order._id.toString().slice(-6).toUpperCase()}` : 'MS-TRK-000000');
+    const trackingNumber = order.tracking?.trackingNumber || (order._id ? `NX-TRK-${order._id.toString().slice(-6).toUpperCase()}` : 'NX-TRK-000000');
 
     const isDelivered = status === 'Delivered';
     const title = isDelivered ? 'Your Order has been Delivered! 📦' : 'Your Order is on the Way! 🚚';
@@ -196,7 +196,7 @@ async function sendOrderStatusEmail(order, status, recipientEmail) {
     const html = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
         <div style="background: ${bannerColor}; padding: 22px; text-align: center; color: #ffffff;">
-          <h1 style="margin: 0; font-size: 24px; font-weight: 700;">MiniStore</h1>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 700;">Nexura</h1>
           <p style="margin: 4px 0 0; font-size: 14px; opacity: 0.9;">Order Status Update</p>
         </div>
         <div style="padding: 24px;">
@@ -207,23 +207,23 @@ async function sendOrderStatusEmail(order, status, recipientEmail) {
           </p>
 
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin: 18px 0;">
-            <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Courier Partner:</strong> ${order.tracking?.carrier || 'MiniStore Express'}</p>
+            <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Courier Partner:</strong> ${order.tracking?.carrier || 'Nexura Express'}</p>
             <p style="margin: 4px 0; font-size: 13px; color: #334155;"><strong>Live Tracking ID:</strong> <span style="font-family: monospace; font-weight: 700; color: #2563eb;">${trackingNumber}</span></p>
           </div>
 
           <p style="color: #64748b; font-size: 13px;">
-            You can view complete delivery milestones in real-time under <strong>My Orders</strong> on the MiniStore platform.
+            You can view complete delivery milestones in real-time under <strong>My Orders</strong> on the Nexura platform.
           </p>
         </div>
         <div style="background: #f1f5f9; padding: 14px; text-align: center; font-size: 12px; color: #64748b;">
-          &copy; ${new Date().getFullYear()} MiniStore E-Commerce Ltd.
+          &copy; ${new Date().getFullYear()} Nexura E-Commerce Ltd.
         </div>
       </div>
     `;
 
     return await sendMail({
       to,
-      subject: `Order Update: #${orderId} is ${status} - MiniStore`,
+      subject: `Order Update: #${orderId} is ${status} - Nexura`,
       html
     });
   } catch (err) {
@@ -240,13 +240,13 @@ async function sendPasswordResetEmail(email, otp) {
     const html = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
         <div style="background: #1e293b; padding: 20px; text-align: center; color: #ffffff;">
-          <h1 style="margin: 0; font-size: 22px; font-weight: 700;">MiniStore Security</h1>
+          <h1 style="margin: 0; font-size: 22px; font-weight: 700;">Nexura Security</h1>
           <p style="margin: 4px 0 0; font-size: 13px; color: #94a3b8;">Password Reset Request</p>
         </div>
         <div style="padding: 24px; text-align: center;">
           <h2 style="color: #0f172a; font-size: 18px; margin-top: 0;">Reset Your Password</h2>
           <p style="color: #475569; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
-            We received a request to reset the password for your MiniStore account. Use the verification code below to complete your reset:
+            We received a request to reset the password for your Nexura account. Use the verification code below to complete your reset:
           </p>
 
           <div style="display: inline-block; background: #f1f5f9; border: 2px dashed #94a3b8; border-radius: 8px; padding: 12px 28px; margin: 10px 0;">
@@ -261,14 +261,14 @@ async function sendPasswordResetEmail(email, otp) {
           </p>
         </div>
         <div style="background: #f8fafc; padding: 12px; text-align: center; font-size: 11px; color: #94a3b8;">
-          &copy; ${new Date().getFullYear()} MiniStore Security Systems.
+          &copy; ${new Date().getFullYear()} Nexura Security Systems.
         </div>
       </div>
     `;
 
     return await sendMail({
       to: email,
-      subject: 'MiniStore Password Reset Verification Code',
+      subject: 'Nexura Password Reset Verification Code',
       html
     });
   } catch (err) {
