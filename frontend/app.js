@@ -4264,7 +4264,7 @@ function selectCheckoutAddress(addressId) {
 function formatPaymentMethodName(method) {
   if (!method) return 'Not Specified';
   switch (method) {
-    case 'WALLET': return 'Nexura Wallet (1-Click Instant)';
+    case 'WALLET': return 'Nexure Wallet (1-Click Instant)';
     case 'RAZORPAY': return 'Razorpay (Cards / UPI / NetBanking)';
     case 'UPI': return 'UPI';
     case 'COD': return 'Cash on Delivery';
@@ -4282,7 +4282,7 @@ function formatPaymentStatusBadge(status) {
 function formatPaymentNote(method) {
   switch (method) {
     case 'WALLET':
-      return '👛 Paid in full using Nexura Wallet. Zero cash collection required on delivery.';
+      return '👛 Paid in full using Nexure Wallet. Zero cash collection required on delivery.';
     case 'RAZORPAY':
       return '💳 Payment successfully verified and captured via Razorpay.';
     case 'COD':
@@ -4523,7 +4523,7 @@ async function placeOrder() {
             key: rzpData.keyId,
             amount: rzpData.order.amount,
             currency: rzpData.order.currency || 'INR',
-            name: 'Nexura',
+            name: 'Nexure',
             description: `Order #${order.orderId || order._id}`,
             order_id: rzpData.order.id,
             handler: async function (rzpResponse) {
@@ -8151,7 +8151,7 @@ function openBecomeSellerModal() {
   closeProfileDropdown();
   const user = getAuthUser();
   if (!user) {
-    openAuthModal('login', 'Please sign in or create an account to sell on Nexura.');
+    openAuthModal('login', 'Please sign in or create an account to sell on Nexure.');
     return;
   }
 
@@ -9175,7 +9175,7 @@ function initFooterFunctionality() {
     }
 
     // Carrier & AWB details
-    const carrierName = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'Nexura Express';
+    const carrierName = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'Nexure Express';
     const awbNumber = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `NX-TRK-${order._id.slice(-6).toUpperCase()}`;
 
     if (carrierEl) carrierEl.textContent = carrierName;
@@ -9423,7 +9423,7 @@ function initFooterFunctionality() {
     }
 
     if (invCarrierEl) {
-      invCarrierEl.textContent = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'Nexura Express';
+      invCarrierEl.textContent = (order.tracking && order.tracking.carrier) ? order.tracking.carrier : 'Nexure Express';
     }
     if (invAwbEl) {
       invAwbEl.textContent = (order.tracking && order.tracking.trackingNumber) ? order.tracking.trackingNumber : `NX-TRK-${order._id.slice(-6).toUpperCase()}`;
@@ -9979,7 +9979,7 @@ async function executeGatewayRecharge() {
         key: rzpData.keyId,
         amount: rzpData.order.amount,
         currency: rzpData.order.currency || 'INR',
-        name: 'Nexura Wallet',
+        name: 'Nexure Wallet',
         description: `Wallet Recharge of ₹${pendingGatewayTopupAmount.toFixed(2)} (+10% Bonus Coins)`,
         order_id: rzpData.order.id,
         prefill: {
@@ -10139,7 +10139,7 @@ if (walletModal) {
 if (walletLoginPromptBtn) {
   walletLoginPromptBtn.addEventListener('click', () => {
     closeWalletModal();
-    openAuthModal('login', 'Please log in to access your Nexura Wallet.');
+    openAuthModal('login', 'Please log in to access your Nexure Wallet.');
   });
 }
 

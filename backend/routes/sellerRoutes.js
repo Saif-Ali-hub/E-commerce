@@ -606,7 +606,7 @@ router.put('/orders/:id/dispatch', async (req, res) => {
     }
 
     const courierCarrier =
-      carrier && carrier.trim() ? carrier.trim() : order.tracking?.carrier || 'Nexura Express';
+      carrier && carrier.trim() ? carrier.trim() : order.tracking?.carrier || 'Nexure Express';
     const courierTracking =
       trackingNumber && trackingNumber.trim()
         ? trackingNumber.trim()

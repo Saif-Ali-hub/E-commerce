@@ -264,7 +264,7 @@ router.post('/verify-recharge', async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Payment of ₹${numericAmount.toFixed(2)} verified! Funds added to your Nexura Wallet.`,
+      message: `Payment of ₹${numericAmount.toFixed(2)} verified! Funds added to your Nexure Wallet.`,
       data: {
         walletBalance: user.walletBalance,
         coins: user.coins,
@@ -349,7 +349,7 @@ router.post('/add-money', async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Payment of ₹${numericAmount.toFixed(2)} verified! Funds added to your Nexura Wallet.`,
+      message: `Payment of ₹${numericAmount.toFixed(2)} verified! Funds added to your Nexure Wallet.`,
       data: {
         walletBalance: user.walletBalance,
         coins: user.coins,

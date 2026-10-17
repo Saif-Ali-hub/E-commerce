@@ -878,7 +878,7 @@ function showProductError(title, message) {
     if (pdErrorTitle) pdErrorTitle.textContent = title || 'Product Not Found';
     if (pdErrorMessage) pdErrorMessage.textContent = message || 'Unable to retrieve product details.';
   }
-  document.title = `${title || 'Error'} | Nexura`;
+  document.title = `${title || 'Error'} | Nexure`;
 }
 
 async function loadProductDetails() {
@@ -1067,7 +1067,7 @@ function renderProductDetails(product) {
   if (!product) return;
 
   // 1. Page Title & Breadcrumbs
-  document.title = `${product.name} | Nexura`;
+  document.title = `${product.name} | Nexure`;
   if (bcCategory) {
     bcCategory.textContent = product.category || 'Catalog';
     bcCategory.href = `index.html?category=${encodeURIComponent(product.category || '')}`;
@@ -1464,7 +1464,7 @@ function renderProductQA() {
       // Official Role Badges
       let badgeHtml = '';
       if (isAdmin) {
-        badgeHtml = `<span class="badge-admin" title="Nexura Administrator"><i class="fas fa-shield-alt"></i> ✓ Admin</span>`;
+        badgeHtml = `<span class="badge-admin" title="Nexure Administrator"><i class="fas fa-shield-alt"></i> ✓ Admin</span>`;
       } else if (isVerified) {
         badgeHtml = `<span class="badge-verified-merchant" title="Verified Merchant / Seller"><i class="fas fa-check-circle"></i> ✓ Verified Merchant</span>`;
       }
@@ -3326,7 +3326,7 @@ document.addEventListener('DOMContentLoaded', () => {
               key: rzpData.keyId,
               amount: rzpData.order.amount,
               currency: rzpData.order.currency || 'INR',
-              name: 'Nexura Express',
+              name: 'Nexure Express',
               description: `Express Order #${createdOrder.orderId || createdOrder._id}`,
               order_id: rzpData.order.id,
               handler: async function (rzpResponse) {

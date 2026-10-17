@@ -213,7 +213,7 @@ const orderSchema = new mongoose.Schema(
       carrier: {
         type: String,
         trim: true,
-        default: 'Nexura Express'
+        default: 'Nexure Express'
       },
       trackingNumber: {
         type: String,
@@ -269,7 +269,7 @@ orderSchema.pre('save', function () {
     this.tracking = {};
   }
   if (!this.tracking.carrier) {
-    this.tracking.carrier = 'Nexura Express';
+    this.tracking.carrier = 'Nexure Express';
   }
   if (!this.tracking.trackingNumber) {
     const randCode = Math.floor(100000 + Math.random() * 900000);

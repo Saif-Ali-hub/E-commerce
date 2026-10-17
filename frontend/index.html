@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Explore quality products at Nexura. Clean, fast, and modern e-commerce marketplace.">
-  <title>Nexura | Next-Gen Shopping</title>
+  <meta name="description" content="Explore quality products at Nexure. Clean, fast, and modern e-commerce marketplace.">
+  <title>Nexure | Next-Gen Shopping</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,29 +48,37 @@
   <!-- Header / Navigation -->
   <header class="navbar" id="main-header">
     <div class="container navbar-inner">
-      <a href="#" class="brand" id="brand-logo" aria-label="Nexura Home">
+      <a href="#" class="brand" id="brand-logo" aria-label="Nexure Home">
         <span class="brand-icon" aria-hidden="true">
           <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="nxBgHead" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#3b82f6"/>
-                <stop offset="50%" stop-color="#2563eb"/>
-                <stop offset="100%" stop-color="#1d4ed8"/>
+                <stop offset="0%" stop-color="#24104f"/>
+                <stop offset="50%" stop-color="#4c1d95"/>
+                <stop offset="100%" stop-color="#6d28d9"/>
               </linearGradient>
-              <linearGradient id="nxStrokeHead" x1="10" y1="10" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+              <linearGradient id="nxGradHead" x1="8" y1="10" x2="28" y2="28" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#ffffff"/>
-                <stop offset="65%" stop-color="#e0f2fe"/>
-                <stop offset="100%" stop-color="#38bdf8"/>
+                <stop offset="30%" stop-color="#f472b6"/>
+                <stop offset="65%" stop-color="#c084fc"/>
+                <stop offset="100%" stop-color="#818cf8"/>
+              </linearGradient>
+              <linearGradient id="nxHandleHead" x1="14" y1="7" x2="22" y2="13" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#e9d5ff"/>
+                <stop offset="100%" stop-color="#a855f7"/>
               </linearGradient>
             </defs>
             <rect width="36" height="36" rx="10" fill="url(#nxBgHead)"/>
-            <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="9.25" stroke="rgba(255, 255, 255, 0.28)" stroke-width="1.5"/>
-            <path d="M11.5 25V11L24.5 25V11" stroke="url(#nxStrokeHead)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="24.5" cy="11" r="2.2" fill="#38bdf8"/>
-            <circle cx="24.5" cy="11" r="1.1" fill="#ffffff"/>
+            <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="9.25" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+            <!-- Shopping Bag Handle -->
+            <path d="M15 13.5V11.5C15 9.5 16.3 8 18 8C19.7 8 21 9.5 21 11.5V13.5" stroke="url(#nxHandleHead)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Infinity-N Loop Ribbon -->
+            <path d="M10 24.5V16.5C10 14.5 11.5 13.5 13 14.5L23 23.5C24.5 24.8 26.5 23.8 26.5 21.5C26.5 19.5 25 18 23 18C20.5 18 18 20.5 18 23C18 25.5 20 27 22.5 27C25 27 26.5 25.5 26.5 23.5" stroke="url(#nxGradHead)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Subtle Apex Pearl -->
+            <circle cx="21" cy="8" r="1.2" fill="#ffffff"/>
           </svg>
         </span>
-        <span class="brand-text">Nex<span class="brand-text-accent">ura</span></span>
+        <span class="brand-text">Nex<span class="brand-text-accent">ure</span></span>
       </a>
 
       <!-- Central Commercial Search Bar -->
@@ -100,8 +108,8 @@
           <span class="nav-badge-pill" id="cart-nav-badge">0</span>
         </button>
 
-        <!-- Nexura Wallet Button & Rewards Pill (Feature 5) -->
-        <button class="wallet-nav-btn" id="nav-wallet-btn" aria-label="Nexura Wallet" title="Nexura Wallet & SuperCoins" style="display: none;" type="button">
+        <!-- Nexure Wallet Button & Rewards Pill (Feature 5) -->
+        <button class="wallet-nav-btn" id="nav-wallet-btn" aria-label="Nexure Wallet" title="Nexure Wallet & SuperCoins" style="display: none;" type="button">
           <span class="wallet-nav-icon">👛</span>
           <span class="wallet-nav-balance" id="nav-wallet-balance-text">₹150</span>
           <span class="wallet-nav-coins-badge" id="nav-wallet-coins-badge" title="Loyalty SuperCoins">🪙 <span id="nav-wallet-coins-text">50</span></span>
@@ -195,11 +203,11 @@
                   </div>
                 </button>
 
-                <!-- Nexura Wallet Option (Feature 5) -->
-                <button class="dropdown-item" id="nav-wallet-dropdown-btn" role="menuitem" type="button" aria-label="Nexura Wallet">
+                <!-- Nexure Wallet Option (Feature 5) -->
+                <button class="dropdown-item" id="nav-wallet-dropdown-btn" role="menuitem" type="button" aria-label="Nexure Wallet">
                   <span class="dropdown-item-icon">👛</span>
                   <div class="dropdown-item-text">
-                    <span class="dropdown-item-title">Nexura Wallet &amp; Rewards</span>
+                    <span class="dropdown-item-title">Nexure Wallet &amp; Rewards</span>
                     <span class="dropdown-item-desc"><span id="dropdown-wallet-balance-text">₹150.00</span> Balance • <span id="dropdown-coins-text">50</span> SuperCoins</span>
                   </div>
                 </button>
@@ -1008,7 +1016,7 @@
             <div class="checkout-wallet-left">
               <input type="checkbox" id="checkout-wallet-checkbox" class="checkout-wallet-checkbox" checked />
               <div class="checkout-wallet-meta">
-                <span class="checkout-wallet-name">👛 Use Nexura Wallet Balance</span>
+                <span class="checkout-wallet-name">👛 Use Nexure Wallet Balance</span>
                 <span class="checkout-wallet-balance-hint">Available: <strong id="checkout-wallet-available-text">₹0.00</strong> <span class="wallet-policy-chip">• Max 50% per order</span></span>
               </div>
             </div>
@@ -1029,7 +1037,7 @@
             <span class="summary-total discount-text" id="checkout-discount-amount">-₹0.00</span>
           </div>
           <div class="cart-summary-row wallet-discount-row" id="checkout-wallet-discount-row" style="display: none;">
-            <span class="summary-label">👛 Nexura Wallet Applied:</span>
+            <span class="summary-label">👛 Nexure Wallet Applied:</span>
             <span class="summary-total discount-text" id="checkout-wallet-discount-amount">-₹0.00</span>
           </div>
           <div class="cart-summary-row total-highlight-row">
@@ -2346,7 +2354,7 @@
           <div style="display: flex; align-items: center; gap: 14px;">
             <span style="font-size: 2rem;">🏪</span>
             <div>
-              <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: var(--color-text-main);">Sell on Nexura</h4>
+              <h4 style="margin: 0 0 4px 0; font-size: 1rem; font-weight: 700; color: var(--color-text-main);">Sell on Nexure</h4>
               <p style="margin: 0; font-size: 0.85rem; color: var(--color-text-muted);">Expand your business. List products and receive direct payouts with 0% setup fees.</p>
             </div>
           </div>
@@ -2442,7 +2450,7 @@
 
       <div class="profile-modal-header">
         <span class="info-header-badge badge-indigo">🏪 Merchant Program</span>
-        <h2 class="profile-modal-title" id="become-seller-modal-title">Sell on Nexura</h2>
+        <h2 class="profile-modal-title" id="become-seller-modal-title">Sell on Nexure</h2>
         <p class="profile-modal-subtitle">Register your business details to unlock vendor catalog and dispatch privileges.</p>
       </div>
 
@@ -2477,7 +2485,7 @@
         </div>
 
         <div style="background: var(--color-bg); padding: 12px 14px; border-radius: 8px; font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 16px;">
-          ℹ️ Your application will be reviewed by Nexura administrators. Once verified, you will be able to add products, dispatch orders, and track payouts.
+          ℹ️ Your application will be reviewed by Nexure administrators. Once verified, you will be able to add products, dispatch orders, and track payouts.
         </div>
 
         <div class="profile-modal-actions">
@@ -2562,7 +2570,7 @@
         <div class="tracking-courier-banner">
           <div class="courier-banner-item">
             <span class="courier-banner-label">🚚 Logistics Partner</span>
-            <span class="courier-banner-val" id="track-result-carrier">Nexura Express</span>
+            <span class="courier-banner-val" id="track-result-carrier">Nexure Express</span>
           </div>
           <div class="courier-banner-item">
             <span class="courier-banner-label">📦 Tracking / AWB No.</span>
@@ -2663,18 +2671,18 @@
             <div class="inv-brand-logo">
               <span class="inv-logo-icon" style="display: inline-flex; align-items: center; width: 28px; height: 28px; vertical-align: middle;">
                 <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="36" height="36" rx="8" fill="#2563eb"/>
-                  <path d="M11.5 25V11L24.5 25V11" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                  <circle cx="24.5" cy="11" r="2.5" fill="#38bdf8"/>
+                  <rect width="36" height="36" rx="8" fill="#4c1d95"/>
+                  <path d="M15 13.5V11.5C15 9.5 16.3 8 18 8C19.7 8 21 9.5 21 11.5V13.5" stroke="#e9d5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10 24.5V16.5C10 14.5 11.5 13.5 13 14.5L23 23.5C24.5 24.8 26.5 23.8 26.5 21.5C26.5 19.5 25 18 23 18C20.5 18 18 20.5 18 23C18 25.5 20 27 22.5 27C25 27 26.5 25.5 26.5 23.5" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
-              <span class="inv-logo-text">Nex<strong>ura</strong></span>
+              <span class="inv-logo-text">Nex<strong style="color: #7c3aed;">ure</strong></span>
             </div>
             <div class="inv-seller-info">
-              <strong>Nexura India Retail Pvt. Ltd.</strong><br>
+              <strong>Nexure India Retail Pvt. Ltd.</strong><br>
               Cyber Hub Tower 4, DLF Phase 2, Gurugram, HR 122002<br>
               <span>GSTIN: <strong>07AAAAA0000A1Z5</strong></span> · <span>CIN: U51909HR2022PTC099881</span><br>
-              <span>Support: support@nexura.in · +91 1800-200-9988</span>
+              <span>Support: support@nexure.in · +91 1800-200-9988</span>
             </div>
           </div>
           <div class="inv-meta-col">
@@ -2723,9 +2731,9 @@
           <div class="inv-address-card">
             <div class="inv-address-title">🏢 Dispatch Warehouse:</div>
             <div class="inv-address-body">
-              <strong>Nexura Central Express Hub #04</strong><br>
+              <strong>Nexure Central Express Hub #04</strong><br>
               Logistics Park, Bhiwandi Highway, Thane, MH - 421302<br>
-              Carrier: <span id="inv-carrier">Nexura Express</span> · AWB: <span id="inv-awb">NX-TRK-000000</span>
+              Carrier: <span id="inv-carrier">Nexure Express</span> · AWB: <span id="inv-awb">NX-TRK-000000</span>
             </div>
           </div>
         </div>
@@ -2782,13 +2790,13 @@
           <div class="inv-footer-auth">
             <div class="inv-seal-badge">
               <span>✓ DIGITALLY VERIFIED</span>
-              <small>Nexura System</small>
+              <small>Nexure System</small>
             </div>
-            <div class="inv-sign-label">Authorized Signatory for Nexura India</div>
+            <div class="inv-sign-label">Authorized Signatory for Nexure India</div>
           </div>
           <div class="inv-footer-barcode">
             <div class="barcode-mock">||| | |||| | ||||| || |||| ||| |||||</div>
-            <small>Thank you for shopping with Nexura!</small>
+            <small>Thank you for shopping with Nexure!</small>
           </div>
         </footer>
       </div>
@@ -2957,7 +2965,7 @@
       <div class="info-modal-header">
         <span class="info-header-badge badge-indigo">🛡️ Data Privacy</span>
         <h3 class="modal-title" id="privacy-modal-title">Privacy Policy</h3>
-        <p class="modal-subtitle">How Nexura collects, utilizes, and safeguards your customer information.</p>
+        <p class="modal-subtitle">How Nexure collects, utilizes, and safeguards your customer information.</p>
       </div>
 
       <div class="info-content-grid">
@@ -3041,7 +3049,7 @@
             <h4 class="info-card-title">Catalog Listings &amp; Pricing</h4>
           </div>
           <p class="info-card-desc">All products are priced in Indian Rupees (₹), inclusive of applicable taxes.
-            Nexura reserves the right to adjust pricing or correct typographical discrepancies prior to order
+            Nexure reserves the right to adjust pricing or correct typographical discrepancies prior to order
             fulfillment.</p>
         </div>
 
@@ -3143,7 +3151,7 @@
             <h4 class="info-card-title">Safe Transaction Workflows</h4>
           </div>
           <p class="info-card-desc">Transactions are processed via validated UPI, Net Banking, and Cash on Delivery
-            workflows. Nexura stores zero sensitive debit/credit card numbers on its servers.</p>
+            workflows. Nexure stores zero sensitive debit/credit card numbers on its servers.</p>
         </div>
 
         <div class="info-card">
@@ -3160,7 +3168,7 @@
             <span class="info-card-icon">ℹ️</span>
             <h4 class="info-card-title">Transparent Engineering Disclosure</h4>
           </div>
-          <p class="info-card-desc">This overview reflects the actual technical safeguards engineered into Nexura. We
+          <p class="info-card-desc">This overview reflects the actual technical safeguards engineered into Nexure. We
             operate on honest technical merit without claiming unverified third-party certifications.</p>
         </div>
       </div>
@@ -3171,7 +3179,7 @@
     </div>
   </div>
 
-  <!-- Nexura Wallet & Loyalty Coins Modal (Feature 5) -->
+  <!-- Nexure Wallet & Loyalty Coins Modal (Feature 5) -->
   <div class="modal-backdrop" id="wallet-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="wallet-modal-title">
     <div class="modal-container wallet-modal-container">
       <button class="modal-close-icon" id="wallet-close-btn" aria-label="Close wallet modal">✕</button>
@@ -3180,7 +3188,7 @@
         <div class="wallet-title-wrap">
           <span class="wallet-header-icon">👛</span>
           <div>
-            <h2 class="wallet-modal-title" id="wallet-modal-title">Nexura Wallet &amp; SuperCoins</h2>
+            <h2 class="wallet-modal-title" id="wallet-modal-title">Nexure Wallet &amp; SuperCoins</h2>
             <p class="wallet-modal-subtitle">Instant 1-click checkout, 100% usable balance &amp; 5% cashback rewards</p>
           </div>
         </div>
@@ -3190,7 +3198,7 @@
       <div class="modal-state" id="wallet-unauth-state" style="display: none;">
         <div class="empty-icon">🔒</div>
         <h3 class="empty-title">Log in to Access Your Wallet</h3>
-        <p class="state-text">Join Nexura today and get ₹150 welcome wallet cash + 50 SuperCoins instantly!</p>
+        <p class="state-text">Join Nexure today and get ₹150 welcome wallet cash + 50 SuperCoins instantly!</p>
         <button class="btn btn-primary" id="wallet-login-prompt-btn">Log In / Register</button>
       </div>
 
@@ -3279,7 +3287,7 @@
 
       <div class="gateway-header">
         <div class="gateway-lock-badge">🔒 256-Bit SSL Bank Encrypted</div>
-        <h3 class="gateway-title" id="wallet-gateway-title">Nexura Secure Checkout</h3>
+        <h3 class="gateway-title" id="wallet-gateway-title">Nexure Secure Checkout</h3>
         <p class="gateway-subtitle">Authenticating with Reserve Bank &amp; NPCI payment network</p>
       </div>
 
@@ -3364,7 +3372,7 @@
       </div>
 
       <div class="gateway-footer">
-        <span>🛡️ Nexura Secure Pay • 100% RBI Compliant • PCI-DSS Certified</span>
+        <span>🛡️ Nexure Secure Pay • 100% RBI Compliant • PCI-DSS Certified</span>
       </div>
     </div>
   </div>
@@ -3378,24 +3386,32 @@
             <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="nxBgFoot" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#3b82f6"/>
-                  <stop offset="50%" stop-color="#2563eb"/>
-                  <stop offset="100%" stop-color="#1d4ed8"/>
+                  <stop offset="0%" stop-color="#24104f"/>
+                  <stop offset="50%" stop-color="#4c1d95"/>
+                  <stop offset="100%" stop-color="#6d28d9"/>
                 </linearGradient>
-                <linearGradient id="nxStrokeFoot" x1="10" y1="10" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                <linearGradient id="nxGradFoot" x1="8" y1="10" x2="28" y2="28" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stop-color="#ffffff"/>
-                  <stop offset="65%" stop-color="#e0f2fe"/>
-                  <stop offset="100%" stop-color="#38bdf8"/>
+                  <stop offset="30%" stop-color="#f472b6"/>
+                  <stop offset="65%" stop-color="#c084fc"/>
+                  <stop offset="100%" stop-color="#818cf8"/>
+                </linearGradient>
+                <linearGradient id="nxHandleFoot" x1="14" y1="7" x2="22" y2="13" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#e9d5ff"/>
+                  <stop offset="100%" stop-color="#a855f7"/>
                 </linearGradient>
               </defs>
               <rect width="36" height="36" rx="10" fill="url(#nxBgFoot)"/>
-              <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="9.25" stroke="rgba(255, 255, 255, 0.28)" stroke-width="1.5"/>
-              <path d="M11.5 25V11L24.5 25V11" stroke="url(#nxStrokeFoot)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="24.5" cy="11" r="2.2" fill="#38bdf8"/>
-              <circle cx="24.5" cy="11" r="1.1" fill="#ffffff"/>
+              <rect x="0.75" y="0.75" width="34.5" height="34.5" rx="9.25" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+              <!-- Shopping Bag Handle -->
+              <path d="M15 13.5V11.5C15 9.5 16.3 8 18 8C19.7 8 21 9.5 21 11.5V13.5" stroke="url(#nxHandleFoot)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Infinity-N Loop Ribbon -->
+              <path d="M10 24.5V16.5C10 14.5 11.5 13.5 13 14.5L23 23.5C24.5 24.8 26.5 23.8 26.5 21.5C26.5 19.5 25 18 23 18C20.5 18 18 20.5 18 23C18 25.5 20 27 22.5 27C25 27 26.5 25.5 26.5 23.5" stroke="url(#nxGradFoot)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Subtle Apex Pearl -->
+              <circle cx="21" cy="8" r="1.2" fill="#ffffff"/>
             </svg>
           </span>
-          <span class="brand-text">Nex<span class="brand-text-accent">ura</span></span>
+          <span class="brand-text">Nex<span class="brand-text-accent">ure</span></span>
         </a>
         <p class="footer-tagline">Curated essentials engineered for daily durability, modern aesthetics, and verified
           performance.</p>
@@ -3426,7 +3442,7 @@
           </li>
           <li><button type="button" class="footer-link-btn" id="footer-returns-btn">7-Day Easy Returns</button></li>
           <li><button type="button" class="footer-link-btn" id="footer-reviews-btn">Verified Customer Reviews</button></li>
-          <li><button type="button" class="footer-link-btn" id="footer-become-seller-btn" style="color: var(--color-primary); font-weight: 600;">🏪 Sell on Nexura</button></li>
+          <li><button type="button" class="footer-link-btn" id="footer-become-seller-btn" style="color: var(--color-primary); font-weight: 600;">🏪 Sell on Nexure</button></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -3441,7 +3457,7 @@
       </div>
     </div>
     <div class="container footer-bottom-bar">
-      <p class="footer-text">&copy; 2026 Nexura. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
+      <p class="footer-text">&copy; 2026 Nexure. Built with HTML, CSS &amp; Vanilla JavaScript.</p>
       <div class="footer-bottom-links">
         <button type="button" class="footer-bottom-btn" id="footer-privacy-btn">Privacy Policy</button>
         <span class="footer-bottom-sep">•</span>

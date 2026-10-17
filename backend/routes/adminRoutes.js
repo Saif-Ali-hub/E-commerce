@@ -174,7 +174,7 @@ router.put('/orders/:id/status', async (req, res) => {
     // Ensure tracking object exists
     if (!order.tracking) {
       order.tracking = {
-        carrier: 'Nexura Express',
+        carrier: 'Nexure Express',
         trackingNumber: `NX-TRK-${Math.floor(100000 + Math.random() * 900000)}`,
         estimatedDeliveryDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         history: []
@@ -193,14 +193,14 @@ router.put('/orders/:id/status', async (req, res) => {
       const stageTitles = {
         'Pending': 'Order Placed & Awaiting Processing',
         'Processing': 'Order Packed & Quality Inspected',
-        'Shipped': `Dispatched via ${order.tracking.carrier || 'Nexura Express'}`,
+        'Shipped': `Dispatched via ${order.tracking.carrier || 'Nexure Express'}`,
         'Out for Delivery': 'Out for Delivery with Courier Executive',
         'Delivered': 'Delivered Successfully to Customer',
         'Cancelled': 'Order Cancelled'
       };
 
       const defaultNotes = {
-        'Pending': 'Order received and confirmed in Nexura system.',
+        'Pending': 'Order received and confirmed in Nexure system.',
         'Processing': 'Item(s) packed in secure packaging and ready for dispatch.',
         'Shipped': `Handed over to carrier. AWB #${order.tracking.trackingNumber || 'N/A'}.`,
         'Out for Delivery': 'Package has arrived at your local delivery hub and is out for doorstep delivery.',

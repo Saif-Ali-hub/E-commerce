@@ -880,7 +880,7 @@ function enrichOrderTracking(orderDoc) {
     orderObj.tracking = {};
   }
   if (!orderObj.tracking.carrier) {
-    orderObj.tracking.carrier = 'Nexura Express';
+    orderObj.tracking.carrier = 'Nexure Express';
   }
   if (!orderObj.tracking.trackingNumber) {
     const code = orderObj._id ? orderObj._id.toString().slice(-6).toUpperCase() : Math.floor(100000 + Math.random() * 900000);

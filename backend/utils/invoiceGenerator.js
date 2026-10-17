@@ -24,23 +24,23 @@ function generateInvoicePDF(order) {
         day: 'numeric'
       });
       const trackingNumber = orderObj.tracking?.trackingNumber || `NX-TRK-${orderId.toString().slice(-6).toUpperCase()}`;
-      const carrier = orderObj.tracking?.carrier || 'Nexura Express';
+      const carrier = orderObj.tracking?.carrier || 'Nexure Express';
 
       // --------------------------------------------------
       // Header Section
       // --------------------------------------------------
       doc
-        .fillColor('#1e3a8a')
+        .fillColor('#4c1d95')
         .fontSize(24)
         .font('Helvetica-Bold')
-        .text('Nexura', 45, 45);
+        .text('Nexure', 45, 45);
 
       doc
         .fillColor('#64748b')
         .fontSize(9)
         .font('Helvetica')
         .text('Official Tax Invoice & Delivery Receipt', 45, 72)
-        .text('Nexura Retail Pvt. Ltd. | GSTIN: 27AABCM8291Q1Z4', 45, 84);
+        .text('Nexure Retail Pvt. Ltd. | GSTIN: 27AABCM8291Q1Z4', 45, 84);
 
       // Right-aligned Invoice Metadata Box
       doc
@@ -214,7 +214,7 @@ function generateInvoicePDF(order) {
       if (walletVal > 0) {
         doc
           .fillColor('#059669')
-          .text('Nexura Wallet Applied:', 340, curY)
+          .text('Nexure Wallet Applied:', 340, curY)
           .text(`- INR ${walletVal.toFixed(2)}`, 465, curY, { width: 75, align: 'right' });
         curY += 15;
       }
@@ -256,7 +256,7 @@ function generateInvoicePDF(order) {
         .fontSize(8)
         .font('Helvetica')
         .fillColor('#94a3b8')
-        .text('Thank you for shopping with Nexura! For return requests or queries, visit Help & Support or contact support@nexura.com', 45, footerY + 8, { align: 'center', width: 505 })
+        .text('Thank you for shopping with Nexure! For return requests or queries, visit Help & Support or contact support@nexure.com', 45, footerY + 8, { align: 'center', width: 505 })
         .text('This is a digitally generated tax invoice and does not require a physical signature.', 45, footerY + 20, { align: 'center', width: 505 });
 
       doc.end();
